@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<extension key="io.compuco.financeextras" type="module">
+  <file>financeextras</file>
+  <name>Finance Extras</name>
+  <description>Thi extension provides CiviCRM financial improvement</description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>Compuco</author>
+    <email>hello@compuco.io</email>
+  </maintainer>
+  <releaseDate>2022-05-16</releaseDate>
+  <version>1.0</version>
+  <develStage>alpha</develStage>
+  <compatibility>
+    <ver>5.39</ver>
+  </compatibility>
+  <comments>This extension is under development</comments>
+  <classloader>
+    <psr4 prefix="Civi\" path="Civi"/>
+  </classloader>
+  <civix>
+    <namespace>CRM/Financeextras</namespace>
+    <angularModule>crmFinanceextras</angularModule>
+  </civix>
+</extension>
