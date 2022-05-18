@@ -24,9 +24,9 @@ class ContributionLinks {
   private string $objectName;
 
   /**
-   * @var int
+   * @var string
    */
-  private int $objectId;
+  private string $objectId;
 
   /**
    * @var string
@@ -41,7 +41,7 @@ class ContributionLinks {
    * @param string $objectName
    * @param array $links
    */
-  public function __construct(string $op, int $objectId, string $objectName, array &$links) {
+  public function __construct(string $op, string $objectId, string $objectName, array &$links) {
     $this->op = $op;
     $this->objectId = $objectId;
     $this->objectName = $objectName;
@@ -77,7 +77,8 @@ class ContributionLinks {
       return FALSE;
     }
 
-    return $this->isContributionEligibleToRefund($this->objectId);
+    $contributionID = (int) $this->objectId;
+    return $this->isContributionEligibleToRefund($contributionID);
   }
 
 }
