@@ -144,7 +144,7 @@ function financeextras_civicrm_themes(&$themes) {
  */
 function financeextras_civicrm_links($op, $objectName, $objectId, &$links, &$mask, &$values) {
   $hooks = [
-    new \Civi\Financeextras\Hook\Links\ContributionLinks($op, $objectId, $objectName, $links),
+    new \Civi\Financeextras\Hook\Links\Contribution($op, $objectId, $objectName, $links),
   ];
 
   foreach ($hooks as $hook) {

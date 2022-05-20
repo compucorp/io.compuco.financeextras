@@ -1,6 +1,6 @@
 <?php
 
-namespace Civi\Financeextras\Payment;
+namespace Civi\Financeextras\Refund;
 
 /**
  * PaymentProcessor
@@ -19,7 +19,7 @@ class PaymentProcessor {
   private array $cache = [];
 
   /**
-   * @return \Civi\Financeextras\Payment\PaymentProcessor
+   * @return \Civi\Financeextras\Refund\PaymentProcessor
    */
   public static function singleton(): PaymentProcessor {
     if (!self::$singleton) {

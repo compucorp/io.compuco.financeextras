@@ -2,16 +2,13 @@
 
 namespace Civi\Financeextras\Hook\Links;
 
-use Civi\Financeextras\Payment\RefundTrait;
-use CRM_Financeextras_ExtensionUtil as E;
+use Civi\Financeextras\Hook\Links\Contribution\Refund;
 
 /**
- * ContributionLinks
+ * Contribution
  * @package Civi\Financeextras\Hook\Links;
  */
-class ContributionLinks {
-
-  use RefundTrait;
+class Contribution {
 
   /**
    * @var array
@@ -34,10 +31,10 @@ class ContributionLinks {
   private string $op;
 
   /**
-   * ContributionLinks constructor.
+   * Contribution constructor.
    *
    * @param string $op
-   * @param int $objectId
+   * @param string $objectId
    * @param string $objectName
    * @param array $links
    */
@@ -53,32 +50,20 @@ class ContributionLinks {
       return;
     }
 
-    $this->links[] = [
-      'name' => 'Submit Credit Card Refund',
-      'url' => 'civicrm/financeextras/payment/refund/card',
-      'qs' => 'reset=1&id=%%id%%',
-      'title' => E::ts('Submit Credit Card Refund'),
+    $links = [
+      new Refund((int) $this->objectId, $this->links),
     ];
-
+    foreach ($links as $link) {
+      $link->add();
+    }
   }
 
-  /**
-   * @return bool
-   *
-   * @throws \CiviCRM_API3_Exception
-   * @throws \CRM_Core_Exception
-   */
   private function shouldRun(): bool {
-    if ($this->objectName !== 'Contribution' && $this->op !== 'contribution.selector') {
+    if ($this->objectName !== 'Contribution' && $this->op !== 'contribution.selector.row') {
       return FALSE;
     }
 
-    if (!$this->hasRefundPermission()) {
-      return FALSE;
-    }
-
-    $contributionID = (int) $this->objectId;
-    return $this->isContributionEligibleToRefund($contributionID);
+    return TRUE;
   }
 
 }
