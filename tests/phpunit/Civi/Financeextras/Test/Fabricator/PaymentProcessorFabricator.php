@@ -12,11 +12,10 @@ class PaymentProcessorFabricator extends AbstractBaseFabricator {
   protected static $entityName = 'PaymentProcessor';
 
   /**
-   * Array if default parameters to be used to create a contact.
+   * Array if default parameters to be used to create a payment processor.
    *
    * @var array
    */
   protected static $defaultParams = [];
-
 
 }
