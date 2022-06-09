@@ -138,3 +138,15 @@ function financeextras_civicrm_entityTypes(&$entityTypes) {
 function financeextras_civicrm_themes(&$themes) {
   _financeextras_civix_civicrm_themes($themes);
 }
+
+/**
+ * Implements hook_civicrm_alterContent().
+ */
+function financeextras_civicrm_alterContent(&$content, $context, $tplName, &$object) {
+  $hooks = [
+    new \Civi\Financeextras\Hook\alterContent\PaymentStatus($tplName, $content),
+  ];
+  foreach ($hooks as $hook) {
+    $hook->run();
+  }
+}
