@@ -1,4 +1,6 @@
 CRM.$(function () {
+  // pendingStatusId, accountsReceivablePaymentMethodId and handlePendingStatusSelection
+  // variables are coming from the backend, and assigned in alterContent hook.
   var currentContributionStatus = CRM.$('#contribution_status_id').val();
   if (currentContributionStatus == pendingStatusId) {
     handlePendingStatusSelection();
