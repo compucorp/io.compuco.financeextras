@@ -13,24 +13,24 @@ abstract class AbstractManager {
   /**
    * Creates the entity.
    */
-  abstract public function create();
+  abstract public function create(): void;
 
   /**
    * Removes the entity.
    */
-  abstract public function remove();
+  abstract public function remove(): void;
 
   /**
    * Deactivates the entity.
    */
-  public function deactivate() {
+  public function deactivate(): void {
     $this->toggle(FALSE);
   }
 
   /**
    * Activates the entity.
    */
-  public function activate() {
+  public function activate(): void {
     $this->toggle(TRUE);
   }
 
@@ -42,6 +42,6 @@ abstract class AbstractManager {
    * @params boolean $status
    *  True to activate the entity, False to deactivate the entity.
    */
-  abstract protected function toggle($status);
+  abstract protected function toggle($status): void;
 
 }
