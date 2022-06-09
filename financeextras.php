@@ -170,3 +170,15 @@ function financeextras_civicrm_buildForm($formName, &$form) {
     $hook->buildForm();
   }
 }
+
+/**
+ * Implements hook_civicrm_alterContent().
+ */
+function financeextras_civicrm_alterContent(&$content, $context, $tplName, &$object) {
+  $hooks = [
+    new \Civi\Financeextras\Hook\alterContent\PaymentStatus($tplName, $content),
+  ];
+  foreach ($hooks as $hook) {
+    $hook->run();
+  }
+}
