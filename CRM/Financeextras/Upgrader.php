@@ -35,7 +35,7 @@ class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
   }
 
   public function uninstall() {
-    $removalSteps  = [
+    $removalSteps = [
       new AccountsReceivablePaymentMethod(),
     ];
     foreach ($removalSteps as $step) {
