@@ -2,6 +2,9 @@
 
 namespace Civi\Financeextras\Hook\alterContent;
 
+use Civi\Financeextras\Setup\Manage\AccountsReceivablePaymentMethod as AccountsReceivablePaymentMethod;
+use CRM_Financeextras_ExtensionUtil as ExtensionUtil;
+
 class PaymentStatus {
 
   private $callerPageTemplate;
@@ -50,18 +53,18 @@ class PaymentStatus {
     // JS variables are not available on contact page tabs when using something like this:
     // https://docs.civicrm.org/dev/en/latest/framework/resources/#add-javascript-variables, so I had
     // to assign them this way instead.
-    $helperVars =  "<script>
+    $helperVars = "<script>
                      var pendingStatusId = {$this->getPendingStatusId()};
                      var accountsReceivablePaymentMethodId = '{$this->getAccountsReceivablePaymentMethodId()}';
                      var paymentDetailsSectionSelector = '{$this->getPaymentDetailsSectionSelector()}';
                    </script>";
     $this->callerPageContent .= $helperVars;
 
-    $url = \CRM_Core_Resources::singleton()->getUrl('io.compuco.financeextras', 'js/payment_status.js');
+    $url = ExtensionUtil::url('js/payment_status.js');
     $this->callerPageContent .= "<script src='{$url}'></script>";
   }
 
-  private function getPendingStatusId(): int {
+  private function getPendingStatusId(): string {
     return civicrm_api3('OptionValue', 'getvalue', [
       'return' => 'value',
       'name' => 'Pending',
@@ -73,7 +76,7 @@ class PaymentStatus {
     return civicrm_api3('OptionValue', 'getvalue', [
       'return' => 'value',
       'option_group_id' => 'payment_instrument',
-      'name' => 'accounts_receivable',
+      'name' => AccountsReceivablePaymentMethod::NAME,
     ]);
   }
 
@@ -90,9 +93,11 @@ class PaymentStatus {
       case self::TARGET_PAGES_TEMPLATES['contribution-form']:
         $selector = '.payment-details_group';
         break;
+
       case self::TARGET_PAGES_TEMPLATES['membership-form']:
         $selector = '.crm-membership-form-block-payment_instrument_id, .crm-membership-form-block-billing';
         break;
+
       case self::TARGET_PAGES_TEMPLATES['event-registration']:
         $selector = '.crm-event-eventfees-form-block-payment_instrument_id, #billing-payment-block';
         break;

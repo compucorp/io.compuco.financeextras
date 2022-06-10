@@ -8,7 +8,7 @@ namespace Civi\Financeextras\Setup\Manage;
  * extension installations, disabling ..etc.
  *
  */
-abstract class AbstractManager {
+abstract class AbstractSetupManager {
 
   /**
    * Creates the entity.
