@@ -27,6 +27,9 @@ jobs:
 
       - name: Config amp
         run : amp config:set --mysql_dsn=mysql://root:root@mysql:3306
+        
+      - name: Composer version downgrade 2.2.5
+        run : composer self-update 2.2.5
 
       - name: Build Drupal site
         run: civibuild create drupal-clean --civi-ver 5.39 --cms-ver 7.89 --web-root $GITHUB_WORKSPACE/site
