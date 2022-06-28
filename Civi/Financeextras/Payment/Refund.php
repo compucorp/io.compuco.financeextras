@@ -51,7 +51,7 @@ class Refund {
         continue;
       }
 
-      if (in_array($trxn['values'][$trxnID]['payment_processor_id'], $supportRefundProcessorIDs)) {
+      if (isset($trxn['values'][$trxnID]['payment_processor_id']) && in_array($trxn['values'][$trxnID]['payment_processor_id'], $supportRefundProcessorIDs)) {
         //Since payment processor that support refund found in one of FinancialTrxn records,
         //return TRUE immediately as the contribution is eligible for refund.
         return TRUE;
