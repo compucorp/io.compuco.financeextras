@@ -138,3 +138,16 @@ function financeextras_civicrm_entityTypes(&$entityTypes) {
 function financeextras_civicrm_themes(&$themes) {
   _financeextras_civix_civicrm_themes($themes);
 }
+
+/**
+ * Implements hook_civicrm_links().
+ */
+function financeextras_civicrm_links($op, $objectName, $objectId, &$links, &$mask, &$values) {
+  $hooks = [
+    new \Civi\Financeextras\Hook\Links\Contribution($op, $objectId, $objectName, $links),
+  ];
+
+  foreach ($hooks as $hook) {
+    $hook->run();
+  }
+}
