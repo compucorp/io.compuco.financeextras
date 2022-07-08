@@ -1,0 +1,5 @@
+.message.help{margin:10px;border-radius: 4px;}
+.payment-info th{text-transform: capitalize;}
+.CRM_Financeextras_Form_Payment_Refund .crm-payment-refund-form-block .form-layout-compressed .payment-info tr.selected {
+  background: #ddd !important;
+}
