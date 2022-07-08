@@ -2,6 +2,14 @@
 
 This extension provides CiviCRM finance improvement.
 
+The extension must implement get_refunded_amount API to supports refund payment.
+
+Currently only "Stripe Extension" supports refunded amount API. So, other payment processor only shows original amount as available amount.
+
+## Implementation details
+API action name : get_refunded_amount
+Parameters : payment_processor_id , trxn_id
+
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
 ## Requirements
