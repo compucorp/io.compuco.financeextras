@@ -78,7 +78,7 @@ class CRM_Financeextras_Hook_BuildForm__AdditionalPaymentButton {
     $formButtonValues = [
       "title" => ts('Submit Credit Card Refund'),
       "icon" => "fa-chevron-right",
-      "link" => "financeextras/payment/refund/card?reset=1&id=" . $this->contributionID,
+      "link" => CRM_Utils_System::url("civicrm/financeextras/payment/refund/card?reset=1&id=" . $this->contributionID),
     ];
     $this->form->assign('contributionSubmitRefundButton', $formButtonValues);
     CRM_Core_Region::instance('form-bottom')->add([
