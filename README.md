@@ -2,6 +2,14 @@
 
 This extension provides CiviCRM finance improvement.
 
+This extension supports credit card refund with extension support refund.
+
+The extension must implement PaymentProcessor.get_refundable_balance API to supporting multiple refunds per transaction.
+
+## Implementation details
+API action name : get_refundable_balance
+Parameters : payment_processor_id , trxn_id
+
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
 ## Requirements
