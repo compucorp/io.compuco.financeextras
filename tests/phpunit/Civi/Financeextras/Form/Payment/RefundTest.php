@@ -10,6 +10,12 @@ use Civi\Financeextras\Test\Fabricator\ContributionFabricator;
  */
 class CRM_Financeextras_Form_Payment_RefundTest extends BaseHeadlessTest {
 
+  /**
+   * @var int
+   *   Contribution id for adding submit refund button.
+   */
+  private $contributionID;
+
   private $refundCreationForm;
 
   public function setUp() {

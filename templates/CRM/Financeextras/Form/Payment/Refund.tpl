@@ -26,7 +26,7 @@
         </tr>
         {foreach from=$paymentInfos item=paymentRow}
         <tr id="tr_{$paymentRow.financialTrxnId}">
-          <td><input class="required crm-form-radio" value="{$paymentRow.transactionId}" type="radio" id="{$paymentRow.financialTrxnId}" data-processorid="{$paymentRow.paymentProcessorId}" data-currency="{$paymentRow.currency}" name="payment_row" ></td>
+          <td><input class="required crm-form-radio" value="{$paymentRow.financialTrxnId}" type="radio" id="{$paymentRow.transactionId}" data-processorid="{$paymentRow.paymentProcessorId}" data-currency="{$paymentRow.currency}" name="payment_row" ></td>
           <td>{$paymentRow.date}</td>
           <td>{$paymentRow.amount|crmMoney:$paymentRow.currency}</td>
           <td class="available_amount_{$paymentRow.financialTrxnId}">{$paymentRow.available_amount|crmMoney:$paymentRow.currency}</td>
