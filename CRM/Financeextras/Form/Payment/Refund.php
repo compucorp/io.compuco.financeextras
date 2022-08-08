@@ -20,10 +20,16 @@ class CRM_Financeextras_Form_Payment_Refund extends CRM_Core_Form {
   private $availableAmount;
 
   /**
-   * @var int
-   *   Payment processor id
+   * @var array
+   *   Payment processor with keys id, name, is_test
    */
-  private $paymentProcessorId;
+  private $paymentProcessor;
+
+  /**
+   * @var array
+   *    Payment Transactions of A Contribution It Include main as well as refund transactions
+   */
+  private $paymentTransactions;
 
   /**
    * @var string
@@ -32,119 +38,93 @@ class CRM_Financeextras_Form_Payment_Refund extends CRM_Core_Form {
   private $chargeID;
 
   /**
+   * @var string
+   *   Refund Status from Payment Processor
+   */
+  private $refundStatus;
+
+  /**
+   * @var int
+   *   Main transaction id
+   */
+  private $mainTransactionId;
+
+  /**
+   * Prevent people double-submitting the form (e.g. by double-clicking).
+   * https://lab.civicrm.org/dev/core/-/issues/1773
+   *
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    * This function is called prior to building and submitting the form
    */
   public function preProcess() {
     $this->contributionID = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+
     $paymentRefundPermission = new \Civi\Financeextras\Payment\Refund($this->contributionID);
     if (!$paymentRefundPermission->contactHasRefundPermission()) {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
       return;
     }
     $paymentInfos = [];
-    $this->availableAmount = 0;
-    $entityFinancialTrxns = $this->getEntityFinancialTransaction($this->contributionID);
-    $paymentProcessor = $this->getPaymentProcessorNameByfinanceTrxnId($entityFinancialTrxns[0]['financial_trxn_id']);
-    $refundAmountMethod = TRUE;
-    $processor = Civi\Payment\System::singleton()->getById($paymentProcessor['payment_processor_id']);
-    if (!method_exists($processor, 'getRefundedAmountByChargeId')) {
-      $refundAmountMethod = FALSE;
-    }
-
-    foreach ($entityFinancialTrxns as $entity) {
-      $financialTrxns = civicrm_api3('FinancialTrxn', 'get', [
-        'id' => $entity['financial_trxn_id'],
-        'is_payment' => 1,
-      ])['values'];
-      foreach ($financialTrxns as $i => $trxn) {
-        $this->chargeID = $trxn['trxn_id'];
-        $this->paymentProcessorId = $trxn['payment_processor_id'];
-        if (!isset($trxn['payment_processor_id']) || $trxn['payment_processor_id'] === "") {
-          return;
-        }
-        if (!method_exists($processor, 'getRefundedAmountByChargeId')) {
-          $this->availableAmount = $trxn['total_amount'];
-        }
-        else {
-          $refundedAmount = $this->getRefundedAmount($this->chargeID, $this->paymentProcessorId);
-          $this->availableAmount = $trxn['total_amount'] - $refundedAmount;
-        }
-
-        $paymentInfos[] = [
-          'date' => date('d-m-Y', strtotime($trxn['trxn_date'])),
-          'amount' => $trxn['total_amount'],
-          'available_amount' => $this->availableAmount,
-          'paymentProcessor' => $paymentProcessor['payment_processor_name'],
-          'transactionId' => $trxn['trxn_id'],
-          'financialTrxnId' => $entity['financial_trxn_id'],
-          'currency' => $trxn['currency'],
-          'paymentProcessorId' => $this->paymentProcessorId,
-        ];
+    $this->paymentTransactions = civicrm_api3('Payment', 'get', [
+      'contribution_id' => $this->contributionID,
+      'status_id' => 1,
+    ])['values'];
+    foreach ($this->paymentTransactions as $trxn) {
+      $this->mainTransactionId[$trxn['id']] = $trxn['id'];
+      $this->availableAmount[$trxn['id']] = 0;
+      $this->chargeID[$trxn['id']] = $trxn['trxn_id'];
+      $this->paymentProcessor = $this->getPaymentProcessorNameById($trxn['payment_processor_id']);
+      $refundAmountMethod = TRUE;
+      $processor = Civi\Payment\System::singleton()->getById($this->paymentProcessor['id']);
+      if (!method_exists($processor, 'getRefundedAmountByChargeId')) {
+        $this->availableAmount = $trxn['total_amount'];
+        $refundAmountMethod = FALSE;
       }
+      else {
+        $refundedAmount = $this->getRefundedAmount($this->chargeID[$trxn['id']], $this->paymentProcessor['id'], $this->mainTransactionId[$trxn['id']]);
+
+        $this->availableAmount[$trxn['id']] = $trxn['total_amount'] - $refundedAmount;
+      }
+      if (!isset($this->paymentProcessor['id']) || $this->paymentProcessor['id'] === "") {
+        return;
+      }
+      $paymentInfos[] = [
+        'date' => date('d-m-Y', strtotime($trxn['trxn_date'])),
+        'amount' => $trxn['total_amount'],
+        'available_amount' => $this->availableAmount[$trxn['id']],
+        'paymentProcessor' => $this->paymentProcessor['name'],
+        'transactionId' => $trxn['trxn_id'],
+        'financialTrxnId' => $trxn['id'],
+        'currency' => $trxn['currency'],
+        'paymentProcessorId' => $this->paymentProcessor['id'],
+      ];
     }
     $this->assign('refundAmountMethod', $refundAmountMethod);
     $this->assign('paymentInfos', $paymentInfos);
-
   }
 
   /**
    * Gets the payment processor name.
    */
-  public function getPaymentProcessorNameByfinanceTrxnId(int $financeTrxnId) {
-    $financialTrxn = civicrm_api3('FinancialTrxn', 'get', [
-      'id' => $financeTrxnId,
-      'is_payment' => 1,
-    ])['values'];
-    $paymentProcessor = civicrm_api3('PaymentProcessor', 'getsingle', [
-      'return' => ['name'],
-      'id' => $financialTrxn[$financeTrxnId]['payment_processor_id'],
+  public function getPaymentProcessorNameById(int $Id) {
+    return civicrm_api3('PaymentProcessor', 'getsingle', [
+      'return' => ['name', 'is_test', 'id'],
+      'id' => $Id,
     ]);
-    $paymentProcessorName = $paymentProcessor['name'];
-
-    return [
-      'payment_processor_name' => $paymentProcessorName,
-      'payment_processor_id' => $financialTrxn[$financeTrxnId]['payment_processor_id'],
-    ];
-  }
-
-  /**
-   * Gets the payment processor name.
-   */
-  public function checkRefundMethodExist(int $financeTrxnId) {
-    $financialTrxn = civicrm_api3('FinancialTrxn', 'get', [
-      'id' => $financeTrxnId,
-      'is_payment' => 1,
-    ])['values'];
-    $paymentProcessor = civicrm_api3('PaymentProcessor', 'getsingle', [
-      'return' => ['name'],
-      'id' => $financialTrxn[$financeTrxnId]['payment_processor_id'],
-    ]);
-    $paymentProcessorName = $paymentProcessor['name'];
-
-    return $paymentProcessorName;
-  }
-
-  /**
-   * Gets the financial transactions.
-   */
-  public function getEntityFinancialTransaction(int $id) {
-    $entityFinancialTrxns = civicrm_api3('EntityFinancialTrxn', 'get', [
-      'sequential' => 1,
-      'entity_id' => $id,
-      'entity_table' => 'civicrm_contribution',
-      'options' => ['limit' => 0],
-    ])['values'];
-
-    return $entityFinancialTrxns;
   }
 
   /**
    * Gets the refunded amount.
    */
-  private function getRefundedAmount(string $chargeID, int $paymentProcessorId) {
+  private function getRefundedAmount(string $chargeID, int $paymentProcessorId, int $transactonId) {
     $refundedAmount = civicrm_api3('PaymentProcessor', 'get_refunded_amount', [
       'payment_processor_id' => $paymentProcessorId,
       'trxn_id' => $chargeID,
+      'financial_trxn_id' => $transactonId,
     ])['values'][0];
 
     return $refundedAmount;
@@ -197,6 +177,7 @@ class CRM_Financeextras_Form_Payment_Refund extends CRM_Core_Form {
         'label' => ts('Reason'),
         'attributes' => ['' => '- ' . ts('select reason') . ' -'] + $reasons,
         'extra' => ['class' => 'huge crm-select2'],
+        'required' => TRUE,
 
       ],
     ];
@@ -257,13 +238,41 @@ class CRM_Financeextras_Form_Payment_Refund extends CRM_Core_Form {
     if ($fields['amount'] <= 0) {
       $errors['amount'] = ts('Please enter valid refund amount.');
     }
-    elseif ($fields['amount'] > $self->availableAmount) {
+    elseif ($fields['amount'] > $self->availableAmount[$fields['payment_row']]) {
       $errors['amount'] = ts('You cannot refund more than the original payment amount.');
     }
     if ($fields['reason'] == "") {
       $errors['reason'] = ts('Please enter refund reason.');
     }
+    if (count($errors) === 0) {
+      $self->triggerRefund($errors, $fields, $self);
+    }
+
     return $errors;
+  }
+
+  /**
+   * Trigger Refund action of Payment Processor
+   */
+  private function triggerRefund(&$errors, $vals, $self) {
+    try {
+      $refundResult = civicrm_api3('PaymentProcessor', 'refund', [
+        'payment_processor_id' => $self->paymentProcessor['id'],
+        'contribution_id' => $self->contributionID,
+        'available_amount' => $self->availableAmount[$vals['payment_row']],
+        'trxn_id' => $self->chargeID[$vals['payment_row']],
+        'contact' => $vals['contact'],
+        'reason' => $vals['reason'],
+        'amount' => $vals['amount'],
+        'currency' => $vals['currency'],
+        'is_test' => $self->paymentProcessor['is_test'],
+      ])['values'];
+
+      $this->refundStatus = $refundResult[0];
+    }
+    catch (\Exception $e) {
+      $errors['amount'] = $e->getMessage();
+    }
   }
 
   /**
@@ -271,17 +280,35 @@ class CRM_Financeextras_Form_Payment_Refund extends CRM_Core_Form {
    */
   public function postProcess($params = NULL) {
     // Gets the submitted values as an array.
+
     $vals = $this->controller->exportValues($this->_name);
-    civicrm_api3('PaymentProcessor', 'refund', [
-      'payment_processor_id' => $this->paymentProcessorId,
-      'contribution_id' => $this->contributionID,
-      'available_amount' => $this->availableAmount,
-      'trxn_id' => $this->chargeID,
-      'contact' => $vals['contact'],
-      'reason' => $vals['reason'],
-      'amount' => $vals['amount'],
-      'currency' => $vals['currency'],
-    ])['values'];
+    if ($this->refundStatus['refund_status'] == "Completed") {
+      $this->createFinancialTrxnRefund($vals);
+    }
+  }
+
+  /**
+   * Creates financial transaction entries for refund
+   */
+  public function createFinancialTrxnRefund($vals) {
+    $financialTrxnId = CRM_Utils_Request::retrieve('payment_row', 'Positive', $this);
+    $eftParams = [
+      'entity_table' => 'civicrm_contribution',
+      'financial_trxn_id' => $this->mainTransactionId[$financialTrxnId],
+      'return' => ['entity', 'amount', 'entity_id', 'financial_trxn_id.check_number'],
+    ];
+    $entity = civicrm_api3('EntityFinancialTrxn', 'getsingle', $eftParams);
+    $paymentParams = [
+      'total_amount' => -$vals['amount'],
+      'contribution_id' => (int) $entity['entity_id'],
+      'is_send_contribution_notification' => FALSE,
+      'trxn_date' => 'now',
+      'trxn_id' => $this->refundStatus['refund_id'],
+      'check_number' => $entity['financial_trxn_id.check_number'] ?? NULL,
+    ];
+
+    civicrm_api3('Payment', 'create', $paymentParams);
+    CRM_Core_Session::setStatus(ts('Refund has been requested successfully.'), ts('Success'), 'success');
   }
 
 }

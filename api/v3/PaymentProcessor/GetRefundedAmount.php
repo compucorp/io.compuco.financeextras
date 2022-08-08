@@ -19,7 +19,7 @@ function civicrm_api3_payment_processor_get_refunded_amount($params) {
   if (!$processor->supportsRefund()) {
     throw new API_Exception('Payment Processor does not support refund');
   }
-  $result = $processor->getRefundedAmountByChargeId($params['trxn_id']);
+  $result = $processor->getRefundedAmountByChargeId($params);
   return civicrm_api3_create_success([$result], $params);
 }
 
