@@ -13,22 +13,22 @@ class Contribution {
   /**
    * @var array
    */
-  private array $links;
+  private $links;
 
   /**
    * @var string
    */
-  private string $objectName;
+  private $objectName;
 
   /**
    * @var string
    */
-  private string $objectId;
+  private $objectId;
 
   /**
    * @var string
    */
-  private string $op;
+  private $op;
 
   /**
    * Contribution constructor.

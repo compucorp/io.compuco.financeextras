@@ -11,12 +11,12 @@ class PaymentProcessor {
   /**
    * @var null|PaymentProcessor
    */
-  private static ?PaymentProcessor $singleton = NULL;
+  private static $singleton = NULL;
 
   /**
    * @var array
    */
-  private array $cache = [];
+  private $cache = [];
 
   /**
    * @return \Civi\Financeextras\Refund\PaymentProcessor

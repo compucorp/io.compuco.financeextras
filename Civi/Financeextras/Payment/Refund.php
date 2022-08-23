@@ -13,7 +13,7 @@ class Refund {
   /**
    * @var int
    */
-  private int $contributionID;
+  private $contributionID;
 
   /**
    * @param $contributionID

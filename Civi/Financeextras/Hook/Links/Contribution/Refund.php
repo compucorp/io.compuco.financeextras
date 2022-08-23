@@ -13,11 +13,11 @@ class Refund {
   /**
    * @var array
    */
-  private array $links;
+  private $links;
   /**
    * @var \Civi\Financeextras\Payment\Refund
    */
-  private \Civi\Financeextras\Payment\Refund $paymentRefund;
+  private $paymentRefund;
 
   /**
    * @param $contributionID
