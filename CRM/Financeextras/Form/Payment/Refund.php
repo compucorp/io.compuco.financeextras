@@ -85,7 +85,7 @@ class CRM_Financeextras_Form_Payment_Refund extends CRM_Core_Form {
         $refundAmountMethod = FALSE;
       }
       else {
-        $refundedAmount = $this->getRefundedAmount($this->chargeID[$trxn['id']], $this->paymentProcessor['id'], $this->mainTransactionId[$trxn['id']]);
+        $refundedAmount = $this->getRefundedAmount($this->chargeID[$trxn['id']], $this->paymentProcessor['id'], $this->mainTransactionId[$trxn['id']], $trxn['currency']);
 
         $this->availableAmount[$trxn['id']] = $trxn['total_amount'] - $refundedAmount;
       }
@@ -120,11 +120,12 @@ class CRM_Financeextras_Form_Payment_Refund extends CRM_Core_Form {
   /**
    * Gets the refunded amount.
    */
-  private function getRefundedAmount(string $chargeID, int $paymentProcessorId, int $transactonId) {
+  private function getRefundedAmount(string $chargeID, int $paymentProcessorId, int $transactonId, string $currency) {
     $refundedAmount = civicrm_api3('PaymentProcessor', 'get_refunded_amount', [
       'payment_processor_id' => $paymentProcessorId,
       'trxn_id' => $chargeID,
       'financial_trxn_id' => $transactonId,
+      'currency' => $currency,
     ])['values'][0];
 
     return $refundedAmount;
