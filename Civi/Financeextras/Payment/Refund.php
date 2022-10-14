@@ -75,7 +75,7 @@ class Refund {
    */
   public function contactHasRefundPermission(): bool {
     $permissions = [
-      'access CiviCRM backend and API',
+      'access CiviCRM',
       'access CiviContribute',
       'edit contributions',
     ];
