@@ -4,6 +4,6 @@
     <path>civicrm/financeextras/payment/refund/card</path>
     <page_callback>CRM_Financeextras_Form_Payment_Refund</page_callback>
     <title>Record a credit card refund</title>
-    <access_arguments>make online contribution</access_arguments>
+    <access_arguments>edit contributions</access_arguments>
   </item>
 </menu>
