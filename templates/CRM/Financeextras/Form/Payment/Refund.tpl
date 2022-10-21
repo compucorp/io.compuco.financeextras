@@ -6,7 +6,10 @@
 {/if}
 <div class="crm-block crm-form-block crm-payment-refund-form-block">
   <div class="crm-accordion-body">
-    <div class="message help" >{ts}Refunds take 5-10 days to appear on a customer's statement{/ts}</div>
+    <div class="message help" >
+      <i aria-hidden="true" class="crm-i fa-info-circle"></i>
+      {ts}Refunds take 5-10 days to appear on a customer's statement{/ts}
+    </div>
   </div>
   <table class="form-layout-compressed">
     <tr class="crm-payment-refund-form-block-contact">
