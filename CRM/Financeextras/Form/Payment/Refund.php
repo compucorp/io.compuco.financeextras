@@ -14,7 +14,7 @@ class CRM_Financeextras_Form_Payment_Refund extends CRM_Core_Form {
   private $contributionID;
 
   /**
-   * @var int
+   * @var array
    *   Available amount to display in payment info table.
    */
   private $availableAmount;
@@ -207,7 +207,7 @@ class CRM_Financeextras_Form_Payment_Refund extends CRM_Core_Form {
         }
       }
     }
-    $this->addFormRule(['CRM_Financeextras_Form_Payment_Refund', 'formRule'], $this);
+    $this->addFormRule([$this, 'formRule']);
 
     $this->addButtons([
       [
@@ -227,26 +227,23 @@ class CRM_Financeextras_Form_Payment_Refund extends CRM_Core_Form {
    *
    * @param array $fields
    *   The input form values.
-   * @param array $files
-   *   The uploaded files if any.
-   * @param $self
    *
    * @return bool|array
    *   true if no errors, else array of errors
    */
-  public function formRule($fields, $files, $self) {
+  public function formRule($fields) {
     $errors = [];
     if ($fields['amount'] <= 0) {
       $errors['amount'] = ts('Please enter valid refund amount.');
     }
-    elseif ($fields['amount'] > $self->availableAmount[$fields['payment_row']]) {
+    elseif ($fields['amount'] > $this->availableAmount[$fields['payment_row']]) {
       $errors['amount'] = ts('You cannot refund more than the original payment amount.');
     }
     if ($fields['reason'] == "") {
       $errors['reason'] = ts('Please enter refund reason.');
     }
     if (count($errors) === 0) {
-      $self->triggerRefund($errors, $fields, $self);
+      $this->triggerRefund($errors, $fields);
     }
 
     return $errors;
@@ -255,18 +252,18 @@ class CRM_Financeextras_Form_Payment_Refund extends CRM_Core_Form {
   /**
    * Trigger Refund action of Payment Processor
    */
-  private function triggerRefund(&$errors, $vals, $self) {
+  private function triggerRefund(&$errors, $vals) {
     try {
       $refundResult = civicrm_api3('PaymentProcessor', 'refund', [
-        'payment_processor_id' => $self->paymentProcessor['id'],
-        'contribution_id' => $self->contributionID,
-        'available_amount' => $self->availableAmount[$vals['payment_row']],
-        'trxn_id' => $self->chargeID[$vals['payment_row']],
+        'payment_processor_id' => $this->paymentProcessor['id'],
+        'contribution_id' => $this->contributionID,
+        'available_amount' => $this->availableAmount[$vals['payment_row']],
+        'trxn_id' => $this->chargeID[$vals['payment_row']],
         'contact' => $vals['contact'],
         'reason' => $vals['reason'],
         'amount' => $vals['amount'],
         'currency' => $vals['currency'],
-        'is_test' => $self->paymentProcessor['is_test'],
+        'is_test' => $this->paymentProcessor['is_test'],
       ])['values'];
 
       $this->refundStatus = $refundResult[0];
