@@ -6,7 +6,10 @@
 {/if}
 <div class="crm-block crm-form-block crm-payment-refund-form-block">
   <div class="crm-accordion-body">
-    <div class="message help" >{ts}Refunds take 5-10 days to appear on a customer's statement{/ts}</div>
+    <div class="message help" >
+      <i aria-hidden="true" class="crm-i fa-info-circle"></i>
+      {ts}Refunds take 5-10 days to appear on a customer's statement{/ts}
+    </div>
   </div>
   <table class="form-layout-compressed">
     <tr class="crm-payment-refund-form-block-contact">
@@ -14,7 +17,7 @@
       <td>{$form.contact.html}</td>
     </tr>
     <tr class="crm-payment-refund-form-block-paymentinfos">
-      <td class="label"><label>{ts}Select Payment To Refund{/ts}</label></td>
+      <td class="label"><label for="payment-row">{ts}Select Payment To Refund{/ts}</label></td>
       <td><table class="selector row-highlight payment-info">
         <tr>
           <th></th>
@@ -26,7 +29,7 @@
         </tr>
         {foreach from=$paymentInfos item=paymentRow}
         <tr id="tr_{$paymentRow.financialTrxnId}">
-          <td><input class="required crm-form-radio" value="{$paymentRow.financialTrxnId}" type="radio" id="{$paymentRow.transactionId}" data-processorid="{$paymentRow.paymentProcessorId}" data-currency="{$paymentRow.currency}" name="payment_row" ></td>
+          <td><input class="required crm-form-radio" value="{$paymentRow.financialTrxnId}" type="radio" id="payment-row" data-processorid="{$paymentRow.paymentProcessorId}" data-currency="{$paymentRow.currency}" name="payment_row" ></td>
           <td>{$paymentRow.date}</td>
           <td>{$paymentRow.amount|crmMoney:$paymentRow.currency}</td>
           <td class="available_amount_{$paymentRow.financialTrxnId}">{$paymentRow.available_amount|crmMoney:$paymentRow.currency}</td>
