@@ -66,6 +66,7 @@ class CRM_Financeextras_Form_Payment_Refund extends CRM_Core_Form {
     $paymentRefundPermission = new \Civi\Financeextras\Payment\Refund($this->contributionID);
     if (!$paymentRefundPermission->contactHasRefundPermission()) {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
+
       return;
     }
     $paymentInfos = [];
@@ -73,12 +74,13 @@ class CRM_Financeextras_Form_Payment_Refund extends CRM_Core_Form {
       'contribution_id' => $this->contributionID,
       'status_id' => 1,
     ])['values'];
+
+    $refundAmountMethod = TRUE;
     foreach ($this->paymentTransactions as $trxn) {
       $this->mainTransactionId[$trxn['id']] = $trxn['id'];
       $this->availableAmount[$trxn['id']] = 0;
       $this->chargeID[$trxn['id']] = $trxn['trxn_id'];
       $this->paymentProcessor = $this->getPaymentProcessorNameById($trxn['payment_processor_id']);
-      $refundAmountMethod = TRUE;
       $processor = Civi\Payment\System::singleton()->getById($this->paymentProcessor['id']);
       if (!method_exists($processor, 'getRefundedAmountByChargeId')) {
         $this->availableAmount = $trxn['total_amount'];
@@ -86,7 +88,6 @@ class CRM_Financeextras_Form_Payment_Refund extends CRM_Core_Form {
       }
       else {
         $refundedAmount = $this->getRefundedAmount($this->chargeID[$trxn['id']], $this->paymentProcessor['id'], $this->mainTransactionId[$trxn['id']], $trxn['currency']);
-
         $this->availableAmount[$trxn['id']] = $trxn['total_amount'] - $refundedAmount;
       }
       if (!isset($this->paymentProcessor['id']) || $this->paymentProcessor['id'] === "") {
@@ -120,15 +121,13 @@ class CRM_Financeextras_Form_Payment_Refund extends CRM_Core_Form {
   /**
    * Gets the refunded amount.
    */
-  private function getRefundedAmount(string $chargeID, int $paymentProcessorId, int $transactonId, string $currency) {
-    $refundedAmount = civicrm_api3('PaymentProcessor', 'get_refunded_amount', [
-      'payment_processor_id' => $paymentProcessorId,
+  private function getRefundedAmount(string $chargeID, int $paymentProcessorID, int $transactionID, string $currency) {
+    return civicrm_api3('PaymentProcessor', 'get_refunded_amount', [
+      'payment_processor_id' => $paymentProcessorID,
       'trxn_id' => $chargeID,
-      'financial_trxn_id' => $transactonId,
+      'financial_trxn_id' => $transactionID,
       'currency' => $currency,
     ])['values'][0];
-
-    return $refundedAmount;
   }
 
   /**
