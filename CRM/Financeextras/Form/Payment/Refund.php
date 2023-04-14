@@ -77,6 +77,13 @@ class CRM_Financeextras_Form_Payment_Refund extends CRM_Core_Form {
 
     $refundAmountMethod = TRUE;
     foreach ($this->paymentTransactions as $trxn) {
+      // Ignore if payment processor ID is not present.
+      // This is the edge case for the transaction that may have been paid
+      // offline e.g. cash or cheque.
+      if (empty($trxn['payment_processor_id'])) {
+        continue;
+      }
+
       $this->mainTransactionId[$trxn['id']] = $trxn['id'];
       $this->availableAmount[$trxn['id']] = 0;
       $this->chargeID[$trxn['id']] = $trxn['trxn_id'];
