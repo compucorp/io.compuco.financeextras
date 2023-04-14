@@ -243,7 +243,7 @@ class CRM_Financeextras_Form_Payment_Refund extends CRM_Core_Form {
       $errors['amount'] = ts('Please enter valid refund amount.');
     }
     elseif ($fields['amount'] > $this->availableAmount[$fields['payment_row']]) {
-      $errors['amount'] = ts('You cannot refund more than the original payment amount.');
+      $errors['amount'] = ts('You cannot refund more than the available amount .');
     }
     if ($fields['reason'] == "") {
       $errors['reason'] = ts('Please enter refund reason.');
