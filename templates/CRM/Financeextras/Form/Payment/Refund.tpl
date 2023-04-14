@@ -29,7 +29,13 @@
         </tr>
         {foreach from=$paymentInfos item=paymentRow}
         <tr id="tr_{$paymentRow.financialTrxnId}">
-          <td><input class="required crm-form-radio" value="{$paymentRow.financialTrxnId}" type="radio" id="payment-row" data-processorid="{$paymentRow.paymentProcessorId}" data-currency="{$paymentRow.currency}" name="payment_row" ></td>
+          <td><input class="required crm-form-radio"
+                     value="{$paymentRow.financialTrxnId}"
+                     type="radio" id="payment-row"
+                     data-processorid="{$paymentRow.paymentProcessorId}"
+                     data-currency="{$paymentRow.currency}" name="payment_row"
+                     {if $paymentRow.available_amount == "0.00"} disabled {/if}>
+          </td>
           <td>{$paymentRow.date}</td>
           <td>{$paymentRow.amount|crmMoney:$paymentRow.currency}</td>
           <td class="available_amount_{$paymentRow.financialTrxnId}">{$paymentRow.available_amount|crmMoney:$paymentRow.currency}</td>
