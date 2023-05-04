@@ -304,5 +304,11 @@ function _financeextras_civix_fixNavigationMenuItems(&$nodes, &$maxNavID, $paren
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
  */
 function _financeextras_civix_civicrm_entityTypes(&$entityTypes) {
-  $entityTypes = array_merge($entityTypes, []);
+  $entityTypes = array_merge($entityTypes, [
+    'CRM_Financeextras_DAO_CreditNote' => [
+      'name' => 'CreditNote',
+      'class' => 'CRM_Financeextras_DAO_CreditNote',
+      'table' => 'financeextras_credit_note',
+    ],
+  ]);
 }

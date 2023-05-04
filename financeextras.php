@@ -78,4 +78,3 @@ function financeextras_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
 function financeextras_civicrm_entityTypes(&$entityTypes) {
   _financeextras_civix_civicrm_entityTypes($entityTypes);
 }
-
