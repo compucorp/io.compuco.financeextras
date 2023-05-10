@@ -13,6 +13,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - uses: actions/setup-node@v2
+
+      - name: Run npm install
+        run: npm i
+
       - name: Install phpcs
         run: cd bin && ./install-php-linter
 
@@ -21,4 +26,7 @@ jobs:
 
       - name: Run phpcs linter
         run: git diff --diff-filter=d origin/${GITHUB_BASE_REF} --name-only -- '*.php' | xargs -r ./bin/phpcs.phar --standard=phpcs-ruleset.xml
-
+      
+      - name: Run eslint linter
+        if: ${{ always() }}
+        run: git diff --diff-filter=d origin/${GITHUB_BASE_REF} --name-only -- '*.js' | xargs -r  npx eslint --max-warnings=0 -c .eslintrc.json
