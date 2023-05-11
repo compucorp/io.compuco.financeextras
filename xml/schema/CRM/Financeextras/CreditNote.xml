@@ -56,7 +56,8 @@
     <name>status_id</name>
     <type>int unsigned</type>
     <comment>One of the values of the financeextras_credit_note_status option group</comment>
-    <required>true</required>
+    <required>false</required>
+    <default>NULL</default>
     <pseudoconstant>
       <optionGroupName>financeextras_credit_note_status</optionGroupName>
     </pseudoconstant>

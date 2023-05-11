@@ -27,7 +27,7 @@ CREATE TABLE `financeextras_credit_note` (
   `contact_id` int unsigned COMMENT 'FK to Contact',
   `cn_number` varchar(11),
   `date` date COMMENT 'Credit Note date',
-  `status_id` int unsigned NOT NULL COMMENT 'One of the values of the financeextras_credit_note_status option group',
+  `status_id` int unsigned NULL DEFAULT NULL COMMENT 'One of the values of the financeextras_credit_note_status option group',
   `reference` varchar(11),
   `currency` varchar(3) DEFAULT NULL COMMENT '3 character string, value from config setting or input via user.',
   `description` text NULL COMMENT 'Credit note description',
