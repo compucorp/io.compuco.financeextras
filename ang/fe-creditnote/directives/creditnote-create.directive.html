@@ -105,9 +105,9 @@
             </tr>
             <tr ng-repeat="item in creditnotes.items track by $index">
               <td>
-                <input type="text" name="item_description_{{$index}}" ng-model="creditnotes.items[$index].item_description" class="form-control" style="resize: none" required />
+                <input type="text" name="description_{{$index}}" ng-model="creditnotes.items[$index].description" class="form-control" style="resize: none" required />
                 <br />
-                <span class="crm-inline-error" ng-show="creditnotesForm.item_description_{{$index}}.$dirty && creditnotesForm.item_description_{{$index}}.$invalid && creditnotesForm.item_description_{{$index}}.$error.required">Description is required</span>
+                <span class="crm-inline-error" ng-show="creditnotesForm.description_{{$index}}.$dirty && creditnotesForm.description_{{$index}}.$invalid && creditnotesForm.description_{{$index}}.$error.required">Description is required</span>
               </td>
               <td style="max-width: 15em;">
                 <input class="form-control"
@@ -127,7 +127,7 @@
                 <span class="crm-inline-error" ng-show="creditnotesForm.financial_type_{{$index}}.$dirty && creditnotesForm.financial_type_{{$index}}.$invalid && creditnotesForm.financial_type_{{$index}}.$error.required">Financial Type is required</span>
               </td>
               <td>
-                <input type="number" min="0" name="quantity_{{$index}}" required placeholder="Quantity" ng-model="creditnotes.items[$index].quantity" class="form-control" ng-change="calculateSubtotal($index)" style="width: 6em" step="0.01" />
+                <input type="number" min="0" name="quantity_{{$index}}" required placeholder="Quantity" ng-model="creditnotes.items[$index].quantity" class="form-control" ng-change="calculateSubtotal($index)" style="width: 6em" step="0.0001" />
                 <br />
                 <span class="crm-inline-error" ng-show="creditnotesForm.quantity_{{$index}}.$dirty && (creditnotesForm.quantity_{{$index}}.$invalid || creditnotesForm.quantity_{{$index}}.$error.required)">Quantity is invalid</span>
               </td>
@@ -139,10 +139,12 @@
                 <br />
                 <span class="crm-inline-error" ng-show="creditnotesForm.unit_price_{{$index}}.$dirty && (creditnotesForm.unit_price_{{$index}}.$invalid || creditnotesForm.unit_price_{{$index}}.$error.required)">Unit price is invalid</span>
               </td>
-              <td>
-                {{ roundTo(creditnotes.items[$index].tax_rate, 4) }}
+              <td style="width: 10em">
+                <input type="text" value="{{ creditnotes.items[$index].tax_rate > 0 ? roundTo(creditnotes.items[$index].tax_rate, 4) : '' }}" class="form-control" disabled>
               </td>
-              <td>{{ formatMoney(creditnotes.items[$index].subtotal_amount, creditnotes.currency) }}</td>
+              <td style="width: 10em">
+                <input type="text" value="{{ formatMoney(creditnotes.items[$index].line_total, creditnotes.currency) }}" class="form-control" disabled>
+              </td>
               <td><a ng-if="creditnotes.items.length > 1" href ng-click="removeCreditnotesItem($index)" ><i class="fa fa-trash"></i></a></td>
             </tr>
            </table>
@@ -158,11 +160,11 @@
         <div class="form-group">
           <div class="col-sm-7">
             <div class="row">
-                <div class="col-sm-3 pull-right">
+                <div class="col-sm-4 pull-right">
                   <table class="table">
                     <tr><th>Subtotal</th><td>{{ currencySymbol }} {{ formatMoney(creditnotes.total, creditnotes.currency) }}</td></tr>
                       <tr ng-repeat="i in taxRates">
-                        <th>Tax @ {{ i.rate }}%</th>
+                        <th>*{{ i.tax_name }} @ {{ i.rate }}%</th>
                         <td>{{ currencySymbol }} {{ formatMoney(i.value, creditnotes.currency) }}</td>
                       </tr>
                     <tr><th>Total</th><td>{{ currencySymbol }} {{formatMoney(creditnotes.grandTotal, creditnotes.currency)}}</td></tr>
