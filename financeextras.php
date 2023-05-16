@@ -78,3 +78,36 @@ function financeextras_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
 function financeextras_civicrm_entityTypes(&$entityTypes) {
   _financeextras_civix_civicrm_entityTypes($entityTypes);
 }
+
+/**
+ * Implements hook_civicrm_pageRun().
+ *
+ * @link https://docs.civicrm.org/dev/en/master/hooks/hook_civicrm_pageRun/
+ */
+function financeextras_civicrm_pageRun($page) {
+  $hooks = [
+    CRM_Financeextras_Hook_PageRun_ContributionPageTab::class,
+  ];
+
+  foreach ($hooks as $hook) {
+    if ($hook::shouldHandle($page)) {
+      (new $hook())->handle($page);
+    }
+  }
+}
+
+/**
+ * Implements hook_civicrm_links().
+ */
+function financeextras_civicrm_links($op, $objectName, $objectId, &$links, &$mask, &$values) {
+  if ($op == 'contribution.selector.row' && $objectName == 'Contribution') {
+    if (CRM_Core_Permission::check('edit contributions')) {
+      $links[] = [
+        'name' => 'Add Credit Note',
+        'url' => 'civicrm/contribution/creditnote',
+        'qs' => 'reset=1&action=add',
+        'title' => 'Add Credit Note',
+      ];
+    }
+  }
+}
