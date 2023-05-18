@@ -17,3 +17,9 @@
   display: flex;
   justify-content: space-between;
 }
+#creditnote__list afsearch-credit-notes ul.dropdown-menu > li.bg-disabled {
+  color: gray;
+  pointer-events: none;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
