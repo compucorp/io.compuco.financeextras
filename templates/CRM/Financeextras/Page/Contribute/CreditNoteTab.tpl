@@ -13,12 +13,19 @@
       <a accesskey="N" href="{$newCreditnotesURL|smarty:nodefaults}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Create New Credit Note{/ts}</span></a>
       <br /><br />
     </div>
-    <div class='clear'></div>
   {/if}
 
-  <div class="messages status no-popup">
-    {icon icon="fa-info-circle"}{/icon}
-    {ts}No credit notes have been recorded for this contact.{/ts}
-  </div>
+  {if $creditNoteCount > 0}
+    <div class='clear'></div>
+    <crm-angular-js modules="fe-creditnote">
+      <creditnote-list contact-id="{$contactId}"></creditnote-list>
+    </crm-angular-js>
+
+  {else}
+    <div class="messages status no-popup">
+      {icon icon="fa-info-circle"}{/icon}
+      {ts}No credit notes have been recorded for this contact.{/ts}
+    </div>
+  {/if}
 </div>
 

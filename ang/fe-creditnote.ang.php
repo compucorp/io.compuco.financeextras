@@ -33,6 +33,7 @@ return [
     'crmUi',
     'crmUtil',
     'ngRoute',
+    'afsearchCreditNotes',
   ],
   'settings' => $options,
 ];

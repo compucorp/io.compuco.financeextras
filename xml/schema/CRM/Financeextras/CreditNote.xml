@@ -7,6 +7,12 @@
   <comment>Stores credit note for contribution refund or allocations</comment>
   <log>true</log>
 
+  <paths>
+    <view>civicrm/contribution/creditnote/view?reset=1&amp;id=[id]</view>
+    <update>civicrm/contribution/creditnote/new?reset=1&amp;id=[id]</update>
+    <delete>civicrm/contribution/creditnote/delete?reset=1&amp;id=[id]</delete>
+  </paths>
+
   <field>
     <name>id</name>
     <type>int unsigned</type>
