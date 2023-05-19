@@ -125,4 +125,22 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
     return \CRM_Core_BAO_FinancialTrxn::create($trxnParams)->toArray();
   }
 
+  /**
+   * Deletes credit note accounting entries.
+   *
+   * @param int $creditNoteId
+   *  The credit note unique identifier.
+   */
+  public static function deleteAccountingEntries($creditNoteId): void {
+    $entityTrxn = new \CRM_Financial_DAO_EntityFinancialTrxn();
+    $entityTrxn->entity_table = \CRM_Financeextras_DAO_CreditNote::$_tableName;
+    $entityTrxn->entity_id = $creditNoteId;
+    $entityTrxn->find(TRUE);
+
+    $trxn = new \CRM_Financial_DAO_FinancialTrxn();
+    $trxn->deleteRecord(['id' => $entityTrxn->financial_trxn_id]);
+
+    $entityTrxn->delete();
+  }
+
 }

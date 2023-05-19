@@ -62,6 +62,28 @@ class CRM_Financeextras_BAO_CreditNoteLine extends CRM_Financeextras_DAO_CreditN
     return $result;
   }
 
+  /**
+   * Deletes credit notes line accounting entries.
+   *
+   * @param int $creditNoteLineId
+   *  The credit note line unique identifier.
+   */
+  public static function deleteAccountingEntries($creditNoteLineId) {
+    $financialItem = new \CRM_Financial_BAO_FinancialItem();
+    $financialItem->entity_table = \CRM_Financeextras_DAO_CreditNoteLine::$_tableName;
+    $financialItem->entity_id = $creditNoteLineId;
+    $financialItem->find(TRUE);
+
+    $entityTrxn = new \CRM_Financial_DAO_EntityFinancialTrxn();
+    $entityTrxn->entity_table = \CRM_Financial_BAO_FinancialItem::$_tableName;
+    $entityTrxn->entity_id = $financialItem->id;
+    $entityTrxn->find(TRUE);
+
+    $entityTrxn->delete();
+
+    $financialItem->delete();
+  }
+
   private static function createAccountingEntries($lineItem, $creditNote, $financialTrxn) {
     $incomeAccount = FinancialAccountUtils::getFinancialTypeAccount($lineItem['financial_type_id'], 'Income Account is');
     $itemParams = [
