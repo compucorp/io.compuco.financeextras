@@ -310,5 +310,10 @@ function _financeextras_civix_civicrm_entityTypes(&$entityTypes) {
       'class' => 'CRM_Financeextras_DAO_CreditNote',
       'table' => 'financeextras_credit_note',
     ],
+    'CRM_Financeextras_DAO_CreditNoteLine' => [
+      'name' => 'CreditNoteLine',
+      'class' => 'CRM_Financeextras_DAO_CreditNoteLine',
+      'table' => 'financeextras_credit_note_line',
+    ],
   ]);
 }

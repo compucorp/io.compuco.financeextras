@@ -6,6 +6,7 @@
 
 SET FOREIGN_KEY_CHECKS=0;
 
+DROP TABLE IF EXISTS `financeextras_credit_note_line`;
 DROP TABLE IF EXISTS `financeextras_credit_note`;
 
 SET FOREIGN_KEY_CHECKS=1;
@@ -37,5 +38,27 @@ CREATE TABLE `financeextras_credit_note` (
   `total_credit` decimal(20,2) NULL COMMENT 'Total value of the credit note',
   PRIMARY KEY (`id`),
   CONSTRAINT FK_financeextras_credit_note_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE
+)
+ENGINE=InnoDB;
+
+-- /*******************************************************
+-- *
+-- * financeextras_credit_note_line
+-- *
+-- * Credit note line items
+-- *
+-- *******************************************************/
+CREATE TABLE `financeextras_credit_note_line` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique CreditNoteLine ID',
+  `credit_note_id` int unsigned COMMENT 'FK to CreditNote',
+  `financial_type_id` int unsigned COMMENT 'FK to CiviCRM Financial Type',
+  `description` text NULL COMMENT 'line item description',
+  `quantity` decimal(20,2) COMMENT 'Quantity',
+  `unit_price` decimal(20,2) COMMENT 'Unit Price',
+  `tax_amount` decimal(20,2) COMMENT 'Tax amount for the line item',
+  `line_total` decimal(20,2) COMMENT 'Line Total',
+  PRIMARY KEY (`id`),
+  CONSTRAINT FK_financeextras_credit_note_line_credit_note_id FOREIGN KEY (`credit_note_id`) REFERENCES `financeextras_credit_note`(`id`) ON DELETE CASCADE,
+  CONSTRAINT FK_financeextras_credit_note_line_financial_type_id FOREIGN KEY (`financial_type_id`) REFERENCES `civicrm_financial_type`(`id`) ON DELETE SET NULL
 )
 ENGINE=InnoDB;
