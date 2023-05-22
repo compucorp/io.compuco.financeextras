@@ -2,7 +2,7 @@
 <extension key="io.compuco.financeextras" type="module">
   <file>financeextras</file>
   <name>Finance Extras</name>
-  <description>Thi extension provides CiviCRM financial improvement</description>
+  <description>This extension provides CiviCRM financial improvement</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>Compuco</author>
@@ -23,4 +23,8 @@
     <angularModule>crmFinanceextras</angularModule>
     <format>22.05.2</format>
   </civix>
+  <mixins>
+    <mixin>menu-xml@1.0.0</mixin>
+    <mixin>ang-php@1.0.0</mixin>
+  </mixins>
 </extension>

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/creditnote/a</path>
+    <page_callback>CRM_Financeextras_Page_Contribute_CreditNoteAngular</page_callback>
+    <access_arguments>edit contributions</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/contribution/creditnote</path>
+    <page_callback>CRM_Financeextras_Page_Contribute_CreditNoteAngular</page_callback>
+    <access_arguments>edit contributions</access_arguments>
+  </item>
+</menu>
