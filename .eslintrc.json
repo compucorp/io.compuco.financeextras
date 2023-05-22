@@ -1,0 +1,22 @@
+{
+    "env": {
+        "browser": true,
+        "commonjs": true,
+        "es2021": true
+    },
+    "extends": "eslint:recommended",
+    "overrides": [
+    ],
+    "parserOptions": {
+        "ecmaVersion": "latest"
+    },
+    "rules": {
+    },
+    "globals": {
+      "CRM": "writable",
+      "angular": "readonly",
+      "inject": "readonly",
+      "moment": "readonly",
+      "ts": "readonly"
+    }
+}
