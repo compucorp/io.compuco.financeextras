@@ -1,0 +1,11 @@
+{htxt id="creditnotes_comment"}
+<p>
+  {ts}An optional internal comment that will not be shown on the printed credit note.{/ts}
+</p>
+{/htxt}
+
+{htxt id="creditnotes_description}
+<p>
+  {ts}An optional public description that will be shown on the printed credit note.{/ts}
+</p>
+{/htxt}

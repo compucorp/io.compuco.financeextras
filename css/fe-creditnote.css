@@ -1,0 +1,19 @@
+/* Add any CSS rules for Angular module "crmFinanceextras" */
+#bootstrap-theme .creditnotes__ui-range .crm-form-date {
+  display: inline-block;
+  width: 134px;
+}
+.ui-dialog #bootstrap-theme.creditnote__container > div#creditnote__create.panel {
+  box-shadow: none;
+}
+.ui-dialog #bootstrap-theme.creditnote__container > div#creditnote__create.panel > .panel-body {
+  border: none;
+  padding: 0;
+}
+.ui-dialog #bootstrap-theme.creditnote__container > div#creditnote__create.panel .col-sm-7 {
+  width: 100%;
+}
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+}
