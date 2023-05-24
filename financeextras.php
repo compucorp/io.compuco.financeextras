@@ -111,3 +111,15 @@ function financeextras_civicrm_links($op, $objectName, $objectId, &$links, &$mas
     }
   }
 }
+
+/**
+ * Implements hook_civicrm_tabset().
+ *
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_tabset
+ */
+function financeextras_civicrm_tabset($tabsetName, &$tabs, $context) {
+  if ($tabsetName === 'civicrm/contact/view') {
+    $loader = Civi::service('angularjs.loader');
+    $loader->addModules(['crmApp', 'fe-creditnote']);
+  }
+}
