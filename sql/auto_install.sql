@@ -7,6 +7,7 @@
 SET FOREIGN_KEY_CHECKS=0;
 
 DROP TABLE IF EXISTS `financeextras_credit_note_line`;
+DROP TABLE IF EXISTS `financeextras_credit_note_allocation`;
 DROP TABLE IF EXISTS `financeextras_credit_note`;
 
 SET FOREIGN_KEY_CHECKS=1;
@@ -38,6 +39,27 @@ CREATE TABLE `financeextras_credit_note` (
   `total_credit` decimal(20,2) NULL COMMENT 'Total value of the credit note',
   PRIMARY KEY (`id`),
   CONSTRAINT FK_financeextras_credit_note_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE
+)
+ENGINE=InnoDB;
+
+-- /*******************************************************
+-- *
+-- * financeextras_credit_note_allocation
+-- *
+-- * Stores amounts of credit that have been allocated or âusedâ from a credit note.
+-- *
+-- *******************************************************/
+CREATE TABLE `financeextras_credit_note_allocation` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique CreditNoteAllocation ID',
+  `credit_note_id` int unsigned COMMENT 'FK to CreditNote',
+  `contribution_id` int unsigned COMMENT 'FK to Contribution',
+  `type_id` int unsigned NULL DEFAULT NULL COMMENT 'One of the values of the financeextras_credit_note_allocation_type option group',
+  `currency` varchar(3) DEFAULT NULL COMMENT '3 character string, value from config setting or input via user.',
+  `reference` text,
+  `amount` decimal(20,2) NULL COMMENT 'Ammount allocated',
+  PRIMARY KEY (`id`),
+  CONSTRAINT FK_financeextras_credit_note_allocation_credit_note_id FOREIGN KEY (`credit_note_id`) REFERENCES `financeextras_credit_note`(`id`) ON DELETE CASCADE,
+  CONSTRAINT FK_financeextras_credit_note_allocation_contribution_id FOREIGN KEY (`contribution_id`) REFERENCES `civicrm_contribution`(`id`)
 )
 ENGINE=InnoDB;
 
