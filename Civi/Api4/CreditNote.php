@@ -5,6 +5,7 @@ namespace Civi\Api4;
 use Civi\Api4\Action\CreditNote\ComputeTotalAction;
 use Civi\Api4\Action\CreditNote\CreditNoteSaveAction;
 use Civi\Api4\Action\CreditNote\DeleteWithItemsAction;
+use Civi\Api4\Action\CreditNote\GetAction;
 
 /**
  * CreditNote entity.
@@ -54,6 +55,15 @@ class CreditNote extends Generic\DAOEntity {
    */
   public static function deleteWithItems($checkPermissions = TRUE) {
     return (new DeleteWithItemsAction(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return DAOGetAction
+   */
+  public static function get($checkPermissions = TRUE) {
+    return (new GetAction(static::getEntityName(), __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
