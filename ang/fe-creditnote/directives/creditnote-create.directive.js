@@ -35,10 +35,15 @@
     const defaultCurrency = 'GBP';
     $scope.isUpdate = false;
     $scope.formValid = true;
+    const financialTypesCache = new Map();
 
     $scope.ts = CRM.ts();
+    $scope.roundTo = roundTo;
+    $scope.formatMoney = formatMoney;
     $scope.saveCreditnotes = saveCreditnotes;
+    $scope.calculateSubtotal = calculateSubtotal;
     $scope.currencyCodes = CurrencyCodes.getAll();
+    $scope.handleFinancialTypeChange = handleFinancialTypeChange;
     $scope.hs = crmUiHelp({ file: 'CRM/Financeextras/CreditNoteCtrl' });
     $scope.currencySymbol = CurrencyCodes.getSymbol(defaultCurrency);
 
@@ -60,12 +65,12 @@
         contact_id: null,
         date: $.datepicker.formatDate('yy-mm-dd', new Date()),
         items: [{
-          item_description: null,
+          description: null,
           financial_type_id: null,
           unit_price: null,
           quantity: null,
           tax_rate: 0,
-          subtotal_amount: 0
+          line_total: 0
         }],
         total: 0,
         grandTotal: 0
@@ -84,7 +89,7 @@
         unit_price: null,
         quantity: null,
         tax_rate: 0,
-        subtotal_amount: 0
+        line_total: 0
       });
     }
 
@@ -102,7 +107,7 @@
      * Computes total and tax rates from API
      */
     function handleTotalChange () {
-      crmApi4('Creditnotes', 'computeTotal', {
+      crmApi4('CreditNote', 'computeTotal', {
         lineItems: $scope.creditnotes.items
       }).then(function (results) {
         $scope.taxRates = results[0].taxRates;
@@ -122,13 +127,14 @@
       }
 
       $scope.submitInProgress = true;
-      crmApi4('Creditnotes', 'save', { records: [$scope.creditnotes] })
+      crmApi4('CreditNote', 'save', { records: [$scope.creditnotes] })
         .then(function () {
+          $scope.submitInProgress = false;
           showSucessNotification();
           redirectToAppropraitePage();
         }, function () {
           $scope.submitInProgress = false;
-          CRM.alert('Unable to create credit notes', ts('Error'), 'error');
+          CRM.alert('Unable to create credit note', ts('Error'), 'error');
         });
     }
 
@@ -164,6 +170,80 @@
     function showSucessNotification () {
       const msg = !$scope.isUpdate ? 'Credit Note has been created successfully.' : 'Details updated successfully';
       CRM.alert(msg, ts('Saved'), 'success');
+    }
+
+    /**
+     * Update tax filed and regenrate line item tax rates for line itme financial types
+     *
+     * @param {number} index of the credit note line item
+     */
+    function handleFinancialTypeChange (index) {
+      $scope.creditnotes.items[index].tax_rate = 0;
+      $scope.$emit('totalChange');
+
+      if ($scope.creditnotes.items[index]['financial_type_id.name']) {
+        $scope.creditnotes.items[index]['financial_type_id.name'] = '';
+      }
+
+      const updateFinancialTypeDependentFields = (financialTypeId) => {
+        $scope.creditnotes.items[index].tax_rate = financialTypesCache.get(financialTypeId).tax_rate;
+        $scope.creditnotes.items[index].tax_name = financialTypesCache.get(financialTypeId).name;
+        $scope.$emit('totalChange');
+      };
+
+      const financialTypeId = $scope.creditnotes.items[index].financial_type_id;
+      if (financialTypeId && financialTypesCache.has(financialTypeId)) {
+        updateFinancialTypeDependentFields(financialTypeId);
+        return;
+      }
+
+      if (financialTypeId) {
+        crmApi4('EntityFinancialAccount', 'get', {
+          where: [["account_relationship:name", "=", "Sales Tax Account is"], ["entity_table", "=", "civicrm_financial_type"], ["entity_id", "=", financialTypeId]],
+          limit: 1,
+          chain: {"financialAccount":["FinancialAccount", "get", {"where":[["id", "=", "$financial_account_id"]]}, 0]}
+        }).then(function(entityFinancialAccounts) {
+          financialTypesCache.set(financialTypeId, entityFinancialAccounts[0]['financialAccount']);
+          updateFinancialTypeDependentFields(financialTypeId);
+        });
+      }
+    }
+
+    /**
+     * Rounds floating ponumber n to specified number of places
+     *
+     * @param {*} n number to round
+     * @param {*} place decimal places to round to
+     * @returns {number} the rounded off number
+     */
+    function roundTo (n, place) {
+      return +(Math.round(n + 'e+' + place) + 'e-' + place);
+    }
+
+    /**
+     * Formats a number into the number format of the currently selected currency
+     *
+     * @param {number} value the number to be formatted
+     * @param {string } currency the selected currency
+     * @returns {number} the formatted number
+     */
+    function formatMoney (value, currency) {
+      return CRM.formatMoney(value, true, CurrencyCodes.getFormat(currency));
+    }
+
+    /**
+     * Sums credit note line item without tax, and computes tax rates separately
+     *
+     * @param {number} index of the credit note line item
+     */
+    function calculateSubtotal (index) {
+      const item = $scope.creditnotes.items[index];
+      if (!item) {
+        return;
+      }
+
+      item.line_total = item.unit_price * item.quantity || 0;
+      $scope.$emit('totalChange');
     }
 
 
