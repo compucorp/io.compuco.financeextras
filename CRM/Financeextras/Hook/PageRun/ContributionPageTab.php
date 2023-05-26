@@ -12,6 +12,7 @@ class CRM_Financeextras_Hook_PageRun_ContributionPageTab implements PageRunInter
    */
   public function handle($page) {
     $this->addResources();
+    $this->setCreditNoteCounts($page);
   }
 
   /**
@@ -27,8 +28,6 @@ class CRM_Financeextras_Hook_PageRun_ContributionPageTab implements PageRunInter
 
   /**
    * Adds page resources.
-   *
-   * @param $region
    */
   private function addResources() {
     Civi::resources()->add([
@@ -39,6 +38,23 @@ class CRM_Financeextras_Hook_PageRun_ContributionPageTab implements PageRunInter
       'scriptFile' => [E::LONG_NAME, 'js/creditnote.js'],
       'region' => 'page-header',
     ]);
+  }
+
+  /**
+   * Sets the credit note counts for the current contact.
+   *
+   * @param CRM_Core_Page $page
+   */
+  private function setCreditNoteCounts($page) {
+    $contactId = $page->getVar('_contactId');
+    $creditNotes = \Civi\Api4\CreditNote::get()
+      ->selectRowCount()
+      ->addSelect('COUNT(id) AS count')
+      ->addWhere('contact_id', '=', $contactId)
+      ->execute();
+
+    $page->assign('creditNoteCount', $creditNotes[0]['count'] ?? 0);
+
   }
 
 }
