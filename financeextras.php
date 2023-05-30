@@ -138,3 +138,35 @@ function financeextras_civicrm_entityTypes(&$entityTypes) {
 function financeextras_civicrm_themes(&$themes) {
   _financeextras_civix_civicrm_themes($themes);
 }
+
+/**
+ * Implements hook_civicrm_links().
+ */
+function financeextras_civicrm_links($op, $objectName, $objectId, &$links, &$mask, &$values) {
+  if (is_null($objectId)) {
+    return;
+  }
+
+  $hooks = [
+    new \Civi\Financeextras\Hook\Links\Contribution($op, $objectId, $objectName, $links),
+  ];
+
+  foreach ($hooks as $hook) {
+    $hook->run();
+  }
+}
+
+/**
+ * Implements hook_civicrm_buildForm().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_buildForm
+ */
+function financeextras_civicrm_buildForm($formName, &$form) {
+  $hooks = [
+    new CRM_Financeextras_Hook_BuildForm__AdditionalPaymentButton($form, $formName),
+  ];
+
+  foreach ($hooks as $hook) {
+    $hook->buildForm();
+  }
+}
