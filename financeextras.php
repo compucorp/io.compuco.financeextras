@@ -101,15 +101,9 @@ function financeextras_civicrm_pageRun($page) {
  * Implements hook_civicrm_links().
  */
 function financeextras_civicrm_links($op, $objectName, $objectId, &$links, &$mask, &$values) {
-  if ($op == 'contribution.selector.row' && $objectName == 'Contribution') {
-    if (CRM_Core_Permission::check('edit contributions')) {
-      $links[] = [
-        'name' => 'Add Credit Note',
-        'url' => 'civicrm/contribution/creditnote',
-        'qs' => 'reset=1&action=add',
-        'title' => 'Add Credit Note',
-      ];
-    }
+  if (CRM_Financeextras_Hook_Links_Contribution::shouldHandle($op, $objectName)) {
+    $contributionHook = new CRM_Financeextras_Hook_Links_Contribution($objectId, $links);
+    $contributionHook->alterLinks();
   }
 }
 
