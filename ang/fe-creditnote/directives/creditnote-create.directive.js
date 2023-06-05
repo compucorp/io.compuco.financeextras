@@ -30,8 +30,9 @@
    * @param {object} CurrencyCodes CurrencyCodes service
    * @param {object} crmUiHelp crm ui help service
    * @param {object} crmApi4 crm api V4 service
+   * @param {object} CreditNoteStatus service
    */
-  function creditnoteCreateController ($scope, $location, $window, CurrencyCodes, crmUiHelp, crmApi4) {
+  function creditnoteCreateController ($scope, $location, $window, CurrencyCodes, crmUiHelp, crmApi4, CreditNoteStatus) {
     const defaultCurrency = 'GBP';
     $scope.isUpdate = false;
     $scope.formValid = true;
@@ -64,6 +65,7 @@
         currency: defaultCurrency,
         contact_id: null,
         date: $.datepicker.formatDate('yy-mm-dd', new Date()),
+        status_id: CreditNoteStatus.getValueByName('open'),
         items: [{
           description: null,
           financial_type_id: null,

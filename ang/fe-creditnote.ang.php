@@ -3,6 +3,7 @@
 // in CiviCRM. See also:
 // \https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_angularModules/n
 
+use Civi\Api4\OptionValue;
 use Civi\Financeextras\Utils\CurrencyUtils;
 
 $options = [];
@@ -14,7 +15,20 @@ function financeextras_set_currency_codes(&$options) {
   $options['currencyCodes'] = CurrencyUtils::getCurrencies();
 }
 
+/**
+ * Exposes credit note statuses to Angular.
+ */
+function financeextras_set_credit_note_status(&$options) {
+  $optionValues = OptionValue::get()
+    ->addSelect('id', 'value', 'name', 'label')
+    ->addWhere('option_group_id:name', '=', 'financeextras_credit_note_status')
+    ->execute();
+
+  $options['creditNoteStatus'] = $optionValues->getArrayCopy();
+}
+
 financeextras_set_currency_codes($options);
+financeextras_set_credit_note_status($options);
 
 return [
   'js' => [

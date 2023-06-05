@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Financeextras\Utils\FinancialAccountUtils;
+
 class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote {
 
   /**
@@ -80,6 +82,47 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
       ],
       $items
     );
+  }
+
+  /**
+   * Creates financial transcation linked to the credit note.
+   *
+   * @param array $data
+   *  The credit note data.
+   *
+   * @param int|null $financialTypeId
+   *  The financial type for the first credit note line.
+   */
+  public static function createWithAccountingEntries($data, $financialTypeId) {
+    $creditNote = self::create($data)->toArray();
+    $financialTrxn = self::createAccountingEntries($creditNote, $financialTypeId);
+
+    return [
+      'creditNote' => $creditNote,
+      'financialTrxn' => $financialTrxn,
+    ];
+  }
+
+  private static function createAccountingEntries($creditNote, $financialTypeId) {
+    $receivableAccount = FinancialAccountUtils::getFinancialTypeAccount($financialTypeId, 'Accounts Receivable Account is');
+
+    $contributionStatus = \CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $pendingStatus = array_search('Pending', $contributionStatus);
+
+    $trxnParams = [
+      'from_financial_account_id' => NULL,
+      'to_financial_account_id' => $receivableAccount,
+      'trxn_date' => $creditNote['date'],
+      'total_amount' => $creditNote['total_credit'] * -1,
+      'currency' => $creditNote['currency'],
+      'is_payment' => 0,
+      'status_id' => $pendingStatus,
+      'payment_processor_id' => NULL,
+      'payment_instrument_id' => 1,
+      'entity_table' => \CRM_Financeextras_DAO_CreditNote::$_tableName,
+      'entity_id' => $creditNote['id'],
+    ];
+    return \CRM_Core_BAO_FinancialTrxn::create($trxnParams)->toArray();
   }
 
 }
