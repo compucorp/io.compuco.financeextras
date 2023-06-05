@@ -17,6 +17,10 @@
             CRM.$("div.ui-dialog").append(buttonPane);
           }
         }, 20);
+      },
+      scope: {
+        contributionId: '@',
+        contactId: '@'
       }
     };
   });
@@ -50,6 +54,8 @@
 
     (function init () {
       initializeCreditnotes();
+      prepopulateFromContribution();
+      setDefaultContactID();
       $scope.newCreditnotesItem = newCreditnotesItem;
       CRM.wysiwyg.create('#creditnotes-description');
       $scope.removeCreditnotesItem = removeCreditnotesItem;
@@ -79,6 +85,54 @@
       };
       $scope.total = 0;
       $scope.taxRates = [];
+    }
+
+    /**
+     * Prepopulates credit notee line items from contrbution
+     */
+    function prepopulateFromContribution() {
+      if (!$scope.contributionId) {
+        return;
+      }
+
+      crmApi4('Contribution', 'get', {
+        where: [["id", "=", $scope.contributionId]],
+        chain: {"items":["LineItem", "get", {"where":[["contribution_id", "=", "$id"]]}]}
+      }).then(function (result) {
+        const contribution = result[0] ?? null;
+
+        if (!contribution) {
+          return
+        }
+        $scope.creditnotes.contact_id = contribution.contact_id
+        const lineItems = contribution.items;
+        const duePercent = (100 * contribution.due_amount) /contribution.total_amount
+        for (let i = 0; i < lineItems.length; i++) {
+          const qty = (duePercent == 100) ? lineItems[i].qty : 1
+          const unitPrice = (duePercent/100) * lineItems[i].unit_price;
+          console.log(qty)
+          $scope.creditnotes.items[i] = {
+            quantity: qty,
+            unit_price: unitPrice,
+            description: lineItems[i].label,
+            financial_type_id: lineItems[i].financial_type_id,
+            tax_rate: 0,
+            line_total: qty * unitPrice
+          }
+
+          handleFinancialTypeChange(i);
+        }
+      });
+
+    }
+
+    /**
+     * Sets default contact ID.
+     */
+    function setDefaultContactID () {
+      if (!$scope.contributionId && $scope.contactId) {
+        $scope.creditnotes.contactId = $scope.contactId
+      }
     }
 
     /**
@@ -201,8 +255,10 @@
           limit: 1,
           chain: {"financialAccount":["FinancialAccount", "get", {"where":[["id", "=", "$financial_account_id"]]}, 0]}
         }).then(function(entityFinancialAccounts) {
-          financialTypesCache.set(financialTypeId, entityFinancialAccounts[0]['financialAccount']);
-          updateFinancialTypeDependentFields(financialTypeId);
+          if (entityFinancialAccounts[0]) {
+            financialTypesCache.set(financialTypeId, entityFinancialAccounts[0]['financialAccount']);
+            updateFinancialTypeDependentFields(financialTypeId);
+          }
         });
       }
     }
