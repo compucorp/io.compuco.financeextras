@@ -4,6 +4,7 @@ namespace Civi\Api4;
 
 use Civi\Api4\Action\CreditNote\ComputeTotalAction;
 use Civi\Api4\Action\CreditNote\CreditNoteSaveAction;
+use Civi\Api4\Action\CreditNote\DeleteWithItemsAction;
 
 /**
  * CreditNote entity.
@@ -40,6 +41,33 @@ class CreditNote extends Generic\DAOEntity {
   public static function computeTotal($checkPermissions = FALSE) {
     return (new ComputeTotalAction(__CLASS__, __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * Deletes a credit note with line and transaction items.
+   *
+   * @param bool $checkPermissions
+   *  Should permission be checked for the user.
+   *
+   * @return DAODeleteAction
+   *   returns the credit note delete action
+   */
+  public static function deleteWithItems($checkPermissions = TRUE) {
+    return (new DeleteWithItemsAction(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public static function permissions() {
+    return [
+      'meta' => ['access CiviCRM'],
+      'get' => ['access CiviCRM', 'access CiviContribute'],
+      'default' => ['access CiviCRM', 'access CiviContribute', 'edit contributions'],
+      'delete' => ['access CiviCRM', 'access CiviContribute', 'delete in CiviContribute'],
+      'deleteWithItems' => ['access CiviCRM', 'access CiviContribute', 'delete in CiviContribute'],
+    ];
   }
 
 }
