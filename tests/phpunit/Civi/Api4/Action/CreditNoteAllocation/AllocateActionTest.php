@@ -106,6 +106,43 @@ class Civi_Api4_CreditNoteAllocation_AllocateActionTest extends BaseHeadlessTest
     $this->assertEquals('Completed', $contribution['contribution_status_id:name']);
   }
 
+  /**
+   * Tests that the credit note status is updated to fully allocated.
+   */
+  public function testCreditNoteStatusIsFullyAllocatedAfterFullCreditAllocation() {
+    $contributionAmount = 300;
+    $creditNote = $this->createCreditNote(100);
+    $contribution = $this->createContribution($creditNote['contact_id'], $contributionAmount);
+    $this->createAllocation($creditNote['id'], $contribution['id'], 50, $creditNote['currency']);
+    $this->createAllocation($creditNote['id'], $contribution['id'], 50, $creditNote['currency']);
+
+    $creditNote = \Civi\Api4\CreditNote::get()
+      ->addSelect('status_id:name', 'total_credit')
+      ->addWhere('id', '=', $creditNote['id'])
+      ->execute()
+      ->first();
+
+    $this->assertEquals('fully_allocated', $creditNote['status_id:name']);
+  }
+
+  /**
+   * Tests that the credit note status is open when there's remaining credit.
+   */
+  public function testCreditNoteStatusIsOpenForPartCreditAllocation() {
+    $contributionAmount = 300;
+    $creditNote = $this->createCreditNote(100);
+    $contribution = $this->createContribution($creditNote['contact_id'], $contributionAmount);
+    $this->createAllocation($creditNote['id'], $contribution['id'], 50, $creditNote['currency']);
+
+    $creditNote = \Civi\Api4\CreditNote::get()
+      ->addSelect('status_id:name', 'total_credit')
+      ->addWhere('id', '=', $creditNote['id'])
+      ->execute()
+      ->first();
+
+    $this->assertEquals('open', $creditNote['status_id:name']);
+  }
+
   private function createCreditNote($creditAmount = 400) {
     $creditNote = $this->getCreditNoteData();
     $creditNote['items'][] = $this->getCreditNoteLineData(['quantity' => 1, 'unit_price' => $creditAmount]);

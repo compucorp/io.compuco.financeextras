@@ -1,5 +1,6 @@
 <?php
 
+use Civi\Api4\CreditNote;
 use Civi\Financeextras\Utils\OptionValueUtils;
 use Civi\Financeextras\Utils\FinancialAccountUtils;
 use Civi\Financeextras\Setup\Manage\CreditNoteStatusManager as CreditNoteStatus;
@@ -180,6 +181,27 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
     $trxn->deleteRecord(['id' => $entityTrxn->financial_trxn_id]);
 
     $entityTrxn->delete();
+  }
+
+  /**
+   * Updates a cedit note status appropraitely post allocation
+   *
+   * @param int $creditNoteId
+   *  The credit note for which allocation was made.
+   */
+  public static function updateCreditNoteStatusPostAllocation($creditNoteId) {
+    $creditNote = CreditNote::get()
+      ->addWhere('id', '=', $creditNoteId)
+      ->addWhere('status_id:name', '=', 'open')
+      ->execute()
+      ->first();
+
+    if (!empty($creditNote) && $creditNote['remaining_credit'] <= 0) {
+      \Civi\Api4\CreditNote::update()
+        ->addValue('status_id:name', 'fully_allocated')
+        ->addWhere('id', '=', $creditNoteId)
+        ->execute();
+    }
   }
 
 }
