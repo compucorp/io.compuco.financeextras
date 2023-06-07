@@ -95,6 +95,10 @@ class SearchDisplayRun {
       if (!empty($allocatedTotal) && $creditNote['status_id:name'] == 'open' && $link['text'] == 'Void') {
         $link['style'] = 'disabled';
       }
+
+      if ($creditNote['status_id:name'] == 'fully_allocated' && !in_array($link['text'], ['View', 'Edit', 'Delete', 'Download PDF Document Credit Note', 'Email Credit Note'])) {
+        $link['style'] = 'disabled';
+      }
     }
   }
 
