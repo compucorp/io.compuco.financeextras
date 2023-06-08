@@ -8,8 +8,8 @@
   <log>true</log>
 
   <paths>
-    <view>civicrm/contribution/creditnote/view?reset=1&amp;id=[id]</view>
-    <update>civicrm/contribution/creditnote/new?reset=1&amp;id=[id]</update>
+    <view>civicrm/contribution/creditnote/view?reset=1&amp;id=[id]&amp;action=view</view>
+    <update>civicrm/contribution/creditnote/new?reset=1&amp;id=[id]&amp;action=update</update>
     <delete>civicrm/contribution/creditnote/delete?reset=1&amp;id=[id]</delete>
   </paths>
 

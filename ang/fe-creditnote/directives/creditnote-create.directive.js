@@ -17,6 +17,10 @@
             CRM.$("div.ui-dialog").append(buttonPane);
           }
         }, 20);
+      },
+      scope: {
+        id: '@',
+        context: '@',
       }
     };
   });
@@ -34,15 +38,17 @@
    */
   function creditnoteCreateController ($scope, $location, $window, CurrencyCodes, crmUiHelp, crmApi4, CreditNoteStatus) {
     const defaultCurrency = 'GBP';
-    $scope.isUpdate = false;
-    $scope.formValid = true;
     const financialTypesCache = new Map();
 
     $scope.ts = CRM.ts();
+    $scope.crmUrl = CRM.url;
+    $scope.formValid = true;
     $scope.roundTo = roundTo;
     $scope.formatMoney = formatMoney;
+    $scope.isView = $scope.context == 'view'
     $scope.saveCreditnotes = saveCreditnotes;
     $scope.calculateSubtotal = calculateSubtotal;
+    $scope.isUpdate = $scope.context == 'update';
     $scope.currencyCodes = CurrencyCodes.getAll();
     $scope.handleFinancialTypeChange = handleFinancialTypeChange;
     $scope.hs = crmUiHelp({ file: 'CRM/Financeextras/CreditNoteCtrl' });
@@ -50,6 +56,7 @@
 
     (function init () {
       initializeCreditnotes();
+      prepopulateCreditnotes();
       $scope.newCreditnotesItem = newCreditnotesItem;
       CRM.wysiwyg.create('#creditnotes-description');
       $scope.removeCreditnotesItem = removeCreditnotesItem;
@@ -64,6 +71,7 @@
       $scope.creditnotes = {
         currency: defaultCurrency,
         contact_id: null,
+        cn_number: null,
         date: $.datepicker.formatDate('yy-mm-dd', new Date()),
         status_id: CreditNoteStatus.getValueByName('open'),
         items: [{
@@ -92,6 +100,45 @@
         quantity: null,
         tax_rate: 0,
         line_total: 0
+      });
+    }
+
+    /**
+     * Prepopulates credit notes using credit note ID
+     */
+    function prepopulateCreditnotes () {
+      if (!$scope.id) {
+        return;
+      }
+
+      crmApi4('CreditNote', 'get', {
+        where: [["id", "=", $scope.id]],
+        chain: {"items":["CreditNoteLine", "get", {"where":[["credit_note_id", "=", "$id"]], "select": ['*', 'financial_type_id.name']}]}
+      }).then(function (result) {
+        const creditnotes = result[0] ?? null;
+        $scope.creditnotes.id = creditnotes.id
+        $scope.creditnotes.contact_id = creditnotes.contact_id
+        $scope.creditnotes.currency = creditnotes.currency
+        $scope.creditnotes.cn_number = creditnotes.cn_number
+        $scope.creditnotes.date = $.datepicker.formatDate('yy-mm-dd', new Date(creditnotes.date))
+        $scope.creditnotes.description = creditnotes.description
+        $scope.creditnotes.reference = creditnotes.reference
+        $scope.creditnotes.comment = creditnotes.comment
+        $scope.creditnotes.items = [];
+
+        creditnotes.items.forEach((element, i) => {
+          $scope.creditnotes.items.push({
+            description: element.description,
+            financial_type_id: element.financial_type_id,
+            unit_price: element.unit_price,
+            quantity: element.quantity,
+            line_total: element.line_total,
+            financial_type: element['financial_type_id.name']
+          })
+
+          handleFinancialTypeChange(i);
+        });
+        CRM.wysiwyg.setVal('#creditnotes-description', $scope.creditnotes.description);
       });
     }
 
