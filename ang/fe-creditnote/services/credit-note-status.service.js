@@ -12,7 +12,6 @@
     };
 
     this.getValueByName = function (name) {
-      console.log(CRM['fe-creditnote'])
       return CRM['fe-creditnote']
         .creditNoteStatus
         .filter(status => status.name === name)
