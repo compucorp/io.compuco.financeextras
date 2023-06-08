@@ -6,7 +6,9 @@
 use Civi\Api4\OptionValue;
 use Civi\Financeextras\Utils\CurrencyUtils;
 
-$options = [];
+$options = [
+  'canEditContribution' => CRM_Core_Permission::check('edit contributions'),
+];
 
 /**
  * Exposes currency codes to Angular.

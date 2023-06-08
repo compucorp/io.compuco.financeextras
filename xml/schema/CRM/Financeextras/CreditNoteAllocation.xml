@@ -103,4 +103,13 @@
     </html>
   </field>
 
+  <field>
+    <name>date</name>
+    <type>date</type>
+    <comment>Allocation date</comment>
+    <html>
+      <type>Select Date</type>
+    </html>
+  </field>
+
 </table>

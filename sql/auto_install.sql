@@ -57,6 +57,7 @@ CREATE TABLE `financeextras_credit_note_allocation` (
   `currency` varchar(3) DEFAULT NULL COMMENT '3 character string, value from config setting or input via user.',
   `reference` text,
   `amount` decimal(20,2) NULL COMMENT 'Ammount allocated',
+  `date` date COMMENT 'Allocation date',
   PRIMARY KEY (`id`),
   CONSTRAINT FK_financeextras_credit_note_allocation_credit_note_id FOREIGN KEY (`credit_note_id`) REFERENCES `financeextras_credit_note`(`id`) ON DELETE CASCADE,
   CONSTRAINT FK_financeextras_credit_note_allocation_contribution_id FOREIGN KEY (`contribution_id`) REFERENCES `civicrm_contribution`(`id`)
