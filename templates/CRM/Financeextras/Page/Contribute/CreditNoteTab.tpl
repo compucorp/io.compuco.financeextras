@@ -10,7 +10,7 @@
   {if $action eq 16 and $permission EQ 'edit'}
   {capture assign=newCreditnotesURL}{crmURL p="civicrm/contribution/creditnote" q="reset=1&action=add&cid=`$contactId`&context=contribution"}{/capture}
     <div class="action-link">
-      <a accesskey="N" href="{$newCreditnotesURL|smarty:nodefaults}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Create New Credit Note{/ts}</span></a>
+      <a accesskey="N" href="{$newCreditnotesURL|smarty:nodefaults}" class="button no-popup"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Create New Credit Note{/ts}</span></a>
       <br /><br />
     </div>
   {/if}
