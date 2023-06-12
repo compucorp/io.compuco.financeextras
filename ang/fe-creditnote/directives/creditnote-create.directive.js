@@ -177,10 +177,9 @@
 
       $scope.submitInProgress = true;
       crmApi4('CreditNote', 'save', { records: [$scope.creditnotes] })
-        .then(function () {
-          $scope.submitInProgress = false;
+        .then(function (result) {
           showSucessNotification();
-          redirectToAppropraitePage();
+          redirectToAppropraitePage(result[0].id);
         }, function () {
           $scope.submitInProgress = false;
           CRM.alert('Unable to create credit note', ts('Error'), 'error');
@@ -203,14 +202,11 @@
 
     /**
      * Handles page rediection after successfully creating creditnotes.
+     * 
+     * @param {boolean} the credit note ID
      */
-    function redirectToAppropraitePage () {
-      if ($scope.isUpdate) {
-        $window.location.href = $window.document.referrer;
-        return;
-      }
-
-      $window.location.href = 'a#/';
+    function redirectToAppropraitePage (creditNoteId) {
+      $window.location.href = CRM.url(`/contribution/creditnote/allocate?crid=${creditNoteId}`);
     }
 
     /**
