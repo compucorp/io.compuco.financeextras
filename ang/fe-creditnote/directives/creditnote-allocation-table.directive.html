@@ -5,7 +5,7 @@
       <label class="col-sm-6 control-label">
         {{ts('Allocated')}}
       </label>
-      <div class="col-sm-6" ng-if="hasAllocatePermission">
+      <div class="col-sm-6" ng-if="hasAllocatePermission && isView">
         <a ng-href="{{ crmUrl('civicrm/contribution/creditnote/allocate', {crid: creditNoteId}) }}" class="btn btn-primary-outline pull-right">Allocate Credit</a>
       </div>
     </div>
@@ -15,14 +15,16 @@
   <br />
 </div>
 <div class="form-group">
-  <div class="col-sm-12" style="overflow: scroll;">
+  <div class="col-sm-12">
     <table class="table table-bordered table-striped">
      <tr>
        <th>Allocation Type</th>
        <th>Allocated To</th>
        <th>Date</th>
        <th>Reference</th>
+       <th>Paid From</th>
        <th>Amount</th>
+       <th ng-if="isUpdate"></th>
      </tr>
      <tr ng-repeat="allocation in allocations track by $index">
       <td>{{ allocation['type_id:label'] }}</td>
@@ -34,7 +36,27 @@
       </td>
       <td>{{ formatDate(allocation['date'], 'dd-M-yy') }}</td>
       <td>{{ allocation['reference'] }}</td>
+      <td>{{ allocation['paid_from'] }}</td>
       <td>{{ formatMoney(allocation['amount'], currency, true) }}</td>
+      <td ng-if="isUpdate">
+        <div class="btn-group btn-group-sm">
+          <button
+            type="button"
+            class="btn btn-default dropdown-toggle crm-hover-button"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+            ng-disabled="item['case_type_id.is_active'] === '0'"
+          >
+            <i class="fa fa-ellipsis-v"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-right">
+            <li ng-if="allocation['type_id:label'] == 'Invoice'">
+              <a title="{{:: ts('Delete') }}" ng-click="deleteAllocation(allocation['id'])" href="#">Delete</a>
+            </li>
+          </ul>
+        </div>
+      </td>
      </tr>
      </table>
   </div>

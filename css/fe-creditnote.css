@@ -33,3 +33,6 @@
   right: 0;
   left: auto;
 }
+#bootstrap-theme .table .table {
+  background-color: unset;
+}
