@@ -25,11 +25,35 @@
               }"
               required
               ng-minlength="1"
-              ng-disabled="isView"
+              ng-disabled="isView || isUpdate"
             />
             <span class="crm-inline-error" ng-show="creditnotesForm.contact.$dirty && creditnotesForm.contact.$invalid && creditnotesForm.contact.$error.required">Contact is required</span>
           </div>
         </div>
+        <div class="form-group" ng-if="isView || isUpdate">
+          <label class="col-sm-2 control-label required-mark">
+            {{ ts('Status') }}
+          </label>
+          <div class="col-sm-5">
+            <input class="form-control"
+              name="status_id"
+              ng-model="creditnotes.status_id"
+              crm-entityref="{
+                create: true,
+                entity: 'OptionValue',
+                api: {
+                  description_field: null,
+                  params: {active: true, option_group_id: 'financeextras_credit_note_status'}
+                },
+                select: { multiple: false, allowClear: false }
+              }"
+              required
+              ng-minlength="1"
+              ng-disabled="isView || isUpdate"
+            />
+          </div>
+        </div>
+
         <div class="form-group">
           <label class="col-sm-2 control-label required-mark">
             {{ ts('Number') }}
@@ -37,7 +61,7 @@
           <div class="col-sm-5">
               <input
                 class="form-control"" id="creditnotes_number"
-                ng-model="creditnotes.cn_number" placeholder="Number" name="number" type="text" disabled/>
+                ng-model="creditnotes.cn_number" placeholder="Number" name="number" type="text" ng-disabled="!isUpdate"/>
           </div>
         </div>
         <div class="form-group">
@@ -81,7 +105,7 @@
               ng-change="handleCurrencyChange()"
               placeholder="Currency"
               name="currency"
-              ng-disabled="isView"
+              ng-disabled="isView || isUpdate"
               required
             >
             <option value="">{{ ts('Currency') }}</option>
@@ -91,7 +115,7 @@
           </div>
         </div>
 
-        <div ng-if="!isView">
+        <div ng-if="!(isView || isUpdate)">
           <div class="row">
             <label class="col-sm-2 control-label required-mark">
               {{ts('Line Items:')}}
@@ -164,7 +188,7 @@
             <label class="col-sm-2"></label>
           </div>
         </div>
-        <div ng-if="isView">
+        <div ng-if="isView || isUpdate">
           <creditnote-line-table credit-note="{{ creditnotes }}" />
         </div>
 
@@ -201,13 +225,13 @@
         </div>
 
       </form>
-      <creditnote-allocation-table ng-if="creditnotes.id && isView" credit-note-id="{{creditnotes.id}}" />
+      <creditnote-allocation-table ng-if="creditnotes.id && (isView || isUpdate)" context="{{context}}" credit-note-id="{{creditnotes.id}}" />
     </div>
     <div class="panel-footer flex-between crm-submit-buttons">
         <a class="btn btn-primary-outline cancel crm-form-submit crm-button-type-cancel" ng-href="{{ crmUrl('civicrm/contact/view', {reset: 1, cid: contactId, selectedChild: 'contribute'}) }}">
           <span class="btn-icon"></span> {{ts('Cancel')}}</a>
         <button ng-if="!isView" type="submit" class="btn btn-primary crm-form-submit crm-button crm-button-type-submit" ng-disabled="submitInProgress" ng-click="saveCreditnotes()">
-          <span class="btn-icon"></span> {{ts('Create')}}</button>
+          <span class="btn-icon"></span> <span ng-if="!isUpdate">{{ts('Create')}}</span> <span ng-if="isUpdate">{{ts('Save')}}</span></button>
     </div>
   </div>
 </div>

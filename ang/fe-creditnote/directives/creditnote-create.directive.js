@@ -174,7 +174,8 @@
         $scope.creditnotes.description = creditnotes.description
         $scope.creditnotes.reference = creditnotes.reference
         $scope.creditnotes.comment = creditnotes.comment
-        $scope.creditnotes.items = [];
+        $scope.creditnotes.status_id = creditnotes.status_id
+        $scope.creditnotes.items = []
 
         creditnotes.items.forEach((element, i) => {
           $scope.creditnotes.items.push({
@@ -232,7 +233,7 @@
           redirectToAppropraitePage(result[0].id);
         }, function () {
           $scope.submitInProgress = false;
-          CRM.alert('Unable to create credit note', ts('Error'), 'error');
+          CRM.alert(`Unable to ${$scope.isUpdate? 'update': 'create'} credit note`, ts('Error'), 'error');
         });
     }
 
@@ -256,6 +257,11 @@
      * @param {boolean} the credit note ID
      */
     function redirectToAppropraitePage (creditNoteId) {
+      if ($scope.isUpdate) {
+        $window.location.href = $window.document.referrer;
+        return;
+      }
+
       $window.location.href = CRM.url(`/contribution/creditnote/allocate?crid=${creditNoteId}`);
     }
 
