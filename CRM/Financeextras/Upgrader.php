@@ -2,6 +2,7 @@
 
 use Civi\Financeextras\Setup\Manage\CreditNoteStatusManager;
 use Civi\Financeextras\Setup\Manage\CreditNoteAllocationTypeManager;
+use Civi\Financeextras\Setup\Manage\CreditNoteInvoiceTemplateManager;
 
 /**
  * Collection of upgrade steps.
@@ -15,6 +16,7 @@ class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
     $steps = [
       new CreditNoteStatusManager(),
       new CreditNoteAllocationTypeManager(),
+      new CreditNoteInvoiceTemplateManager(),
     ];
 
     foreach ($steps as $step) {
@@ -29,6 +31,7 @@ class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
     $steps = [
       new CreditNoteStatusManager(),
       new CreditNoteAllocationTypeManager(),
+      new CreditNoteInvoiceTemplateManager(),
     ];
 
     foreach ($steps as $step) {
@@ -43,6 +46,7 @@ class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
     $steps = [
       new CreditNoteStatusManager(),
       new CreditNoteAllocationTypeManager(),
+      new CreditNoteInvoiceTemplateManager(),
     ];
 
     foreach ($steps as $step) {
@@ -57,6 +61,7 @@ class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
     $steps = [
       new CreditNoteStatusManager(),
       new CreditNoteAllocationTypeManager(),
+      new CreditNoteInvoiceTemplateManager(),
     ];
 
     foreach ($steps as $step) {
