@@ -151,7 +151,7 @@ $mgd = [
                   'condition' => [],
                 ],
                 [
-                  'path' => 'civicrm/',
+                  'path' => 'civicrm/contribution/creditnote/download-pdf?id=[id]',
                   'icon' => 'fa-external-link',
                   'text' => 'Download PDF Document Credit Note',
                   'style' => 'default',
