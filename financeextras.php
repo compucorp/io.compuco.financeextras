@@ -16,6 +16,19 @@ function financeextras_civicrm_config(&$config) {
 }
 
 /**
+ * Implements hook_civicrm_container().
+ */
+function financeextras_civicrm_container($container) {
+  $containers = [
+    new \Civi\Financeextras\Hook\Container\ServiceContainer($container),
+  ];
+
+  foreach ($containers as $container) {
+    $container->register();
+  }
+}
+
+/**
  * Implements hook_civicrm_install().
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_install
