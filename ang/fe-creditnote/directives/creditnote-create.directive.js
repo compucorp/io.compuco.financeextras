@@ -21,6 +21,7 @@
       scope: {
         id: '@',
         context: '@',
+        contactId: '@',
       }
     };
   });
@@ -58,6 +59,7 @@
     (function init () {
       initializeCreditnotes();
       prepopulateCreditnotes();
+      setDefaultContactID();
       $scope.newCreditnotesItem = newCreditnotesItem;
       CRM.wysiwyg.create('#creditnotes-description');
       $scope.removeCreditnotesItem = removeCreditnotesItem;
@@ -307,6 +309,14 @@
       return setting[0]['value']['tax_term'] ?? '';
     }
 
+    /**
+     * Sets default contact ID.
+     */
+    function setDefaultContactID () {
+      if (!parseInt($scope.contributionId) && parseInt($scope.contactId)) {
+        $scope.creditnotes.contact_id = $scope.contactId
+      }
+    }
 
   }
 })(angular, CRM.$, CRM._);
