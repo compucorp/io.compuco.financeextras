@@ -175,7 +175,7 @@
                   <table class="table">
                     <tr><th>Subtotal</th><td>{{ formatMoney(creditnotes.total, creditnotes.currency) }}</td></tr>
                       <tr ng-repeat="i in taxRates">
-                        <th>*{{ i.tax_name }} @ {{ i.rate }}%</th>
+                        <th>*{{ taxTerm }} @ {{ i.rate }}%</th>
                         <td>{{ formatMoney(i.value, creditnotes.currency) }}</td>
                       </tr>
                     <tr><th>Total</th><td>{{formatMoney(creditnotes.grandTotal, creditnotes.currency)}}</td></tr>

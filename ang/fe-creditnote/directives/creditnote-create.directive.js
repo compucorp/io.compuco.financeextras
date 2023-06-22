@@ -41,6 +41,7 @@
     const financialTypesCache = new Map();
 
     $scope.ts = CRM.ts();
+    $scope.taxTerm = '';
     $scope.crmUrl = CRM.url;
     $scope.formValid = true;
     $scope.roundTo = roundTo;
@@ -87,6 +88,8 @@
       };
       $scope.total = 0;
       $scope.taxRates = [];
+
+      getTaxTerm().then((taxTerm) => $scope.taxTerm = taxTerm)
     }
 
     /**
@@ -107,7 +110,7 @@
      * Prepopulates credit notes using credit note ID
      */
     function prepopulateCreditnotes () {
-      if (!$scope.id) {
+      if (!parseInt($scope.id)) {
         return;
       }
 
@@ -289,6 +292,19 @@
 
       item.line_total = item.unit_price * item.quantity || 0;
       $scope.$emit('totalChange');
+    }
+
+    /**
+     * Retrieves the contribution tax term from settings
+     * 
+     * @returns {string} tax term
+     */
+    async function getTaxTerm() {
+      const setting = await crmApi4('Setting', 'get', {
+        select: ["contribution_invoice_settings"]
+      });
+
+      return setting[0]['value']['tax_term'] ?? '';
     }
 
 
