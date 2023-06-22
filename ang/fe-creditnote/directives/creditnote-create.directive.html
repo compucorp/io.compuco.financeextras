@@ -53,17 +53,16 @@
           </div>
         </div>
         <div class="form-group">
-          <label class="col-sm-2 control-label required-mark">
+          <label class="col-sm-2 control-label">
             {{ ts('Description') }}
             <a crm-ui-help="hs({title:ts('Description'), id:'creditnotes_description'})"></a>
           </label>
           <div class="col-sm-5">
-            <textarea name="description" ng-model="creditnotes.description" class="crm-form-wysiwyg" id="creditnotes-description" ng-disabled="isView" required></textarea>
-            <span class="crm-inline-error" ng-show="creditnotesForm.description.$dirty && creditnotesForm.description.$invalid && creditnotesForm.description.$error.required">Description is required</span>
+            <textarea name="description" ng-model="creditnotes.description" class="crm-form-wysiwyg" id="creditnotes-description" ng-disabled="isView"></textarea>
           </div>
         </div>
         <div class="form-group">
-          <label class="col-sm-2 control-label required-mark">
+          <label class="col-sm-2 control-label">
             {{ ts('Reference') }}
           </label>
           <div class="col-sm-5 civicase__ui-range">
