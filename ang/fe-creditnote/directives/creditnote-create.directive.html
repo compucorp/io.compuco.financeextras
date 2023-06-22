@@ -204,8 +204,8 @@
       <creditnote-allocation-table ng-if="creditnotes.id && isView" credit-note-id="{{creditnotes.id}}" />
     </div>
     <div class="panel-footer flex-between crm-submit-buttons">
-        <button type="button" class="btn btn-primary-outline cancel crm-form-submit crm-button crm-button-type-cancel" history-back>
-          <span class="btn-icon"></span> {{ts('Cancel')}}</button>
+        <a class="btn btn-primary-outline cancel crm-form-submit crm-button-type-cancel" ng-href="{{ crmUrl('civicrm/contact/view', {reset: 1, cid: contactId, selectedChild: 'contribute'}) }}">
+          <span class="btn-icon"></span> {{ts('Cancel')}}</a>
         <button ng-if="!isView" type="submit" class="btn btn-primary crm-form-submit crm-button crm-button-type-submit" ng-disabled="submitInProgress" ng-click="saveCreditnotes()">
           <span class="btn-icon"></span> {{ts('Create')}}</button>
     </div>
