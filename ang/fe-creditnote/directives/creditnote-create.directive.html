@@ -142,7 +142,6 @@
                 </td>
                 <td>
                   <div class="input-group" style="width: 10em">
-                    <span class="input-group-addon">{{ currencySymbol }}</span>
                     <input type="number" min="0" name="unit_price_{{$index}}" required placeholder="Unit Price" ng-model="creditnotes.items[$index].unit_price" ng-change="calculateSubtotal($index)" class="form-control" step="0.01" />
                   </div>
                   <br />
@@ -175,12 +174,12 @@
             <div class="row">
                 <div class="col-sm-4 pull-right">
                   <table class="table">
-                    <tr><th>Subtotal</th><td>{{ currencySymbol }} {{ formatMoney(creditnotes.total, creditnotes.currency) }}</td></tr>
+                    <tr><th>Subtotal</th><td>{{ formatMoney(creditnotes.total, creditnotes.currency) }}</td></tr>
                       <tr ng-repeat="i in taxRates">
                         <th>*{{ i.tax_name }} @ {{ i.rate }}%</th>
-                        <td>{{ currencySymbol }} {{ formatMoney(i.value, creditnotes.currency) }}</td>
+                        <td>{{ formatMoney(i.value, creditnotes.currency) }}</td>
                       </tr>
-                    <tr><th>Total</th><td>{{ currencySymbol }} {{formatMoney(creditnotes.grandTotal, creditnotes.currency)}}</td></tr>
+                    <tr><th>Total</th><td>{{formatMoney(creditnotes.grandTotal, creditnotes.currency)}}</td></tr>
                   </table>
                 </div>
             </div>
