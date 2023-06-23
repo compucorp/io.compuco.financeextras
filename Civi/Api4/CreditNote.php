@@ -12,6 +12,7 @@ use Civi\Api4\Action\CreditNote\GetAction;
  *
  * Provided by the Finance Extras extension.
  *
+ * @searchable primary
  * @package Civi\Api4
  */
 class CreditNote extends Generic\DAOEntity {
