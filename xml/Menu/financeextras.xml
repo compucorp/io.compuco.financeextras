@@ -5,6 +5,11 @@
     <page_callback>CRM_Financeextras_Page_Contribute_CreditNoteAngular</page_callback>
     <access_arguments>edit contributions</access_arguments>
   </item>
+    <item>
+    <path>civicrm/contribution/creditnote/download-pdf</path>
+    <page_callback>CRM_Financeextras_Form_Contribute_CreditNoteInvoice::download</page_callback>
+    <access_arguments>edit contributions</access_arguments>
+  </item>
   <item>
     <path>civicrm/contribution/creditnote</path>
     <page_callback>CRM_Financeextras_Page_Contribute_CreditNoteAngular</page_callback>
