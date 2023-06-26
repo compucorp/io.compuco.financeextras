@@ -10,8 +10,9 @@
     (function(angular, $, _) {
       const app = angular.module('creditnoteTab', ['fe-creditnote']);
       app.directive('view', function () {
+      const template = context == 'view' ? 'view' : 'create'
       return {
-        template: `<creditnote-create id=${id} context=${context}></creditnote-create>`,
+        template: `<creditnote-${template} id=${id} context=${context}></creditnote-create>`,
       }
     });
     })(angular, CRM.$, CRM._);
