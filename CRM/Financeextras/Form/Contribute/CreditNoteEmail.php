@@ -2,6 +2,7 @@
 
 use Civi\Api4\CreditNote;
 use Civi\Token\TokenProcessor;
+use Civi\Financeextras\Event\CreditNoteMailedEvent;
 
 /**
  * Handles Credit Note Email Invoice Task.
@@ -116,6 +117,12 @@ class CRM_Financeextras_Form_Contribute_CreditNoteEmail extends CRM_Core_Form {
       'count' => $sents,
     ]), ts('Message Sent', ['plural' => 'Messages Sent', 'count' => $sents]), 'success');
 
+    Civi::dispatcher()->dispatch(CreditNoteMailedEvent::NAME, new CreditNoteMailedEvent(
+      $this->creditNoteId,
+      $creditNoteInvoice,
+      $this->getSubject(),
+      array_column($this->getRowsForEmails(), 'contact_id')
+    ));
   }
 
   /**
