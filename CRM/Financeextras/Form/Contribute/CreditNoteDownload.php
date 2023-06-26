@@ -2,9 +2,9 @@
 
 
 /**
- * Handles Credit Note Invoice Task.
+ * Handles Credit Note Download Task.
  */
-class CRM_Financeextras_Form_Contribute_CreditNoteInvoice extends CRM_Core_Form {
+class CRM_Financeextras_Form_Contribute_CreditNoteDownload extends CRM_Core_Form {
 
   /**
    * Renders and return the generated PDF to the browser.

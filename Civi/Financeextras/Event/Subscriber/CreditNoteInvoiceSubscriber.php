@@ -15,7 +15,22 @@ class CreditNoteInvoiceSubscriber implements EventSubscriberInterface {
   public static function getSubscribedEvents() {
     return [
       CreditNoteMailedEvent::NAME => 'createMailActivity',
+      CreditNoteDownloadedEvent::NAME => 'createDownloadActivity',
     ];
+  }
+
+  /**
+   * Create activity for the creditnote invoice download.
+   *
+   * @param \Civi\Financeextras\Event\CreditNoteDownloadedEvent $e
+   *   The registration event. Add new tokens using register().
+   */
+  public function createDownloadActivity(CreditNoteDownloadedEvent $e) {
+    $activityType = 'Downloaded Invoice';
+    $subject = 'Downloaded Credit Note PDF';
+    $targetContactId = $this->getCreditNoteContactId($e->getCreditNoteId());
+    $attachment = $this->storeFile($e->getCreditNoteInvoice()['html'], $e->getCreditNoteInvoice()['format']);
+    $this->createActivity([$targetContactId], $activityType, $subject, $attachment);
   }
 
   /**
