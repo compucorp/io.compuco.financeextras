@@ -76,6 +76,7 @@ class CreditNote extends Generic\DAOEntity {
   public static function permissions() {
     return [
       'meta' => ['access CiviCRM'],
+      'computeTotal' => ['access CiviCRM', 'access CiviContribute'],
       'get' => ['access CiviCRM', 'access CiviContribute'],
       'default' => ['access CiviCRM', 'access CiviContribute', 'edit contributions'],
       'delete' => ['access CiviCRM', 'access CiviContribute', 'delete in CiviContribute'],

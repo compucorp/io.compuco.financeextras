@@ -11,6 +11,11 @@
     <access_arguments>edit contributions</access_arguments>
   </item>
   <item>
+    <path>civicrm/contribution/creditnote/view</path>
+    <page_callback>CRM_Financeextras_Page_Contribute_CreditNoteAngular</page_callback>
+    <access_arguments>access CiviContribute</access_arguments>
+  </item>
+  <item>
     <path>civicrm/contribution/creditnote</path>
     <page_callback>CRM_Financeextras_Page_Contribute_CreditNoteAngular</page_callback>
     <access_arguments>edit contributions</access_arguments>
