@@ -21,6 +21,7 @@
       scope: {
         id: '@',
         context: '@',
+        contactId: '@',
       }
     };
   });
@@ -41,6 +42,7 @@
     const financialTypesCache = new Map();
 
     $scope.ts = CRM.ts();
+    $scope.taxTerm = '';
     $scope.crmUrl = CRM.url;
     $scope.formValid = true;
     $scope.roundTo = roundTo;
@@ -57,6 +59,7 @@
     (function init () {
       initializeCreditnotes();
       prepopulateCreditnotes();
+      setDefaultContactID();
       $scope.newCreditnotesItem = newCreditnotesItem;
       CRM.wysiwyg.create('#creditnotes-description');
       $scope.removeCreditnotesItem = removeCreditnotesItem;
@@ -87,6 +90,8 @@
       };
       $scope.total = 0;
       $scope.taxRates = [];
+
+      getTaxTerm().then((taxTerm) => $scope.taxTerm = taxTerm)
     }
 
     /**
@@ -107,7 +112,7 @@
      * Prepopulates credit notes using credit note ID
      */
     function prepopulateCreditnotes () {
-      if (!$scope.id) {
+      if (!parseInt($scope.id)) {
         return;
       }
 
@@ -291,6 +296,27 @@
       $scope.$emit('totalChange');
     }
 
+    /**
+     * Retrieves the contribution tax term from settings
+     * 
+     * @returns {string} tax term
+     */
+    async function getTaxTerm() {
+      const setting = await crmApi4('Setting', 'get', {
+        select: ["contribution_invoice_settings"]
+      });
+
+      return setting[0]['value']['tax_term'] ?? '';
+    }
+
+    /**
+     * Sets default contact ID.
+     */
+    function setDefaultContactID () {
+      if (!parseInt($scope.contributionId) && parseInt($scope.contactId)) {
+        $scope.creditnotes.contact_id = $scope.contactId
+      }
+    }
 
   }
 })(angular, CRM.$, CRM._);

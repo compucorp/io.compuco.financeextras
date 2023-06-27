@@ -6,12 +6,13 @@
 <script type="text/javascript">
   const id = JSON.parse({ $id });
   const context = '{ $context }';
+  const contactId = JSON.parse({ $contact_id });
   {literal}
     (function(angular, $, _) {
       const app = angular.module('creditnoteTab', ['fe-creditnote']);
       app.directive('view', function () {
       return {
-        template: `<creditnote-create id=${id} context=${context}></creditnote-create>`,
+        template: `<creditnote-create id=${id} context=${context} contact-id=${contactId}></creditnote-create>`,
       }
     });
     })(angular, CRM.$, CRM._);
