@@ -1,7 +1,7 @@
 
 <li id="tab_credit_note" class="crm-tab-button ui-corner-all ui-tabs-tab ui-corner-top ui-state-default ui-tab">
   <a href="#credit_note_subtab" title="{ts}Credit Notes{/ts}">
-    {ts}Credit Notes{/ts}
+    {ts}Credit Notes{/ts} {if $creditNoteCount > 0}<em>{$creditNoteCount}</em> {/if}
   </a>
 </li>
 
@@ -17,9 +17,15 @@
 
   {if $creditNoteCount > 0}
     <div class='clear'></div>
-    <crm-angular-js modules="fe-creditnote">
-      <creditnote-list contact-id="{$contactId}"></creditnote-list>
-    </crm-angular-js>
+    <div id="bootstrap-theme" class="creditnote__container">
+    <div class="panel panel-default" id="creditnote__list">
+      <div class="panel-body">
+        <crm-angular-js modules="fe-creditnote">
+          <afsearch-credit-notes options="{ldelim}contact_id: {$contactId}{rdelim}"></afsearch-credit-notes>
+        </crm-angular-js>
+      </div>
+    </div>
+  </div>
 
   {else}
     <div class="messages status no-popup">
@@ -28,4 +34,3 @@
     </div>
   {/if}
 </div>
-
