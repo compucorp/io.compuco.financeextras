@@ -1,10 +1,11 @@
 <?php
 
+use Civi\Financeextras\Event\CreditNoteDownloadedEvent;
 
 /**
- * Handles Credit Note Invoice Task.
+ * Handles Credit Note Download Task.
  */
-class CRM_Financeextras_Form_Contribute_CreditNoteInvoice extends CRM_Core_Form {
+class CRM_Financeextras_Form_Contribute_CreditNoteDownload extends CRM_Core_Form {
 
   /**
    * Renders and return the generated PDF to the browser.
@@ -16,6 +17,12 @@ class CRM_Financeextras_Form_Contribute_CreditNoteInvoice extends CRM_Core_Form 
     $rendered = $creditNoteInvoiceService->render($creditNoteId);
     ob_end_clean();
     CRM_Utils_PDF_Utils::html2pdf($rendered['html'], 'credit_note_invoice.pdf', FALSE, $rendered['format']);
+
+    Civi::dispatcher()->dispatch(CreditNoteDownloadedEvent::NAME, new CreditNoteDownloadedEvent(
+      $creditNoteId,
+      $rendered
+    ));
+
     CRM_Utils_System::civiExit();
   }
 

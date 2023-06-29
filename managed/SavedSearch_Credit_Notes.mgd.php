@@ -162,7 +162,7 @@ $mgd = [
                   'target' => '',
                 ],
                 [
-                  'path' => 'civicrm/',
+                  'path' => 'civicrm/contribution/creditnote/email?id=[id]',
                   'icon' => 'fa-external-link',
                   'text' => 'Email Credit Note',
                   'style' => 'default',
