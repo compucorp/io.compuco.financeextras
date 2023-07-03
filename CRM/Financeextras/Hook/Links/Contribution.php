@@ -79,6 +79,7 @@ class CRM_Financeextras_Hook_Links_Contribution {
         'url' => 'civicrm/contribution/creditnote',
         'qs' => 'reset=1&action=add&contribution_id=' . $this->contributionId,
         'title' => 'Add Credit Note',
+        'class' => 'no-popup',
       ];
     }
   }

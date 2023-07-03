@@ -147,7 +147,7 @@
                   <span class="crm-inline-error" ng-show="creditnotesForm.unit_price_{{$index}}.$dirty && (creditnotesForm.unit_price_{{$index}}.$invalid || creditnotesForm.unit_price_{{$index}}.$error.required)">Unit price is invalid</span>
                 </td>
                 <td style="width: 10em">
-                  <input type="text" value="{{ creditnotes.items[$index].tax_rate > 0 ? roundTo(creditnotes.items[$index].tax_rate, 4) : '' }}" class="form-control" disabled>
+                  <input type="text" value="{{ creditnotes.items[$index].tax_rate > 0 ? roundTo(creditnotes.items[$index].tax_rate, 4)+'%' : '' }}" class="form-control" disabled>
                 </td>
                 <td style="width: 10em">
                   <input type="text" value="{{ formatMoney(creditnotes.items[$index].line_total, creditnotes.currency) }}" class="form-control" disabled>
