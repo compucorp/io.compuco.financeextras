@@ -1,7 +1,5 @@
 CRM.$(function () {
-  CRM.$(function () {
-    moveCreditNoteTabNextToContributionTab();
-  });
+  moveCreditNoteTabNextToContributionTab();
 
   /**
    * Moves the credit note tab to the appropratie position

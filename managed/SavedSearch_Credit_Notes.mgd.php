@@ -173,7 +173,7 @@ $mgd = [
                   'target' => 'crm-popup',
                 ],
                 [
-                  'path' => 'civicrm/',
+                  'path' => 'civicrm/contribution/creditnote/void?id=[id]',
                   'icon' => 'fa-external-link',
                   'text' => 'Void',
                   'style' => 'default',
@@ -181,7 +181,7 @@ $mgd = [
                   'entity' => '',
                   'action' => '',
                   'join' => '',
-                  'target' => '',
+                  'target' => 'crm-popup',
                 ],
                 [
                   'path' => 'civicrm/contribution/creditnote/allocate?crid=[id]',

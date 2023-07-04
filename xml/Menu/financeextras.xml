@@ -30,4 +30,9 @@
     <page_callback>CRM_Financeextras_Form_Contribute_CreditNoteDelete</page_callback>
     <access_arguments>access CiviCRM, access CiviContribute, delete in CiviContribute</access_arguments>
   </item>
+  <item>
+    <path>civicrm/contribution/creditnote/void</path>
+    <page_callback>CRM_Financeextras_Form_Contribute_CreditNoteVoid</page_callback>
+    <access_arguments>access CiviCRM, access CiviContribute, edit contributions</access_arguments>
+  </item>
 </menu>
