@@ -54,12 +54,34 @@ class CRM_Financeextras_BAO_CreditNoteLine extends CRM_Financeextras_DAO_CreditN
       ];
 
       $lineItem = self::create($lineItemParams)->toArray();
-      self::createAccountingEntries($lineItem, $creditNote, $financialTrxn);
+      $lineItemData = array_merge($lineItem,
+        ['unit_price' => $lineItem['unit_price'] * -1, 'tax_amount' => $lineItem['tax_amount'] * -1]
+      );
+      self::createAccountingEntries($lineItemData, $creditNote, $financialTrxn, 'Unpaid');
 
       $result[] = $lineItem;
     });
 
     return $result;
+  }
+
+  /**
+   * Reverses credit notes line accounting entries.
+   *
+   * When voiding a credit note we create accounting entries that reverse/undo
+   * the entries we previously created, main difference is that
+   * the amounts are now positive.
+   *
+   * @param array $data
+   *  The credit note data.
+   *
+   * @param array $financialTrxn
+   *  The credit note financial transaction entity.
+   */
+  public static function voidAccountingEntries($data, $financialTrxn) {
+    foreach ($data['items'] as $lineItem) {
+      self::createAccountingEntries($lineItem, $data, $financialTrxn, 'Paid');
+    }
   }
 
   /**
@@ -84,22 +106,22 @@ class CRM_Financeextras_BAO_CreditNoteLine extends CRM_Financeextras_DAO_CreditN
     $financialItem->delete();
   }
 
-  private static function createAccountingEntries($lineItem, $creditNote, $financialTrxn) {
-    $incomeAccount = FinancialAccountUtils::getFinancialTypeAccount($lineItem['financial_type_id'], 'Income Account is');
+  private static function createAccountingEntries($lineItem, $creditNote, $financialTrxn, $status) {
+    $financialAccount = FinancialAccountUtils::getFinancialTypeAccount($lineItem['financial_type_id'], 'Income Account is');
     $itemParams = [
       'transaction_date' => $creditNote['date'],
       'contact_id' => $creditNote['contact_id'],
       'currency' => $creditNote['currency'],
-      'amount' => ($lineItem['quantity'] * $lineItem['unit_price']) * -1,
+      'amount' => ($lineItem['quantity'] * $lineItem['unit_price']),
       'description' => $lineItem['description'],
-      'status_id' => 'Unpaid',
-      'financial_account_id' => $incomeAccount,
+      'status_id' => $status,
+      'financial_account_id' => $financialAccount,
       'entity_table' => \CRM_Financeextras_DAO_CreditNoteLine::$_tableName,
       'entity_id' => $lineItem['id'],
     ];
     \CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $financialTrxn);
 
-    if (!empty($lineItem['tax_amount']) && $lineItem['tax_amount'] > 0) {
+    if (!empty($lineItem['tax_amount']) && abs($lineItem['tax_amount']) > 0) {
       $taxAccount = FinancialAccountUtils::getFinancialTypeAccount($lineItem['financial_type_id'], 'Sales Tax Account is');
       $taxAccountDesc = \Civi\Api4\FinancialAccount::get()
         ->addSelect('description')
@@ -107,7 +129,7 @@ class CRM_Financeextras_BAO_CreditNoteLine extends CRM_Financeextras_DAO_CreditN
         ->execute()
         ->first()['description'] ?? "";
 
-      $itemParams['amount'] = $lineItem['tax_amount'] * -1;
+      $itemParams['amount'] = $lineItem['tax_amount'];
       $itemParams['financial_account_id'] = $taxAccount;
       $itemParams['description'] = $lineItem['description'] . " - " . $taxAccountDesc;
       \CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $financialTrxn);
