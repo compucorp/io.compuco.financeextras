@@ -1,6 +1,8 @@
 <?php
 
+use Civi\Financeextras\Utils\OptionValueUtils;
 use Civi\Financeextras\Utils\FinancialAccountUtils;
+use Civi\Financeextras\Setup\Manage\CreditNoteStatusManager as CreditNoteStatus;
 
 class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote {
 
@@ -85,17 +87,20 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
   }
 
   /**
-   * Creates financial transcation linked to the credit note.
+   * Creates a credit note with accounting entries.
    *
    * @param array $data
-   *  The credit note data.
-   *
+   *   The credit note data.
    * @param int|null $financialTypeId
-   *  The financial type for the first credit note line.
+   *   The financial type for the first credit note line.
+   *
+   * @return array
+   *   An array containing the created credit note and its financial transaction.
    */
-  public static function createWithAccountingEntries($data, $financialTypeId) {
+  public static function createWithAccountingEntries(array $data, ?int $financialTypeId): array {
     $creditNote = self::create($data)->toArray();
-    $financialTrxn = self::createAccountingEntries($creditNote, $financialTypeId);
+    $data = array_merge($creditNote, ['total_credit' => $creditNote['total_credit'] * -1]);
+    $financialTrxn = self::createAccountingEntries($data, $financialTypeId, 'Pending');
 
     return [
       'creditNote' => $creditNote,
@@ -103,26 +108,60 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
     ];
   }
 
-  private static function createAccountingEntries($creditNote, $financialTypeId) {
+  /**
+   * Creates accounting entries for a credit note.
+   *
+   * @param array $creditNote
+   *   The credit note data.
+   * @param int|null $financialTypeId
+   *   The financial type for the credit note.
+   * @param string $status
+   *   The status to set for the transaction.
+   *
+   * @return array
+   *   The created financial transaction.
+   */
+  private static function createAccountingEntries(array $creditNote, ?int $financialTypeId, string $status): array {
     $receivableAccount = FinancialAccountUtils::getFinancialTypeAccount($financialTypeId, 'Accounts Receivable Account is');
 
     $contributionStatus = \CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $pendingStatus = array_search('Pending', $contributionStatus);
+    $statusId = array_search($status, $contributionStatus);
 
     $trxnParams = [
       'from_financial_account_id' => NULL,
       'to_financial_account_id' => $receivableAccount,
       'trxn_date' => $creditNote['date'],
-      'total_amount' => $creditNote['total_credit'] * -1,
+      'total_amount' => $creditNote['total_credit'],
       'currency' => $creditNote['currency'],
       'is_payment' => 0,
-      'status_id' => $pendingStatus,
+      'status_id' => $statusId,
       'payment_processor_id' => NULL,
       'payment_instrument_id' => 1,
       'entity_table' => \CRM_Financeextras_DAO_CreditNote::$_tableName,
       'entity_id' => $creditNote['id'],
     ];
     return \CRM_Core_BAO_FinancialTrxn::create($trxnParams)->toArray();
+  }
+
+  /**
+   * Voids a credit note.
+   *
+   * @param int $creditNoteId
+   *   The ID of the credit note to void.
+   * @param int|null $financialTypeId
+   *   The financial type for the credit note.
+   * @return array
+   *   The voided financial transaction.
+   */
+  public static function voidCreditNote(int $creditNoteId, ?int $financialTypeId): array {
+    $creditNoteBAO = new CRM_Financeextras_DAO_CreditNote();
+    $creditNoteBAO->id = $creditNoteId;
+    $creditNoteBAO->find(TRUE);
+
+    $creditNoteBAO->status_id = OptionValueUtils::getValueForOptionValue(CreditNoteStatus::NAME, 'void');
+    $creditNoteBAO->update();
+
+    return self::createAccountingEntries($creditNoteBAO->toArray(), $financialTypeId, 'Cancelled');
   }
 
   /**

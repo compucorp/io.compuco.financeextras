@@ -4,6 +4,7 @@ namespace Civi\Financeextras\Test\Helper;
 
 use Civi\Api4\CreditNote;
 use Civi\Api4\OptionValue;
+use Civi\Financeextras\Utils\OptionValueUtils;
 use Civi\Financeextras\Test\Fabricator\ContactFabricator;
 
 /**
@@ -95,12 +96,28 @@ trait CreditNoteTrait {
       $creditNote['items'][0]['tax_rate'] = $params['items']['tax_rate'];
     }
 
-    $creditNote['id'] = CreditNote::save()
+    return CreditNote::save()
       ->addRecord($creditNote)
       ->execute()
-      ->jsonSerialize()[0]['id'];
+      ->first();
+  }
 
-    return $creditNote;
+  /**
+   * Creates credit note allocation record
+   *
+   * @param int $creditNoteId
+   * @param string $allocationType
+   * @param int $amount
+   */
+  public function allocateCredit($creditNoteId, $allocationType, $amount) {
+    $type = OptionValueUtils::getValueForOptionValue('financeextras_credit_note_allocation_type', $allocationType);
+
+    \Civi\Api4\CreditNoteAllocation::create()
+      ->addValue('credit_note_id', $creditNoteId)
+      ->addValue('type_id', $type)
+      ->addValue('currency', 'GBP')
+      ->addValue('amount', $amount)
+      ->execute();
   }
 
 }
