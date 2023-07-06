@@ -36,15 +36,26 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
    *
    */
   public static function createWithAccountingEntries($data) {
-    $creditNoteAllocation = self::create($data)->toArray();
+    $transaction = CRM_Core_Transaction::create();
+    try {
+      $allocation = self::create($data)->toArray();
 
-    self::createAccountingEntries($data['credit_note_id'], $data['contribution_id'], $data['amount']);
+      self::createAccountingEntries($allocation['id'], $data['credit_note_id'], $data['contribution_id'], $data['amount']);
+    }
+    catch (\Throwable $th) {
+      $transaction->rollback();
 
-    return $creditNoteAllocation;
+      throw $th;
+    }
+
+    return $allocation;
   }
 
   /**
    * Creates the neccessary accounting entries using Payment API.
+   *
+   * @param int $allocationId
+   *  The credit note allocation ID
    *
    * @param int $creditNoteId
    *  The credit note credit is to be allocated from.
@@ -55,7 +66,7 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
    * @param float $amount
    *  The amount to be allocated.
    */
-  private static function createAccountingEntries($creditNoteId, $contributionId, $amount) {
+  private static function createAccountingEntries($allocationId, $creditNoteId, $contributionId, $amount) {
     $date = date("Y-m-d");
     $params = [
       'contribution_id' => $contributionId,
@@ -63,6 +74,7 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
       'trxn_date' => $date,
       'is_send_contribution_notification' => FALSE,
       'payment_processor_id' => NULL,
+    // Defaulting to 1 as payment instrument value doesn't matter for credit allocation
       'payment_instrument_id' => 1,
     ];
 
@@ -76,11 +88,68 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
       'Accounts Receivable Account is'
     );
     $transaction = \CRM_Financial_BAO_Payment::create($params);
+
+    // The Payment API typically uses the "Accounts Receivable" as the "from" account
+    // and the financial account linked to the payment processor or the default
+    // asset account as the "to" account. Here, we manually set both accounts
+    // to the specified account ID, to ensure they are attached to epxected accounts.
     \CRM_Core_BAO_FinancialTrxn::create([
       'id' => $transaction->id,
       'from_financial_account_id' => $account,
       'to_financial_account_id' => $account,
     ]);
+
+    self::createAllocationEntityTransactions($allocationId, $transaction->id, $amount);
+  }
+
+  /**
+   * Creates entity transactions for an allocation.
+   *
+   * Two types ofentity financial trnsactions are created
+   *  - Entity financial trnsaction to directly link line item to the finacial transanction
+   *  By default CiviCRM links the the trnsaction to a finacial item and then links
+   *  the financial item to the line item
+   *
+   * - Enity financial transaction to directly link the allocation entity to financial trnsction
+   *
+   * @param int $allocationId
+   *   The allocation ID.
+   * @param int $transactionId
+   *   The transaction ID.
+   * @param float $amount
+   *   The amount of the allocation.
+   */
+  private static function createAllocationEntityTransactions($allocationId, $transactionId, $amount) {
+    $finacialItemEntityTrxns = \Civi\Api4\EntityFinancialTrxn::get()
+      ->addSelect('amount', 'financial_trxn_id', 'financial_item.entity_id', 'financial_item.entity_table')
+      ->addJoin('FinancialItem AS financial_item', 'INNER', ['financial_item.id', '=', 'entity_id'])
+      ->addWhere('entity_table', '=', 'civicrm_financial_item')
+      ->addWhere('financial_trxn_id', '=', $transactionId)
+      ->execute();
+
+    foreach ($finacialItemEntityTrxns as $entityTrxn) {
+      $lineItemEntityTrxn = [
+        'entity_table' => $entityTrxn['financial_item.entity_table'],
+        'entity_id' => $entityTrxn['financial_item.entity_id'],
+        'financial_trxn_id' => $transactionId,
+        'amount' => $entityTrxn['amount'],
+      ];
+
+      $entityTrxn = new CRM_Financial_DAO_EntityFinancialTrxn();
+      $entityTrxn->copyValues($lineItemEntityTrxn);
+      $entityTrxn->save();
+    }
+
+    $allocationEntityTrxn = [
+      'entity_table' => CRM_Financeextras_BAO_CreditNoteAllocation::$_tableName,
+      'financial_trxn_id' => $transactionId,
+      'entity_id' => $allocationId,
+      'amount' => $amount,
+    ];
+
+    $entityTrxn = new CRM_Financial_DAO_EntityFinancialTrxn();
+    $entityTrxn->copyValues($allocationEntityTrxn);
+    $entityTrxn->save();
   }
 
 }

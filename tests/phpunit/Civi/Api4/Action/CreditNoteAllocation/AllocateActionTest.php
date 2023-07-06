@@ -2,6 +2,7 @@
 
 use Civi\Api4\CreditNote;
 use Civi\Api4\CreditNoteAllocation;
+use Civi\Api4\LineItem;
 use Civi\Financeextras\Test\Helper\CreditNoteTrait;
 use Civi\Financeextras\Utils\FinancialAccountUtils;
 
@@ -63,6 +64,47 @@ class Civi_Api4_CreditNoteAllocation_AllocateActionTest extends BaseHeadlessTest
       ->execute()
       ->first();
     $this->assertNotEmpty($financialTrxn);
+  }
+
+  /**
+   * Tests that the expected entity financial transactions are created as part of the accounting entries.
+   */
+  public function testExpectedEntityFinancialAccountingEntriesAreCreated() {
+    $amountAllocated = 100;
+    $creditNote = $this->createCreditNote();
+    $contribution = $this->createContribution($creditNote['contact_id'], 200);
+    $allocation = $this->createAllocation($creditNote['id'], $contribution['id'], $amountAllocated, $creditNote['currency']);
+    $lineItems = LineItem::get()->addWhere('contribution_id', '=', $contribution['id'])->execute();
+
+    $entityFinancialTrxn = \Civi\Api4\EntityFinancialTrxn::get(FALSE)
+      ->addWhere('entity_id', '=', $contribution['id'])
+      ->addWhere('entity_table', '=', 'civicrm_contribution')
+      ->addWhere('amount', '=', $amountAllocated)
+      ->execute()
+      ->first();
+
+    $count = 0;
+    foreach ($lineItems as $lineItem) {
+      $lineItemEntityFinancialTrxn = \Civi\Api4\EntityFinancialTrxn::get(FALSE)
+        ->addWhere('entity_id', '=', $lineItem['id'])
+        ->addWhere('entity_table', '=', CRM_Price_BAO_LineItem::$_tableName)
+        ->addWhere('financial_trxn_id', '=', $entityFinancialTrxn['financial_trxn_id'])
+        ->execute()
+        ->first();
+
+      $count++;
+      $this->assertNotEmpty($lineItemEntityFinancialTrxn);
+    }
+    $this->assertEquals($lineItems->count(), $count);
+
+    $allocationEntityFinancialTrxn = \Civi\Api4\EntityFinancialTrxn::get(FALSE)
+      ->addWhere('entity_id', '=', $allocation['id'])
+      ->addWhere('entity_table', '=', CRM_Financeextras_BAO_CreditNoteAllocation::$_tableName)
+      ->addWhere('financial_trxn_id', '=', $entityFinancialTrxn['financial_trxn_id'])
+      ->execute()
+      ->first();
+
+    $this->assertNotEmpty($allocationEntityFinancialTrxn);
   }
 
   /**
