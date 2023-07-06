@@ -15,9 +15,12 @@ class CRM_Financeextras_Page_Contribute_CreditNoteAngular extends \CRM_Core_Page
     $loader = Civi::service('angularjs.loader');
     $creditNoteId = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 'null');
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE, 'null');
+    $contributionId = CRM_Utils_Request::retrieve('contribution_id', 'Positive', $this, FALSE, 'null');
+
     $this->assign('id', $creditNoteId);
     $this->assign('context', $route['name']);
     $this->assign('contact_id', $contactId);
+    $this->assign('contribution_id', $contributionId);
     $loader->addModules(['crmApp', 'fe-creditnote']);
     CRM_Utils_System::setTitle(ts($route['title']));
 
