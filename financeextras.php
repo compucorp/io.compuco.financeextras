@@ -133,3 +133,9 @@ function financeextras_civicrm_tabset($tabsetName, &$tabs, $context) {
     $loader->addModules(['crmApp', 'fe-creditnote']);
   }
 }
+
+function financeextras_civicrm_post(string $op, string $objectName, int $objectId, &$objectRef) {
+  if ($objectName === 'CreditNoteAllocation' && $op === 'create') {
+    \CRM_Financeextras_BAO_CreditNote::updateCreditNoteStatusPostAllocation($objectRef->credit_note_id);
+  }
+}

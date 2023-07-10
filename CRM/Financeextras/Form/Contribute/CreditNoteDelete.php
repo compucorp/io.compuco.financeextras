@@ -1,7 +1,7 @@
 <?php
 
 use Civi\Api4\CreditNote;
-use CRM_Certificate_ExtensionUtil as E;
+use CRM_Financeextras_ExtensionUtil as E;
 
 /**
  * Credit Note delete Form controller class.
