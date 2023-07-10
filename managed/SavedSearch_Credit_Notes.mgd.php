@@ -152,7 +152,7 @@ $mgd = [
                 ],
                 [
                   'path' => 'civicrm/contribution/creditnote/download-pdf?id=[id]',
-                  'icon' => 'fa-external-link',
+                  'icon' => 'fa-download',
                   'text' => 'Download PDF Document Credit Note',
                   'style' => 'default',
                   'condition' => [],
@@ -163,7 +163,7 @@ $mgd = [
                 ],
                 [
                   'path' => 'civicrm/contribution/creditnote/email?id=[id]',
-                  'icon' => 'fa-external-link',
+                  'icon' => 'fa-envelope-o',
                   'text' => 'Email Credit Note',
                   'style' => 'default',
                   'condition' => [],
@@ -174,7 +174,7 @@ $mgd = [
                 ],
                 [
                   'path' => 'civicrm/contribution/creditnote/void?id=[id]',
-                  'icon' => 'fa-external-link',
+                  'icon' => 'fa-ban',
                   'text' => 'Void',
                   'style' => 'default',
                   'condition' => [],
@@ -185,7 +185,7 @@ $mgd = [
                 ],
                 [
                   'path' => 'civicrm/contribution/creditnote/allocate?crid=[id]',
-                  'icon' => 'fa-external-link',
+                  'icon' => 'fa-money',
                   'text' => 'Allocate credit to invoice',
                   'style' => 'default',
                   'condition' => [],
@@ -196,7 +196,7 @@ $mgd = [
                 ],
                 [
                   'path' => 'civicrm/',
-                  'icon' => 'fa-external-link',
+                  'icon' => 'fa-retweet',
                   'text' => 'Record cash refund',
                   'style' => 'default',
                   'condition' => [],
@@ -207,7 +207,7 @@ $mgd = [
                 ],
                 [
                   'path' => 'civicrm/',
-                  'icon' => 'fa-external-link',
+                  'icon' => 'fa-credit-card',
                   'text' => 'Make credit card refund',
                   'style' => 'default',
                   'condition' => [],
