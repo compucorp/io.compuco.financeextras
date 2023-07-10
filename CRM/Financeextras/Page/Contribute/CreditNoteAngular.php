@@ -32,6 +32,7 @@ class CRM_Financeextras_Page_Contribute_CreditNoteAngular extends \CRM_Core_Page
     $routes = [
       CRM_Core_Action::ADD => ['name' => 'new', 'title' => 'New Credit Note'],
       CRM_Core_Action::VIEW => ['name' => 'view', 'title' => 'View Credit Note'],
+      CRM_Core_Action::UPDATE => ['name' => 'update', 'title' => 'Update Credit Note'],
     ];
     return $routes[$action] ?? $routes[CRM_Core_Action::ADD];
   }

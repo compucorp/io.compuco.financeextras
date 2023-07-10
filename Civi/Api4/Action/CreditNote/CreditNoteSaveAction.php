@@ -43,7 +43,12 @@ class CreditNoteSaveAction extends AbstractSaveAction {
     try {
       $output = [];
       foreach ($items as $creditNote) {
-        $output[] = $this->createCreditNoteWithAccountingEntries($creditNote);
+        if (empty($creditNote['id'])) {
+          $output[] = $this->createCreditNoteWithAccountingEntries($creditNote);
+          continue;
+        }
+
+        $output[] = $this->updateCreditNote($creditNote);
       }
 
       return $output;
@@ -101,6 +106,28 @@ class CreditNoteSaveAction extends AbstractSaveAction {
     $finacialTypeId = $data['items'][0]['financial_type_id'];
 
     return CreditNoteBAO::createWithAccountingEntries($data, $finacialTypeId);
+  }
+
+  /**
+   * Updates credit note entity
+   *
+   * @param array $data
+   *  The credit note params
+   *
+   * @return array
+   *   updated credit note entity
+   */
+  public function updateCreditNote(array $data) {
+    $params = [
+      'id' => $data['id'],
+      'date' => $data['date'],
+      'comment' => $data['comment'],
+      'cn_number' => $data['cn_number'],
+      'reference' => $data['reference'],
+      'description' => $data['description'],
+    ];
+
+    return CreditNoteBAO::create($params);
   }
 
 }

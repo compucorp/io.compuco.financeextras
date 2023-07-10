@@ -8,6 +8,7 @@
       templateUrl: '~/fe-creditnote/directives/creditnote-allocation-table.directive.html',
       scope: {
         creditNoteId: '@',
+        context: '@'
       }
     };
   });
@@ -27,8 +28,10 @@
     $scope.total_credit = 0;
     $scope.allocated_credit = 0;
     $scope.remaining_credit = 0;
+    $scope.isView = $scope.context == 'view'
     $scope.formatDate = CRM.utils.formatDate;
     $scope.formatMoney = MoneyFormat.formatMoney;
+    $scope.isUpdate = $scope.context == 'update';
     $scope.hasAllocatePermission = CRM['fe-creditnote'].canEditContribution;
 
     crmApi4('CreditNote', 'get', {
@@ -37,12 +40,18 @@
       chain: {"allocations":["CreditNoteAllocation", "get", {"where":[["credit_note_id", "=", "$id"]], "select":["*", "type_id:label", "contribution_id.invoice_number"]}]}
     }).then(function(result) {
       const creditnotes = result[0] ?? null;
+
       $scope.currency = creditnotes.currency
-      $scope.allocations = creditnotes.allocations
+      $scope.allocations = creditnotes.allocations ?? []
       $scope.total_credit = creditnotes.total_credit
       $scope.remaining_credit = creditnotes.remaining_credit
       $scope.allocated_credit = creditnotes.total_credit - creditnotes.remaining_credit
     });
+
+    $scope.deleteAllocation = () => {
+      //not yet implemented.
+      CRM.alert('', 'No implementation', '', 'success');
+    }
 
   }
 
