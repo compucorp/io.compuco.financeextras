@@ -2,6 +2,7 @@
 
 namespace Civi\Api4;
 
+use Civi\Api4\Action\CreditNoteAllocation\GetAction;
 use Civi\Api4\Action\CreditNoteAllocation\AllocateAction;
 
 /**
@@ -12,6 +13,17 @@ use Civi\Api4\Action\CreditNoteAllocation\AllocateAction;
  * @package Civi\Api4
  */
 class CreditNoteAllocation extends Generic\DAOEntity {
+
+  /**
+   * {@inheritDoc}
+   *
+   * @param bool $checkPermissions
+   * @return DAOGetAction
+   */
+  public static function get($checkPermissions = TRUE) {
+    return (new GetAction(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
 
   /**
    * Allocate credit to contributions.
