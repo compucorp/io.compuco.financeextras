@@ -86,6 +86,7 @@ class AllocateAction extends AbstractAction {
       'currency' => $this->currency,
       'reference' => $this->reference,
       'amount' => $this->amount,
+      'date' => date("Y-m-d"),
     ];
 
     return CRM_Financeextras_BAO_CreditNoteAllocation::createWithAccountingEntries($data);

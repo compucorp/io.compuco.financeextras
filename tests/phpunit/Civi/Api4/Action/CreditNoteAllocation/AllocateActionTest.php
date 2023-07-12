@@ -83,19 +83,13 @@ class Civi_Api4_CreditNoteAllocation_AllocateActionTest extends BaseHeadlessTest
       ->execute()
       ->first();
 
-    $count = 0;
-    foreach ($lineItems as $lineItem) {
-      $lineItemEntityFinancialTrxn = \Civi\Api4\EntityFinancialTrxn::get(FALSE)
-        ->addWhere('entity_id', '=', $lineItem['id'])
-        ->addWhere('entity_table', '=', CRM_Price_BAO_LineItem::$_tableName)
-        ->addWhere('financial_trxn_id', '=', $entityFinancialTrxn['financial_trxn_id'])
-        ->execute()
-        ->first();
+    $lineItemEntityFinancialTrxn = \Civi\Api4\EntityFinancialTrxn::get(FALSE)
+      ->addWhere('entity_table', '=', CRM_Financial_BAO_FinancialItem::$_tableName)
+      ->addWhere('financial_trxn_id', '=', $entityFinancialTrxn['financial_trxn_id'])
+      ->execute();
 
-      $count++;
-      $this->assertNotEmpty($lineItemEntityFinancialTrxn);
-    }
-    $this->assertEquals($lineItems->count(), $count);
+    $this->assertNotEmpty($lineItemEntityFinancialTrxn);
+    $this->assertEquals($lineItems->count(), $lineItemEntityFinancialTrxn->count());
 
     $allocationEntityFinancialTrxn = \Civi\Api4\EntityFinancialTrxn::get(FALSE)
       ->addWhere('entity_id', '=', $allocation['id'])
