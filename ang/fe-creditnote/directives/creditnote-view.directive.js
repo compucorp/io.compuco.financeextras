@@ -70,8 +70,8 @@
         $scope.creditnotes = creditnotes
         $scope.currency = creditnotes.currency
         $scope.currencySymbol = CurrencyCodes.getSymbol(creditnotes.currency);
-        $scope.creditnotes.date = $.datepicker.formatDate('dd/mm/yy', new Date(creditnotes.date))
-
+        /*eslint-disable no-undef*/
+        $scope.creditnotes.date = strftime(CRM['fe-creditnote'].shortDateFormat, creditnotes.date)
         creditnotes.items.forEach((element, i) => {
           element.financial_type = element['financial_type_id.name']
           handleFinancialTypeChange(i);
