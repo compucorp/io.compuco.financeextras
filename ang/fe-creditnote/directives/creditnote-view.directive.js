@@ -37,6 +37,7 @@
     const defaultCurrency = 'GBP';
     const financialTypesCache = new Map();
 
+    $scope.taxTerm = '';
     $scope.ts = CRM.ts();
     $scope.crmUrl = CRM.url;
     $scope.roundTo = roundTo;
@@ -48,6 +49,7 @@
     (function init () {
       prepopulateCreditnotes();
 
+      getTaxTerm().then((taxTerm) => $scope.taxTerm = taxTerm)
       $scope.$on('totalChange', _.debounce(handleTotalChange, 250));
     }());
 
@@ -67,7 +69,7 @@
         const creditnotes = result[0] ?? null;
         $scope.creditnotes = creditnotes
         $scope.currencySymbol = CurrencyCodes.getSymbol(creditnotes.currency);
-        $scope.creditnotes.date = $.datepicker.formatDate('dd/mmyy', new Date(creditnotes.date))
+        $scope.creditnotes.date = $.datepicker.formatDate('dd/mm/yy', new Date(creditnotes.date))
 
         creditnotes.items.forEach((element, i) => {
           element.financial_type = element['financial_type_id.name']
@@ -149,6 +151,19 @@
      */
     function roundTo (n, place) {
       return +(Math.round(n + 'e+' + place) + 'e-' + place);
+    }
+
+    /**
+     * Retrieves the contribution tax term from settings
+     * 
+     * @returns {string} tax term
+     */
+    async function getTaxTerm() {
+      const setting = await crmApi4('Setting', 'get', {
+        select: ["contribution_invoice_settings"]
+      });
+
+      return setting[0]['value']['tax_term'] ?? '';
     }
 
   }
