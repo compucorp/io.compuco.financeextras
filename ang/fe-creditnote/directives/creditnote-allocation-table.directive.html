@@ -31,7 +31,7 @@
       <td>
         <a 
           ng-href="{{crmUrl('civicrm/contact/view/contribution', {reset:1, id:allocation.contribution_id, action:'view'})}}">
-            {{ allocation['contribution_id.invoice_number'] }}
+            {{ (allocation['contribution_id.invoice_number']) || allocation['contribution_id']  }}
         </a>
       </td>
       <td>{{ formatDate(allocation['date'], 'dd-M-yy') }}</td>
