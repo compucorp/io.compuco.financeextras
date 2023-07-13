@@ -68,6 +68,7 @@
       }).then(function (result) {
         const creditnotes = result[0] ?? null;
         $scope.creditnotes = creditnotes
+        $scope.currency = creditnotes.currency
         $scope.currencySymbol = CurrencyCodes.getSymbol(creditnotes.currency);
         $scope.creditnotes.date = $.datepicker.formatDate('dd/mm/yy', new Date(creditnotes.date))
 
