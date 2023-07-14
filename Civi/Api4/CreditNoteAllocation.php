@@ -4,6 +4,7 @@ namespace Civi\Api4;
 
 use Civi\Api4\Action\CreditNoteAllocation\GetAction;
 use Civi\Api4\Action\CreditNoteAllocation\AllocateAction;
+use Civi\Api4\Action\CreditNoteAllocation\ReverseAction;
 
 /**
  * CreditNoteAllocation entity.
@@ -32,10 +33,24 @@ class CreditNoteAllocation extends Generic\DAOEntity {
    *   Should permission be checked for the user.
    *
    * @return Civi\Api4\Action\CreditNoteAllocation\Allocate
-   *   returns compute total action
+   *   returns credit note allocate action
    */
   public static function allocate($checkPermissions = TRUE) {
     return (new AllocateAction(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * Reverses credit allocation to contribution.
+   *
+   * @param bool $checkPermissions
+   *   Should permission be checked for the user.
+   *
+   * @return Civi\Api4\Action\CreditNoteAllocation\Reverse
+   *   returns credit note reverse action
+   */
+  public static function reverse($checkPermissions = TRUE) {
+    return (new ReverseAction(__CLASS__, __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
