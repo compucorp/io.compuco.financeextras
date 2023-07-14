@@ -152,4 +152,33 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
     $entityTrxn->save();
   }
 
+  /**
+   * Returns Debit account of the financial transaction the credit allocation record is linked to.
+   *
+   * @param int $id
+   *  Credit note allocation ID
+   * @return string
+   *   Debit Account name
+   */
+  public static function getPaidFrom($id) {
+    $entityTrxn = new \CRM_Financial_DAO_EntityFinancialTrxn();
+    $entityTrxn->entity_table = \CRM_Financeextras_DAO_CreditNoteAllocation::$_tableName;
+    $entityTrxn->entity_id = $id;
+    $entityTrxn->find(TRUE);
+    if (empty($entityTrxn->financial_trxn_id)) {
+      return NULL;
+    }
+
+    $financialTrxn = \Civi\Api4\FinancialTrxn::get()
+      ->addWhere('id', '=', $entityTrxn->financial_trxn_id)
+      ->addSelect('to_financial_account_id:label')
+      ->execute()
+      ->first();
+
+    if (empty($financialTrxn)) {
+      return NULL;
+    }
+    return $financialTrxn['to_financial_account_id:label'];
+  }
+
 }
