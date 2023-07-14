@@ -97,7 +97,7 @@
     }
 
     /**
-     * Prepopulates credit notee line items from contrbution
+     * Prepopulates credit note line items from contrbution
      */
     function prepopulateFromContribution() {
       if (!parseInt($scope.contributionId)) {
@@ -176,6 +176,7 @@
         $scope.creditnotes.comment = creditnotes.comment
         $scope.creditnotes.status_id = creditnotes.status_id
         $scope.creditnotes.items = []
+        $scope.contactId = creditnotes.contact_id
 
         creditnotes.items.forEach((element, i) => {
           $scope.creditnotes.items.push({

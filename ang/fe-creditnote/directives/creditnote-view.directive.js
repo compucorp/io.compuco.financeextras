@@ -31,15 +31,16 @@
    * @param {object} $scope the controller scope
    * @param {object} CurrencyCodes CurrencyCodes service
    * @param {object} crmApi4 crm api V4 service
+   * @param {object} MoneyFormat service
    */
-  function creditnoteViewController ($scope, CurrencyCodes, crmApi4) {
+  function creditnoteViewController ($scope, CurrencyCodes, crmApi4, MoneyFormat) {
     const defaultCurrency = 'GBP';
     const financialTypesCache = new Map();
 
     $scope.ts = CRM.ts();
     $scope.crmUrl = CRM.url;
     $scope.roundTo = roundTo;
-    $scope.formatMoney = formatMoney;
+    $scope.formatMoney = MoneyFormat.formatMoney;
     $scope.getContactLink = getContactLink;
     $scope.currencySymbol = CurrencyCodes.getSymbol(defaultCurrency);
     $scope.hasEditPermission = CRM['fe-creditnote'].canEditContribution;
@@ -149,18 +150,6 @@
     function roundTo (n, place) {
       return +(Math.round(n + 'e+' + place) + 'e-' + place);
     }
-
-    /**
-     * Formats a number into the number format of the currently selected currency
-     *
-     * @param {number} value the number to be formatted
-     * @param {string } currency the selected currency
-     * @returns {number} the formatted number
-     */
-    function formatMoney (value, currency) {
-      return CRM.formatMoney(value, true, CurrencyCodes.getFormat(currency));
-    }
-
 
   }
 })(angular, CRM.$, CRM._);

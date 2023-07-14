@@ -34,24 +34,38 @@
     $scope.isUpdate = $scope.context == 'update';
     $scope.hasAllocatePermission = CRM['fe-creditnote'].canEditContribution;
 
-    crmApi4('CreditNote', 'get', {
-      where: [["id", "=", $scope.creditNoteId]],
-      limit: 25,
-      chain: {"allocations":["CreditNoteAllocation", "get", {"where":[["credit_note_id", "=", "$id"]], "select":["*", "type_id:label", "contribution_id.invoice_number"]}]}
-    }).then(function(result) {
-      const creditnotes = result[0] ?? null;
-
-      $scope.currency = creditnotes.currency
-      $scope.allocations = creditnotes.allocations ?? []
-      $scope.total_credit = creditnotes.total_credit
-      $scope.remaining_credit = creditnotes.remaining_credit
-      $scope.allocated_credit = creditnotes.total_credit - creditnotes.remaining_credit
-    });
-
-    $scope.deleteAllocation = () => {
-      //not yet implemented.
-      CRM.alert('', 'No implementation', '', 'success');
+    const getAllocations = () => {
+      crmApi4('CreditNote', 'get', {
+        where: [["id", "=", $scope.creditNoteId]],
+        chain: {"allocations":["CreditNoteAllocation", "get", {"where":[["credit_note_id", "=", "$id"], ["is_reversed", "=", false]], "select":["*", "type_id:label", "contribution_id.invoice_number"]}]}
+      }).then(function(result) {
+        const creditnotes = result[0] ?? null;
+  
+        $scope.currency = creditnotes.currency
+        $scope.allocations = creditnotes.allocations ?? []
+        $scope.total_credit = creditnotes.total_credit
+        $scope.remaining_credit = creditnotes.remaining_credit
+        $scope.allocated_credit = creditnotes.total_credit - creditnotes.remaining_credit
+      });
     }
+
+    $scope.deleteAllocation = (id) => {
+      CRM.$.blockUI();
+      crmApi4('CreditNoteAllocation', 'reverse', {
+        id
+      }).then(function() {
+        CRM.alert(ts('Credit note allocation has been successfully deleted'), ts('Success'), 'success');
+        getAllocations();
+      }, function() {
+        CRM.alert(ts('Unable to delete credit note allocation'), ts('Error'), 'error');
+      }).finally(function() {
+        CRM.$.unblockUI();
+      })
+    }
+
+    (function init() {
+      getAllocations()
+    }());
 
   }
 

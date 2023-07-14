@@ -19,6 +19,9 @@
      * @returns {number} the formatted number
      */
     this.formatMoney = (value, currency, symbol) => {
+      if (!currency) {
+        currency = 'GBP' // If data is still loading, currency could be undefined
+      }
       let money = CRM.formatMoney(value, true, CurrencyCodes.getFormat(currency));
 
       if (symbol) {
