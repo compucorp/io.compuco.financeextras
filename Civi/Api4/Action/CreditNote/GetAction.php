@@ -36,6 +36,7 @@ class GetAction extends DAOGetAction {
     $allocations = \Civi\Api4\CreditNoteAllocation::get()
       ->addSelect('*', 'type_id:name')
       ->addWhere('credit_note_id', '=', $id)
+      ->addWhere('is_reversed', '=', FALSE)
       ->execute()
       ->getArrayCopy();
 
