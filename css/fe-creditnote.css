@@ -36,3 +36,6 @@
 #bootstrap-theme .table .table {
   background-color: unset;
 }
+#creditnote__view #creditnote__detail>tbody> tr > td {
+  border-top: none;
+}

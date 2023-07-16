@@ -37,6 +37,7 @@
     const defaultCurrency = 'GBP';
     const financialTypesCache = new Map();
 
+    $scope.taxTerm = '';
     $scope.ts = CRM.ts();
     $scope.crmUrl = CRM.url;
     $scope.roundTo = roundTo;
@@ -48,6 +49,7 @@
     (function init () {
       prepopulateCreditnotes();
 
+      getTaxTerm().then((taxTerm) => $scope.taxTerm = taxTerm)
       $scope.$on('totalChange', _.debounce(handleTotalChange, 250));
     }());
 
@@ -66,9 +68,10 @@
       }).then(function (result) {
         const creditnotes = result[0] ?? null;
         $scope.creditnotes = creditnotes
+        $scope.currency = creditnotes.currency
         $scope.currencySymbol = CurrencyCodes.getSymbol(creditnotes.currency);
-        $scope.creditnotes.date = $.datepicker.formatDate('dd/mmyy', new Date(creditnotes.date))
-
+        /*eslint-disable no-undef*/
+        $scope.creditnotes.date = strftime(CRM['fe-creditnote'].shortDateFormat, creditnotes.date)
         creditnotes.items.forEach((element, i) => {
           element.financial_type = element['financial_type_id.name']
           handleFinancialTypeChange(i);
@@ -149,6 +152,19 @@
      */
     function roundTo (n, place) {
       return +(Math.round(n + 'e+' + place) + 'e-' + place);
+    }
+
+    /**
+     * Retrieves the contribution tax term from settings
+     * 
+     * @returns {string} tax term
+     */
+    async function getTaxTerm() {
+      const setting = await crmApi4('Setting', 'get', {
+        select: ["contribution_invoice_settings"]
+      });
+
+      return setting[0]['value']['tax_term'] ?? '';
     }
 
   }

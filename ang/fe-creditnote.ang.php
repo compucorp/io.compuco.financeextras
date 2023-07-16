@@ -7,6 +7,7 @@ use Civi\Api4\OptionValue;
 use Civi\Financeextras\Utils\CurrencyUtils;
 
 $options = [
+  'shortDateFormat' => Civi::Settings()->get('dateformatshortdate'),
   'canEditContribution' => CRM_Core_Permission::check('edit contributions'),
 ];
 
@@ -34,6 +35,7 @@ financeextras_set_credit_note_status($options);
 
 return [
   'js' => [
+    'js/strftime.js',
     'ang/fe-creditnote.module.js',
     'ang/fe-creditnote/*.js',
     'ang/fe-creditnote/*/*.js',
