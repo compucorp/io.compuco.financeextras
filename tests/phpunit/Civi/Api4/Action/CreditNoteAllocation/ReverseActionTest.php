@@ -131,6 +131,37 @@ class Civi_Api4_CreditNoteAllocation_ReverseActionTest extends BaseHeadlessTest 
     $this->assertTrue($updatedAllocation['is_reversed']);
   }
 
+  /**
+   * Tests that the credit note status is updated to open after reverse
+   */
+  public function testFullyAllocatedCreditNoteStatusRevertToOpenAfterReverse() {
+    $contributionAmount = 300;
+    $creditNote = $this->createCreditNote(100);
+    $contribution = $this->createContribution($creditNote['contact_id'], $contributionAmount);
+    $firstAllocation = $this->createAllocation($creditNote['id'], $contribution['id'], 50, $creditNote['currency']);
+    $secondAllocation = $this->createAllocation($creditNote['id'], $contribution['id'], 50, $creditNote['currency']);
+
+    $creditNote = \Civi\Api4\CreditNote::get()
+      ->addSelect('status_id:name', 'total_credit')
+      ->addWhere('id', '=', $creditNote['id'])
+      ->execute()
+      ->first();
+
+    $this->assertEquals('fully_allocated', $creditNote['status_id:name']);
+
+    CreditNoteAllocation::reverse()
+      ->setId($secondAllocation['id'])
+      ->execute();
+
+    $creditNote = \Civi\Api4\CreditNote::get()
+      ->addSelect('status_id:name', 'total_credit')
+      ->addWhere('id', '=', $creditNote['id'])
+      ->execute()
+      ->first();
+
+    $this->assertEquals('open', $creditNote['status_id:name']);
+  }
+
   private function createCreditNote($creditAmount = 400) {
     $creditNote = $this->getCreditNoteData();
     $creditNote['items'][] = $this->getCreditNoteLineData(['quantity' => 1, 'unit_price' => $creditAmount]);
