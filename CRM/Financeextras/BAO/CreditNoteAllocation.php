@@ -64,6 +64,10 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
     if (empty($allocation)) {
       throw new \CRM_Core_Exception("Credit Note allocation not found");
     }
+    self::create([
+      'id' => $allocation['id'],
+      'is_reversed' => TRUE,
+    ]);
     $account = FinancialAccountUtils::getFinancialTypeAccount($allocation['line'][0]['financial_type_id'], 'Accounts Receivable Account is');
 
     $amount = -$allocation['amount'];

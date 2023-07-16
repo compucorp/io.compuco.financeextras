@@ -1,10 +1,10 @@
 <?php
 
+use Civi\Api4\LineItem;
 use Civi\Api4\CreditNote;
 use Civi\Api4\CreditNoteAllocation;
-use Civi\Api4\LineItem;
-use Civi\Financeextras\Test\Helper\CreditNoteTrait;
 use Civi\Financeextras\Utils\FinancialAccountUtils;
+use Civi\Financeextras\Test\Helper\CreditNoteTrait;
 
 /**
  * CreditNote.ReverseAction API Test Case.
@@ -105,6 +105,30 @@ class Civi_Api4_CreditNoteAllocation_ReverseActionTest extends BaseHeadlessTest 
 
     $contributionPaid = \CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution['id'], TRUE);
     $this->assertEquals(0, $contributionPaid);
+  }
+
+  /**
+   * Tests that the credit note allocation status is set to reversed after deallocation.
+   */
+  public function testCreditNoteAllocationStatusIsUpdated() {
+    $amountAllocated = 100;
+    $creditNote = $this->createCreditNote();
+    $contribution = $this->createContribution($creditNote['contact_id'], 200);
+    $allocation = $this->createAllocation($creditNote['id'], $contribution['id'], $amountAllocated, $creditNote['currency']);
+
+    $contributionPaid = \CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution['id'], TRUE);
+    $this->assertEquals($amountAllocated, $contributionPaid);
+
+    CreditNoteAllocation::reverse()
+      ->setId($allocation['id'])
+      ->execute();
+
+    $updatedAllocation = CreditNoteAllocation::get()
+      ->addWhere('id', '=', $allocation['id'])
+      ->execute()
+      ->first();
+
+    $this->assertTrue($updatedAllocation['is_reversed']);
   }
 
   private function createCreditNote($creditAmount = 400) {
