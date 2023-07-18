@@ -140,3 +140,48 @@ function financeextras_civicrm_post($op, $objectName, $objectId, &$objectRef) {
     \CRM_Financeextras_BAO_CreditNote::updateCreditNoteStatusPostAllocation($objectId);
   }
 }
+
+/**
+ * Implements hook_civicrm_validateForm().
+ */
+function financeextras_civicrm_validateForm($formName, &$fields, &$files, &$form, &$errors) {
+  $hooks = [
+    \Civi\Financeextras\Hook\ValidateForm\ContributionCreate::class,
+  ];
+
+  foreach ($hooks as $hook) {
+    if ($hook::shouldHandle($form, $formName)) {
+      (new $hook($form, $fields, $errors))->handle();
+    }
+  }
+}
+
+/**
+ * Implements hook_civicrm_postProcess().
+ */
+function financeextras_civicrm_postProcess($formName, $form) {
+  $hooks = [
+    \Civi\Financeextras\Hook\PostProcess\ContributionPostProcess::class,
+  ];
+
+  foreach ($hooks as $hook) {
+    if ($hook::shouldHandle($form, $formName)) {
+      (new $hook($form))->handle();
+    }
+  }
+}
+
+/**
+ * Implements hook_civicrm_buildForm().
+ */
+function financeextras_civicrm_buildForm($formName, &$form) {
+  $hooks = [
+    \Civi\Financeextras\Hook\BuildForm\ContributionCreate::class,
+  ];
+
+  foreach ($hooks as $hook) {
+    if ($hook::shouldHandle($form, $formName)) {
+      (new $hook($form))->handle();
+    }
+  }
+}
