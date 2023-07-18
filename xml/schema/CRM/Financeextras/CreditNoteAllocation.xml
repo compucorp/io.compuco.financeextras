@@ -112,4 +112,16 @@
     </html>
   </field>
 
+  <field>
+    <name>is_reversed</name>
+    <title>Reversed</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Allocation has been deleted by user</comment>
+    <required>true</required>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+
 </table>

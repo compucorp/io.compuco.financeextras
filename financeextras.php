@@ -135,7 +135,7 @@ function financeextras_civicrm_tabset($tabsetName, &$tabs, $context) {
 }
 
 function financeextras_civicrm_post($op, $objectName, $objectId, &$objectRef) {
-  if ($objectName === 'CreditNoteAllocation' && $op === 'create') {
-    \CRM_Financeextras_BAO_CreditNote::updateCreditNoteStatusPostAllocation($objectRef->credit_note_id);
+  if ($objectName === 'CreditNoteAllocation' && in_array($op, ['create', 'edit'])) {
+    \CRM_Financeextras_BAO_CreditNote::updateCreditNoteStatusPostAllocation($objectId);
   }
 }

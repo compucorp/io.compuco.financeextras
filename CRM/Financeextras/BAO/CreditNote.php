@@ -1,6 +1,5 @@
 <?php
 
-use Civi\Api4\CreditNote;
 use Civi\Financeextras\Utils\OptionValueUtils;
 use Civi\Financeextras\Utils\FinancialAccountUtils;
 use Civi\Financeextras\Setup\Manage\CreditNoteStatusManager as CreditNoteStatus;
@@ -186,22 +185,33 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
   /**
    * Updates a cedit note status appropraitely post allocation
    *
-   * @param int $creditNoteId
+   * @param int $allocationId
    *  The credit note for which allocation was made.
    */
-  public static function updateCreditNoteStatusPostAllocation($creditNoteId) {
-    $creditNote = CreditNote::get()
-      ->addWhere('id', '=', $creditNoteId)
-      ->addWhere('status_id:name', '=', 'open')
+  public static function updateCreditNoteStatusPostAllocation($allocationId) {
+    $allocation = \Civi\Api4\CreditNoteAllocation::get()
+      ->addWhere('id', '=', $allocationId)
+      ->addChain('credit_note', \Civi\Api4\CreditNote::get()
+        ->addWhere('id', '=', '$credit_note_id')
+        ->addWhere('status_id:name', 'IN', ['open', 'fully_allocated'])
+        )
       ->execute()
       ->first();
+    $creditNote = $allocation['credit_note'][0] ?? NULL;
 
-    if (!empty($creditNote) && $creditNote['remaining_credit'] <= 0) {
-      \Civi\Api4\CreditNote::update()
-        ->addValue('status_id:name', 'fully_allocated')
-        ->addWhere('id', '=', $creditNoteId)
-        ->execute();
+    if (empty($creditNote)) {
+      return;
     }
+
+    $status = match(TRUE) {
+      $creditNote['remaining_credit'] <= 0 => 'fully_allocated',
+      default => 'open'
+    };
+
+    \Civi\Api4\CreditNote::update()
+      ->addValue('status_id:name', $status)
+      ->addWhere('id', '=', $creditNote['id'])
+      ->execute();
   }
 
 }

@@ -58,6 +58,7 @@ CREATE TABLE `financeextras_credit_note_allocation` (
   `reference` text,
   `amount` decimal(20,2) NULL COMMENT 'Ammount allocated',
   `date` date COMMENT 'Allocation date',
+  `is_reversed` tinyint NOT NULL DEFAULT 0 COMMENT 'Allocation has been deleted by user',
   PRIMARY KEY (`id`),
   CONSTRAINT FK_financeextras_credit_note_allocation_credit_note_id FOREIGN KEY (`credit_note_id`) REFERENCES `financeextras_credit_note`(`id`) ON DELETE CASCADE,
   CONSTRAINT FK_financeextras_credit_note_allocation_contribution_id FOREIGN KEY (`contribution_id`) REFERENCES `civicrm_contribution`(`id`)

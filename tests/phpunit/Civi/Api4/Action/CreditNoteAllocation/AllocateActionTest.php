@@ -1,8 +1,8 @@
 <?php
 
+use Civi\Api4\LineItem;
 use Civi\Api4\CreditNote;
 use Civi\Api4\CreditNoteAllocation;
-use Civi\Api4\LineItem;
 use Civi\Financeextras\Test\Helper\CreditNoteTrait;
 use Civi\Financeextras\Utils\FinancialAccountUtils;
 

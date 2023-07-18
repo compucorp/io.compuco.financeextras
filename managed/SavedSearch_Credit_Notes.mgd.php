@@ -44,6 +44,11 @@ $mgd = [
                 '=',
                 'CreditNote_CreditNoteAllocation_credit_note_id_01.credit_note_id',
               ],
+              [
+                'CreditNote_CreditNoteAllocation_credit_note_id_01.is_reversed',
+                '=',
+                FALSE,
+              ],
             ],
           ],
           'having' => [],

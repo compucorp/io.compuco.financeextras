@@ -64,7 +64,7 @@ class SearchDisplayRun {
         ->execute()
         ->first();
 
-      $remaining = $display['data']['total_credit'] - $display['data']['SUM_CreditNote_CreditNoteAllocation_credit_note_id_01_amount'] ?? 0;
+      $remaining = $creditNote['remaining_credit'];
       $lastIndex = count($display['columns']) - 1;
       $display['columns'][$lastIndex + 1] = $display['columns'][$lastIndex];
       $display['columns'][$lastIndex] = [
