@@ -146,6 +146,7 @@ function financeextras_civicrm_post($op, $objectName, $objectId, &$objectRef) {
  */
 function financeextras_civicrm_validateForm($formName, &$fields, &$files, &$form, &$errors) {
   $hooks = [
+    \Civi\Financeextras\Hook\ValidateForm\MembershipCreate::class,
     \Civi\Financeextras\Hook\ValidateForm\ContributionCreate::class,
   ];
 
@@ -176,6 +177,7 @@ function financeextras_civicrm_postProcess($formName, $form) {
  */
 function financeextras_civicrm_buildForm($formName, &$form) {
   $hooks = [
+    \Civi\Financeextras\Hook\BuildForm\MembershipCreate::class,
     \Civi\Financeextras\Hook\BuildForm\ContributionCreate::class,
   ];
 
