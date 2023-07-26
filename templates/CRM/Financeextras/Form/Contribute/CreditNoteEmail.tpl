@@ -26,16 +26,16 @@
     <td>{$form.template.html}</td>
   </tr>
   <tr class="crm-contactEmail-form-block-subject">
-    <td class="label">{$form.subject.label}</td>
-    <td>
-      {$form.subject.html|crmAddClass:huge}&nbsp;
-    </td>
-  </tr>
-  <tr class="crm-email-element">
-    <td class="label">{ts}Email body{/ts}</td>
-    <td><div class="html">{$form.html_message.html}</div></td>
-  </tr>
+       <td class="label">{$form.subject.label}</td>
+       <td>
+         {$form.subject.html|crmAddClass:huge}&nbsp;
+         <input class="crm-token-selector big" data-field="subject" />
+         {help id="id-token-subject" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp"}
+       </td>
+    </tr>
 </table>
+
+{include file="CRM/Contact/Form/Task/EmailCommon.tpl" noAttach=0}
 
 <div class="spacer"></div>
 <div class="crm-submit-buttons">
@@ -46,6 +46,9 @@
 <script>
 
   CRM.$(function($) {
+    $('.crm-plaint_text_email-accordion').hide();
+    $('#attachments').parent().parent().hide()
+    $('#saveTemplate').parent().hide();
     var sourceDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' q='id=1' h=0 }{literal}";
 
     var $form = $("form.{/literal}{$form.formClass}{literal}");
