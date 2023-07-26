@@ -20,6 +20,10 @@ class GetAction extends DAOGetAction {
       $items = $result->getArrayCopy();
 
       foreach ($items as &$item) {
+        if (empty($item['id'])) {
+          continue;
+        }
+
         $allocatedCredits = $this->getAllocations($item['id']);
         $item = array_merge($item, $allocatedCredits);
 
