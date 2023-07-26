@@ -59,7 +59,7 @@ class SearchDisplayRun {
   private static function alterCreditNoteSearchDisplay(&$result) {
     foreach ($result as &$display) {
       $creditNote = \Civi\Api4\CreditNote::get()
-        ->addSelect('status_id:name', 'total_credit')
+        ->addSelect('status_id:name', 'total_credit', 'currency')
         ->addWhere('id', '=', $display['data']['id'])
         ->execute()
         ->first();
@@ -68,12 +68,13 @@ class SearchDisplayRun {
       $lastIndex = count($display['columns']) - 1;
       $display['columns'][$lastIndex + 1] = $display['columns'][$lastIndex];
       $display['columns'][$lastIndex] = [
-        'val' => \CRM_Utils_Money::format($remaining),
+        'val' => \CRM_Utils_Money::format($remaining, $creditNote['currency']),
         'label' => 'Remaining',
       ];
-      $display['data']['remaining'] = \CRM_Utils_Money::format($remaining);
+      $display['data']['remaining'] = \CRM_Utils_Money::format($remaining, $creditNote['currency']);
 
       self::alterCreditNoteSearchDisplayLinks($creditNote, $display['columns'][$lastIndex + 1]);
+      self::alterCreditNoteSearchDisplayMoneyColumn($creditNote, $display['columns']);
     }
   }
 
@@ -98,6 +99,28 @@ class SearchDisplayRun {
 
       if ($creditNote['status_id:name'] == 'fully_allocated' && !in_array($link['text'], ['View', 'Edit', 'Delete', 'Download PDF Document Credit Note', 'Email Credit Note'])) {
         $link['style'] = 'disabled';
+      }
+    }
+  }
+
+  /**
+   * Formats the money columns using the right currency
+   *
+   * This is needed because the Core by default formats money datatype column using the system configured format
+   *
+   * @param array $creditNote
+   *  Credit note data.
+   * @param array $columns
+   *  Credit note search display columns.
+   */
+  private static function alterCreditNoteSearchDisplayMoneyColumn(array $creditNote, array &$columns) {
+    foreach ($columns as &$column) {
+      if ($column['label'] == 'Total Value') {
+        $column['val'] = \CRM_Utils_Money::format($creditNote['total_credit'], $creditNote['currency']);
+      }
+
+      if ($column['label'] == 'Allocated') {
+        $column['val'] = \CRM_Utils_Money::format($creditNote['allocated_invoice'], $creditNote['currency']);
       }
     }
   }
