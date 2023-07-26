@@ -56,7 +56,7 @@ class CRM_Financeextras_Form_Contribute_CreditNoteAllocate extends CRM_Core_Form
 
     foreach ($contributions as $contribution) {
       $this->add('text', 'item_ref[' . $contribution["id"] . ']', NULL, []);
-      $this->add('number', 'item_amount[' . $contribution["id"] . ']', NULL, []);
+      $this->add('number', 'item_amount[' . $contribution["id"] . ']', NULL, ['min' => 0, 'step' => 0.01]);
     }
 
     $this->addButtons([
@@ -79,8 +79,8 @@ class CRM_Financeextras_Form_Contribute_CreditNoteAllocate extends CRM_Core_Form
    */
   public function postProcess() {
     $values = $this->getSubmitValues();
-    $amounts = array_filter($values['item_amount']);
-    $references = array_filter($values['item_ref']);
+    $amounts = array_filter($values['item_amount'] ?? []);
+    $references = array_filter($values['item_ref'] ?? []);
 
     if (!$this->validateAllocation($amounts)) {
       return FALSE;
@@ -98,7 +98,7 @@ class CRM_Financeextras_Form_Contribute_CreditNoteAllocate extends CRM_Core_Form
         ->setCreditNoteId($this->crid)
         ->setReference($references[$contributionId])
         ->setTypeId($this->getAllocationTypeValueByName('invoice'))
-        ->setAmount($amounts[$contributionId])
+        ->setAmount(floatval($amounts[$contributionId]))
         ->setCurrency($this->creditNote['currency'])
         ->execute();
     }
@@ -122,6 +122,11 @@ class CRM_Financeextras_Form_Contribute_CreditNoteAllocate extends CRM_Core_Form
    * @return array|bool
    */
   public function validateAllocation($amounts) {
+    if (!empty(array_filter($amounts, fn($n) => $n < 1))) {
+      CRM_Core_Session::setStatus('Amount to be refunded must be greater than zero.', 'Error', 'error');
+      return FALSE;
+    }
+
     $creditsToAllocate = array_sum($amounts);
 
     if ($creditsToAllocate > $this->creditNote['remaining_credit']) {
