@@ -114,6 +114,7 @@
           return
         }
 
+        $scope.contactId = contribution.contact_id
         $scope.creditnotes.contact_id = contribution.contact_id
         const lineItems = contribution.items;
         // Ensure the due amount is not less than zero
