@@ -120,8 +120,9 @@ class CRM_Financeextras_Form_Contribute_CreditNoteEmail extends CRM_Core_Form {
     Civi::dispatcher()->dispatch(CreditNoteMailedEvent::NAME, new CreditNoteMailedEvent(
       $this->creditNoteId,
       $creditNoteInvoice,
-      $this->getSubject(),
-      array_column($this->getRowsForEmails(), 'contact_id')
+      $subject,
+      array_column($this->getRowsForEmails(), 'contact_id'),
+      $html . $additionalDetails
     ));
   }
 
