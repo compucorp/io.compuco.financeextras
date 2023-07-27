@@ -85,7 +85,7 @@
               <th style="padding: 8px 10px; border: 0px solid #000; text-align:right;font-weight:bold;white-space: nowrap;"><font size="1">{ts}Quantity{/ts}</font></th>
               <th style="padding: 8px 10px; border: 0px solid #000; text-align:right;font-weight:bold;white-space: nowrap;"><font size="1">{ts}Unit Price{/ts}</font></th>
               <th style="padding: 8px 10px; border: 0px solid #000; text-align:right;font-weight:bold;white-space: nowrap;"><font size="1">{ts}Sales Tax{/ts}</font></th>
-              <th style="padding: 8px 10px; border: 0px solid #000; text-align:right;font-weight:bold;white-space: nowrap;"><font size="1">{ts}Amount GBP{/ts}</font></th>
+              <th style="padding: 8px 10px; border: 0px solid #000; text-align:right;font-weight:bold;white-space: nowrap;"><font size="1">{ts}Amount {$credit_note.currency}{/ts}</font></th>
             </tr>
           </thead>
           <tbody>
@@ -93,14 +93,14 @@
             <tr style="{if ($k%2) == 0} background-color: #F5F5F5; {/if} border: 1px solid #000;">
               <td style="padding: 8px 10px;text-align: left;border: 0px solid #000;" > <font size="1">{$item.description}</font></td>
               <td style="padding: 8px 10px;text-align: right;border: 0px solid #000;"><font size="1">{$item.quantity}</font></td>
-              <td style="padding: 8px 10px;text-align: right;border: 0px solid #000;"><font size="1">{$item.unit_price|crmMoney:$credit_note.currency}</font></td>
-              <td style="padding: 8px 10px;text-align: right;border: 0px solid #000;"><font size="1">{if empty($item.tax_rate) }0{else}{$item.tax_rate}{/if}%</font></td>
-              <td style="padding: 8px 10px;text-align: right;border: 0px solid #000;"><font size="1">{$item.line_total|crmMoney:$credit_note.currency}</font></td>
+              <td style="padding: 8px 10px;text-align: right;border: 0px solid #000;"><font size="1">{$item.unit_price|string_format:"%.2f"}</font></td>
+              <td style="padding: 8px 10px;text-align: right;border: 0px solid #000;"><font size="1">{if empty($item.tax_rate) }0.00{else}{$item.tax_rate}{/if}%</font></td>
+              <td style="padding: 8px 10px;text-align: right;border: 0px solid #000;"><font size="1">{$item.line_total|string_format:"%.2f"}</font></td>
             </tr>
             {/foreach}
             <tr>
               <td colspan="2" style="border: none;"></td>
-              <td colspan="2" style="text-align:right;white-space: nowrap;  border: none;"><font size="1">{ts}SubTotal(GBP) {/ts}</font></td>
+              <td colspan="2" style="text-align:right;white-space: nowrap;  border: none;"><font size="1">{ts}Sub Total({$credit_note.currency}) {/ts}</font></td>
               <td style="text-align:right; border: none;"><font size="1">{$credit_note.subtotal|crmMoney:$credit_note.currency}</font></td>
             </tr>
             {foreach from=$credit_note.taxRates item=tax}
@@ -116,7 +116,7 @@
               </tr>
               <tr>
                 <td colspan="2" style="border: none;"></td>
-                <td colspan="2" style="text-align:right;white-space: nowrap; border: none;"><b><font size="1">{ts}Total Amount(GBP){/ts}</font></b></td>
+                <td colspan="2" style="text-align:right;white-space: nowrap; border: none;"><b><font size="1">{ts}Total Amount({$credit_note.currency}){/ts}</font></b></td>
                 <td style="text-align:right;white-space: nowrap; border: none;"><font size="1">{$credit_note.total_credit|crmMoney:$credit_note.currency}</font></td>
               </tr>
               {if !empty($credit_note.invoice_allocations)}
@@ -169,7 +169,7 @@
                 </tr>
                 <tr>
                   <td colspan="2" style="border: none;"></td>
-                  <td colspan="2" style="text-align:right;white-space: nowrap; border: none;"><b><font size="1">Remaining Credit(GBP)</font></b></td>
+                  <td colspan="2" style="text-align:right;white-space: nowrap; border: none;"><b><font size="1">Remaining Credit({$credit_note.currency})</font></b></td>
                   <td style="text-align:right;white-space: nowrap; border: none;"><font size="1">{$credit_note.remaining_credit|crmMoney:$credit_note.currency}</font></td>
                 </tr>
               {/if}
@@ -186,7 +186,7 @@
             border: 1px dotted #000;
             border-style: none none dotted;
         ">
-        <img src="{crmResURL ext=io.compuco.financeextras file=images/cut.png}" style="height: 31px; width: auto;">
+        <img src="{$base_url}{crmResURL ext=io.compuco.financeextras file=images/cut.png}" style="height: 31px; width: auto;">
       </div>
 
       <div>
@@ -198,7 +198,7 @@
           </tr>
           <tr>
             <td colspan="4" style="border: none;"><font size="1">Please do not pay on this advice. Deduct the amount of this Credit Note from your next payment to us.</font></td>
-            <td colspan="1" style="text-align:right;white-space: nowrap; border: none;"><font size="1">Credit Note#</font></td>
+            <td colspan="1" style="text-align:right;white-space: nowrap; border: none;"><font size="1">Credit Note #</font></td>
             <td style="text-align:right;white-space: nowrap; border: none;"><font size="1">{$credit_note.cn_number}</font></td>
           </tr>
           <tr>
@@ -207,7 +207,7 @@
           </tr>
           <tr>
             <td colspan="4" style="border: none;"></td>
-            <td colspan="1" style="text-align:right;white-space: nowrap; border: none;"><b><font size="1">{ts}Credit Amount(GBP){/ts}</font></b></td>
+            <td colspan="1" style="text-align:right;white-space: nowrap; border: none;"><b><font size="1">{ts}Credit Amount({$credit_note.currency}){/ts}</font></b></td>
             <td style="text-align:right;white-space: nowrap; border: none;"><font size="1">{$credit_note.remaining_credit|crmMoney:$credit_note.currency}</font></td>
           </tr>
         </table>
