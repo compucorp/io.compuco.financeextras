@@ -30,7 +30,7 @@ class CreditNoteInvoiceSubscriber implements EventSubscriberInterface {
     $subject = 'Downloaded Credit Note PDF';
     $targetContactId = $this->getCreditNoteContactId($e->getCreditNoteId());
     $attachment = $this->storeFile($e->getCreditNoteInvoice()['html'], $e->getCreditNoteInvoice()['format']);
-    $this->createActivity([$targetContactId], $activityType, $subject, $attachment);
+    $this->createActivity([$targetContactId], $activityType, $subject, $attachment, '');
   }
 
   /**
@@ -42,7 +42,7 @@ class CreditNoteInvoiceSubscriber implements EventSubscriberInterface {
   public function createMailActivity(CreditNoteMailedEvent $e) {
     $activityType = 'Emailed Invoice';
     $attachment = $this->storeFile($e->getCreditNoteInvoice()['html'], $e->getCreditNoteInvoice()['format']);
-    $this->createActivity($e->getMailedContacts(), $activityType, $e->getSubject(), $attachment);
+    $this->createActivity($e->getMailedContacts(), $activityType, $e->getSubject(), $attachment, $e->getDetails());
   }
 
   /**
@@ -52,8 +52,9 @@ class CreditNoteInvoiceSubscriber implements EventSubscriberInterface {
    * @param string $type
    * @param string $subject
    * @param array $attachment
+   * @param string $details
    */
-  private function createActivity($targetContactIds, $type, $subject, $attachment) {
+  private function createActivity($targetContactIds, $type, $subject, $attachment, $details) {
     $now = (new DateTime())->format('YmdHis');
     $currentUser = \CRM_Core_Session::singleton()->get('userID');
     \Civi\Api4\Activity::create()
@@ -62,6 +63,7 @@ class CreditNoteInvoiceSubscriber implements EventSubscriberInterface {
       ->addValue('source_contact_id', $currentUser)
       ->addValue('activity_type_id:name', $type)
       ->addValue('activity_date_time', $now)
+      ->addValue('details', $details)
       ->addValue('attachFile_1', [
         'uri' => $attachment,
         'type' => 'application/pdf',

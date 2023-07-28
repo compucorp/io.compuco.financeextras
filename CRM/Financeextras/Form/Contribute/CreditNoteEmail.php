@@ -112,16 +112,14 @@ class CRM_Financeextras_Form_Contribute_CreditNoteEmail extends CRM_Core_Form {
       $sents += ($sent ? 1 : 0);
     }
 
-    CRM_Core_Session::setStatus(ts('One email has been sent successfully. ', [
-      'plural' => '%count emails were sent successfully. ',
-      'count' => $sents,
-    ]), ts('Message Sent', ['plural' => 'Messages Sent', 'count' => $sents]), 'success');
+    CRM_Core_Session::setStatus(ts('Credit Note Sent by Email Successfully.'), ts('Message Sent'), 'success');
 
     Civi::dispatcher()->dispatch(CreditNoteMailedEvent::NAME, new CreditNoteMailedEvent(
       $this->creditNoteId,
       $creditNoteInvoice,
-      $this->getSubject(),
-      array_column($this->getRowsForEmails(), 'contact_id')
+      $subject,
+      array_column($this->getRowsForEmails(), 'contact_id'),
+      $html . $additionalDetails
     ));
   }
 

@@ -17,6 +17,7 @@ class CreditNoteMailedEvent extends Event {
         protected array $creditNoteInvoice,
         protected string $mailSubject,
         protected array $contactIds,
+        protected string $details,
     ) {
   }
 
@@ -34,6 +35,10 @@ class CreditNoteMailedEvent extends Event {
 
   public function getMailedContacts() {
     return $this->contactIds;
+  }
+
+  public function getDetails() {
+    return $this->details;
   }
 
 }
