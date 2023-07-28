@@ -41,7 +41,7 @@ class AllocateAction extends AbstractAction {
   /**
    * Amount to allocate
    *
-   * @var int
+   * @var mixed
    */
   protected $amount;
 
