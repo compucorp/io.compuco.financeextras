@@ -54,4 +54,15 @@ class CreditNoteAllocation extends Generic\DAOEntity {
       ->setCheckPermissions($checkPermissions);
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  public static function permissions() {
+    return [
+      'meta' => ['access CiviCRM'],
+      'get' => ['access CiviCRM', 'access CiviContribute'],
+      'default' => ['access CiviCRM', 'access CiviContribute', 'edit contributions'],
+    ];
+  }
+
 }
