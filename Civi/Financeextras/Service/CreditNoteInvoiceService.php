@@ -88,7 +88,7 @@ class CreditNoteInvoiceService {
     $creditNote['date'] = date('M d, Y', strtotime($creditNote['date']));
 
     foreach ($creditNote['items'] as &$item) {
-      $item['tax_rate'] = ($item['tax_amount'] * 100) / $item['line_total'];
+      $item['tax_rate'] = sprintf('%.2f', ($item['tax_amount'] * 100) / $item['line_total']);
     }
 
     $contributions = empty($creditNote['allocations']) ? [] : Contribution::get()
