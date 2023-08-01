@@ -161,7 +161,7 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
    * @param float $amount
    *   The amount of the allocation.
    */
-  private static function createAllocationEntityTransactions($allocationId, $transactionId, $amount) {
+  public static function createAllocationEntityTransactions($allocationId, $transactionId, $amount) {
     $allocationEntityTrxn = [
       'entity_table' => CRM_Financeextras_BAO_CreditNoteAllocation::$_tableName,
       'financial_trxn_id' => $transactionId,

@@ -119,8 +119,9 @@ class SearchDisplayRun {
         $column['val'] = \CRM_Utils_Money::format($creditNote['total_credit'], $creditNote['currency']);
       }
 
+      $allocatedTotal = $creditNote['allocated_manual_refund'] + $creditNote['allocated_online_refund'] + $creditNote['allocated_invoice'];
       if ($column['label'] == 'Allocated') {
-        $column['val'] = \CRM_Utils_Money::format($creditNote['allocated_invoice'], $creditNote['currency']);
+        $column['val'] = \CRM_Utils_Money::format($allocatedTotal, $creditNote['currency']);
       }
     }
   }

@@ -106,6 +106,54 @@ class CRM_Financeextras_BAO_CreditNoteLine extends CRM_Financeextras_DAO_CreditN
     $financialItem->delete();
   }
 
+  /**
+   * Links credit note line item with refund transaction and updates financial item status
+   *
+   * @param int $creditNoteLineId
+   *    Credit note line ID
+   * @param int $financialTrxnId
+   *  The refund financial transaction
+   * @param float $amount
+   *  The refunded amount for the line item
+   *
+   */
+  public static function refundAccountingEntries($creditNoteLineId, $financialTrxnId, $amount) {
+    $param = [
+      'entity_table' => CRM_Financeextras_BAO_CreditNoteLine::$_tableName,
+      'financial_trxn_id' => $financialTrxnId,
+      'entity_id' => $creditNoteLineId,
+      'amount' => $amount,
+    ];
+
+    $entityTrxn = new CRM_Financial_DAO_EntityFinancialTrxn();
+    $entityTrxn->copyValues($param);
+    $entityTrxn->save();
+
+    $financialItem = \Civi\Api4\FinancialItem::get(FALSE)
+      ->addWhere('entity_id', '=', $creditNoteLineId)
+      ->addWhere('entity_table', '=', \CRM_Financeextras_DAO_CreditNoteLine::$_tableName)
+      ->execute()
+      ->first();
+
+    $totalLineItemPaid = \Civi\Api4\EntityFinancialTrxn::get()
+      ->addSelect('SUM(amount) AS sum')
+      ->addWhere('entity_table:name', '=', 'civicrm_financial_item')
+      ->addWhere('entity_id', '=', $financialItem['id'])
+      ->execute()
+      ->first()['sum'];
+
+    $status = match(TRUE) {
+      $totalLineItemPaid == $financialItem['amount'] => 'Paid',
+      default => 'Partially Paid'
+    };
+
+    $params = [
+      'id' => $financialItem['id'],
+      'status_id' => $status,
+    ];
+    \CRM_Financial_BAO_FinancialItem::create($params);
+  }
+
   private static function createAccountingEntries($lineItem, $creditNote, $financialTrxn, $status) {
     $financialAccount = FinancialAccountUtils::getFinancialTypeAccount($lineItem['financial_type_id'], 'Income Account is');
     $itemParams = [
