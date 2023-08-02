@@ -15,6 +15,14 @@ CRM.$(function () {
     }
   });
 
+  // Show the payment method if "Payment Plan" option is selected on the membership form.
+  CRM.$('#payment_plan_fields_tabs').on('click', function() {
+    var contributionToggleValue = CRM.$('[name=contribution_type_toggle]').val();
+    if (contributionToggleValue == 'payment_plan') {
+      CRM.$(paymentDetailsSectionSelector).show();
+    }
+  });
+
   function handlePendingStatusSelection() {
     CRM.$("#payment_instrument_id").val(accountsReceivablePaymentMethodId).change();
     CRM.$(paymentDetailsSectionSelector).hide();
