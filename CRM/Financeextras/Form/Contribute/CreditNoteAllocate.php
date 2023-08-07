@@ -122,7 +122,7 @@ class CRM_Financeextras_Form_Contribute_CreditNoteAllocate extends CRM_Core_Form
    * @return array|bool
    */
   public function validateAllocation($amounts) {
-    if (!empty(array_filter($amounts, fn($n) => $n < 1))) {
+    if (!empty(array_filter($amounts, fn($n) => $n <= 0))) {
       CRM_Core_Session::setStatus('Amount to be refunded must be greater than zero.', 'Error', 'error');
       return FALSE;
     }
