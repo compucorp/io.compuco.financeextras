@@ -181,7 +181,7 @@ class CreditNoteInvoiceService {
    * Returns the tax term.
    */
   private function getTaxTerm() {
-    $settings = Setting::get()
+    $settings = Setting::get(FALSE)
       ->addSelect('contribution_invoice_settings')
       ->execute()
       ->first()['value'];
