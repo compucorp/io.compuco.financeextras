@@ -116,6 +116,9 @@
 
         $scope.contactId = contribution.contact_id
         $scope.creditnotes.contact_id = contribution.contact_id
+        $scope.creditnotes.currency = contribution.currency
+        $scope.currencySymbol = CurrencyCodes.getSymbol(contribution.currency);
+
         const lineItems = contribution.items;
         // Ensure the due amount is not less than zero
         const dueAmount = Math.max(contribution.total_amount - contribution.paid_amount, 0)
@@ -171,6 +174,7 @@
         $scope.creditnotes.id = creditnotes.id
         $scope.creditnotes.contact_id = creditnotes.contact_id
         $scope.creditnotes.currency = creditnotes.currency
+        $scope.currencySymbol = CurrencyCodes.getSymbol(creditnotes.currency);
         $scope.creditnotes.cn_number = creditnotes.cn_number
         $scope.creditnotes.date = $.datepicker.formatDate('yy-mm-dd', new Date(creditnotes.date))
         $scope.creditnotes.description = creditnotes.description
