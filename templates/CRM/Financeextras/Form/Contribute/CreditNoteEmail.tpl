@@ -49,6 +49,8 @@
     $('.crm-plaint_text_email-accordion').hide();
     $('#attachments').parent().parent().hide()
     $('#saveTemplate').parent().hide();
+    const cancelBtn = cj( "button:contains('Previous')" )
+    cancelBtn.html(cancelBtn.html().replace('Previous', 'Cancel'))
     var sourceDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' q='id=1' h=0 }{literal}";
 
     var $form = $("form.{/literal}{$form.formClass}{literal}");
