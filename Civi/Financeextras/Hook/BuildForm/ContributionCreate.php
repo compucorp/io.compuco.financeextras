@@ -16,6 +16,7 @@ class ContributionCreate {
 
   public function handle() {
     $this->addCustomLineItemTemplate();
+    $this->addCreditNoteCancelAction();
     $this->configureRecordPaymentField();
     $this->preventUserFromSettingContributionStatus();
   }
@@ -63,6 +64,20 @@ class ContributionCreate {
       ]);
       \Civi::resources()->addVars('financeextras', ['currencies' => \CRM_Core_OptionGroup::values('currencies_enabled')]);
     }
+  }
+
+  private function addCreditNoteCancelAction() {
+    if (!$this->form->_id) {
+      return;
+    }
+
+    \Civi::resources()->add([
+      'scriptFile' => [E::LONG_NAME, 'js/addContributionCreditNoteBtn.js'],
+      'region' => 'page-header',
+    ]);
+
+    $url = \CRM_Utils_System::url('civicrm/contribution/creditnote', 'reset=1&action=add&contribution_id=' . $this->form->_id);
+    \Civi::resources()->addVars('financeextras', ['creditnote_btn_url' => $url]);
   }
 
   private function isEdit() {
