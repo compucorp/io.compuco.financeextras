@@ -196,6 +196,7 @@ function financeextras_civicrm_postProcess($formName, $form) {
  */
 function financeextras_civicrm_buildForm($formName, &$form) {
   $hooks = [
+    \Civi\Financeextras\Hook\BuildForm\ContributionView::class,
     \Civi\Financeextras\Hook\BuildForm\MembershipCreate::class,
     \Civi\Financeextras\Hook\BuildForm\ParticipantCreate::class,
     \Civi\Financeextras\Hook\BuildForm\ContributionCreate::class,
