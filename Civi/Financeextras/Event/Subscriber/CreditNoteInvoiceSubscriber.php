@@ -6,6 +6,7 @@ use DateTime;
 use Civi\Financeextras\Event\CreditNoteMailedEvent;
 use Civi\Financeextras\Event\CreditNoteDownloadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Civi\Financeextras\Setup\Manage\CreditNoteActivityTypeManager;
 
 class CreditNoteInvoiceSubscriber implements EventSubscriberInterface {
 
@@ -26,7 +27,7 @@ class CreditNoteInvoiceSubscriber implements EventSubscriberInterface {
    *   The registration event. Add new tokens using register().
    */
   public function createDownloadActivity(CreditNoteDownloadedEvent $e) {
-    $activityType = 'Downloaded Invoice';
+    $activityType = CreditNoteActivityTypeManager::DOWNLOAD_INVOICE_ACTIVITY;
     $subject = 'Downloaded Credit Note PDF';
     $targetContactId = $this->getCreditNoteContactId($e->getCreditNoteId());
     $attachment = $this->storeFile($e->getCreditNoteInvoice()['html'], $e->getCreditNoteInvoice()['format']);
@@ -40,7 +41,7 @@ class CreditNoteInvoiceSubscriber implements EventSubscriberInterface {
    *   The registration event. Add new tokens using register().
    */
   public function createMailActivity(CreditNoteMailedEvent $e) {
-    $activityType = 'Emailed Invoice';
+    $activityType = CreditNoteActivityTypeManager::EMAIL_INVOICE_ACTIVITY;
     $attachment = $this->storeFile($e->getCreditNoteInvoice()['html'], $e->getCreditNoteInvoice()['format']);
     $this->createActivity($e->getMailedContacts(), $activityType, $e->getSubject(), $attachment, $e->getDetails());
   }

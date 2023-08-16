@@ -1,6 +1,7 @@
 <?php
 
 use Civi\Financeextras\Setup\Manage\CreditNoteStatusManager;
+use Civi\Financeextras\Setup\Manage\CreditNoteActivityTypeManager;
 use Civi\Financeextras\Setup\Manage\CreditNoteAllocationTypeManager;
 use Civi\Financeextras\Setup\Manage\CreditNoteInvoiceTemplateManager;
 
@@ -15,6 +16,7 @@ class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
   public function install() {
     $steps = [
       new CreditNoteStatusManager(),
+      new CreditNoteActivityTypeManager(),
       new CreditNoteAllocationTypeManager(),
       new CreditNoteInvoiceTemplateManager(),
     ];
@@ -30,6 +32,7 @@ class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
   public function uninstall() {
     $steps = [
       new CreditNoteStatusManager(),
+      new CreditNoteActivityTypeManager(),
       new CreditNoteAllocationTypeManager(),
       new CreditNoteInvoiceTemplateManager(),
     ];
@@ -45,6 +48,7 @@ class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
   public function enable() {
     $steps = [
       new CreditNoteStatusManager(),
+      new CreditNoteActivityTypeManager(),
       new CreditNoteAllocationTypeManager(),
       new CreditNoteInvoiceTemplateManager(),
     ];
@@ -60,6 +64,7 @@ class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
   public function disable() {
     $steps = [
       new CreditNoteStatusManager(),
+      new CreditNoteActivityTypeManager(),
       new CreditNoteAllocationTypeManager(),
       new CreditNoteInvoiceTemplateManager(),
     ];
