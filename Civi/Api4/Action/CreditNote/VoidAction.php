@@ -92,6 +92,7 @@ class VoidAction extends AbstractAction {
 
     $creditNoteAllocations = CreditNoteAllocation::get()
       ->addWhere('credit_note_id', '=', $this->id)
+      ->addWhere('is_reversed', '=', FALSE)
       ->execute()
       ->first();
 
