@@ -139,3 +139,21 @@ function financeextras_civicrm_post($op, $objectName, $objectId, &$objectRef) {
     \CRM_Financeextras_BAO_CreditNote::updateCreditNoteStatusPostAllocation($objectId);
   }
 }
+
+/**
+ * Implements fieldOptions hook().
+ *
+ * @param string $entity
+ * @param string $field
+ * @param array $options
+ * @param array $params
+ */
+function financeextras_civicrm_fieldOptions($entity, $field, &$options, $params) {
+  if (in_array($entity, ['FinancialItem']) && $field == 'entity_table') {
+    $options[\CRM_Financeextras_DAO_CreditNoteLine::$_tableName] = ts('Credit Note Line');
+  }
+
+  if (in_array($entity, ['EntityFinancialTrxn']) && $field == 'entity_table') {
+    $options[\CRM_Financeextras_DAO_CreditNote::$_tableName] = ts('Credit Note');
+  }
+}
