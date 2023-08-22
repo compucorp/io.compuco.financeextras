@@ -15,12 +15,18 @@ CRM.$(function ($) {
     });
   
     $('#price_set_id').on('change', function() {
+      recordPaymentAmount.value = $('#line-total').data('raw-total');
       if (($(this).val() !== '')) {
+        recordPaymentAmount.value = $('#pricevalue').data('raw-total');
         $('#pricevalue').on('change', function() {
           recordPaymentAmount.value = $('#pricevalue').data('raw-total');
         });
       }
     })
+
+    $('#line-total').on('datachanged', function() {
+      recordPaymentAmount.value = $('#line-total').data('raw-total');
+    });
   }
 
   function hideStatusField() {
