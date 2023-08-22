@@ -4,6 +4,7 @@ namespace Civi\Financeextras\Hook\BuildForm;
 
 use CRM_Financeextras_ExtensionUtil as E;
 use Civi\Financeextras\Utils\OptionValueUtils;
+use CRM_Core_Action;
 
 class ContributionCreate {
 
@@ -14,6 +15,7 @@ class ContributionCreate {
   }
 
   public function handle() {
+    $this->addCustomLineItemTemplate();
     $this->configureRecordPaymentField();
     $this->preventUserFromSettingContributionStatus();
   }
@@ -65,6 +67,27 @@ class ContributionCreate {
 
   private function isEdit() {
     return !empty($this->form->_id);
+  }
+
+  /**
+   * Defaults to opening a contribution with the line item editor view.
+   */
+  private function addCustomLineItemTemplate() {
+    $lineItemEditorIsInstalled = 'installed' ===
+    \CRM_Extension_System::singleton()->getManager()->getStatus('biz.jmaconsulting.lineitemedit');
+
+    if (!$lineItemEditorIsInstalled) {
+      return;
+    }
+
+    if (!in_array($this->form->_action, [CRM_Core_Action::ADD, CRM_Core_Action::UPDATE])) {
+      return;
+    }
+
+    \Civi::resources()->add([
+      'template' => 'CRM/Financeextras/Form/Contribute/CustomLineItem.tpl',
+      'region' => 'page-body',
+    ]);
   }
 
   /**
