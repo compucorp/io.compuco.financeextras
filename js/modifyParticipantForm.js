@@ -53,6 +53,7 @@ CRM.$(function ($) {
     $('.fe-contribution-date').html($('#receive_date').parent())
     $('.crm-event-eventfees-form-block-financial_type_id .description').hide()
     $('.fe-record_contribution-block #currency-symbol').text(window.symbol)
+    $('#total_amount').before($('.fe-record_contribution-block #currency-symbol').clone().append(' '))
     $('.crm-event-eventfees-form-block-contribution_status_id').hide();
   }
 

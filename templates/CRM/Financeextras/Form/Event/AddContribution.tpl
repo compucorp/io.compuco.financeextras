@@ -27,8 +27,14 @@
   </table>
   </fieldset>
 </div>
-<style>
-  .fe-record_contribution-fields > tbody > tr > td#amount-label {
-    vertical-align: baseline;
-  }
+{literal}
+  <style>
+    .fe-record_contribution-fields > tbody > tr > td#amount-label,
+    .crm-event-eventfees-form-block-total_amount > td.label {
+      vertical-align: baseline;
+    }
+    #payment_information fieldset.pay-later_info-group legend {
+      display: none;
+    }
 </style>
+{/literal}
