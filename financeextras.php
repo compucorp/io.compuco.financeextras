@@ -2,7 +2,9 @@
 
 require_once 'financeextras.civix.php';
 // phpcs:disable
+
 use CRM_Financeextras_ExtensionUtil as E;
+use Civi\Financeextras\Event\ContributionPaymentUpdatedEvent;
 // phpcs:enable
 
 /**
@@ -138,6 +140,17 @@ function financeextras_civicrm_tabset($tabsetName, &$tabs, $context) {
 function financeextras_civicrm_post($op, $objectName, $objectId, &$objectRef) {
   if ($objectName === 'CreditNoteAllocation' && in_array($op, ['create', 'edit'])) {
     \CRM_Financeextras_BAO_CreditNote::updateCreditNoteStatusPostAllocation($objectId);
+  }
+
+  if ($objectName === 'Contribution' && in_array($op, ['create', 'edit'])) {
+    \Civi::dispatcher()->dispatch(ContributionPaymentUpdatedEvent::NAME, new ContributionPaymentUpdatedEvent($objectId));
+    $contribution = \Civi\Api4\Contribution::get()
+      ->addWhere('id', '=', $objectId)
+      ->execute()
+      ->first();
+    if (empty($objectRef->contact_id)) {
+      $objectRef->contact_id = $contribution['contact_id'];
+    }
   }
 }
 
