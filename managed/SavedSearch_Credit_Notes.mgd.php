@@ -200,7 +200,7 @@ $mgd = [
                   'target' => '',
                 ],
                 [
-                  'path' => 'civicrm/',
+                  'path' => 'civicrm/contribution/creditnote/refund?id=[id]',
                   'icon' => 'fa-retweet',
                   'text' => 'Record cash refund',
                   'style' => 'default',
