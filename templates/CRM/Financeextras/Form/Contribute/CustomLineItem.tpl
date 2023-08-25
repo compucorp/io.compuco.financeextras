@@ -4,6 +4,7 @@
     CRM.$(function($) {
       const submittedRows = $.parseJSON('{/literal}{$lineItemSubmitted}{literal}');
       const action = '{/literal}{$action}{literal}';
+      const isEmptyPriceSet = !$('#price_set_id').length || $('#price_set_id').val() === ''
 
       // This dealy ensures the lineitem table has been built before trying to manipulate its field.
       setTimeout(() => {
@@ -17,15 +18,21 @@
         $('#selectPriceSet').prepend( `<div id="lineItemSwitch" class="crm-hover-button">OR <a href="#">Switch back to using line items</a></div>`)
         $('#lineItemSwitch').css('display', 'block').on('click', () => $('#price_set_id').val('').change())
 
-        if ($('#price_set_id').val() === '' && submittedRows.length <= 0) {
+        if ((isEmptyPriceSet) && submittedRows.length <= 0) {
           $('#add-items').click()
         }
-        toggleLineItemOrPricesetFields($('#price_set_id').val() === '');
+        toggleLineItemOrPricesetFields(isEmptyPriceSet);
 
         $('#price_set_id').on('change', function() {
           setTimeout(() => {
             toggleLineItemOrPricesetFields($(this).val() === '');
           }, 100);
+        });
+
+        $('#add-another-item').on('click', function() {
+          if ($('#price_set_id')) {
+            $('#totalAmountORPriceSet, #price_set_id').show();
+          }
         });
       }, 100);
 

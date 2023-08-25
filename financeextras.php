@@ -172,8 +172,10 @@ function financeextras_civicrm_fieldOptions($entity, $field, &$options, $params)
   }
 }
 
-/*
+/**
+ *
  * Implements hook_civicrm_validateForm().
+ *
  */
 function financeextras_civicrm_validateForm($formName, &$fields, &$files, &$form, &$errors) {
   $hooks = [
