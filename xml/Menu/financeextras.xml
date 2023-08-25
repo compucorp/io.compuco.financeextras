@@ -40,4 +40,9 @@
     <page_callback>CRM_Financeextras_Form_Contribute_CreditNoteAllocate</page_callback>
     <access_arguments>edit contributions</access_arguments>
   </item>
+  <item>
+    <path>civicrm/contribution/creditnote/refund</path>
+    <page_callback>CRM_Financeextras_Form_Contribute_CreditNoteRefund</page_callback>
+    <access_arguments>edit contributions</access_arguments>
+  </item>
 </menu>

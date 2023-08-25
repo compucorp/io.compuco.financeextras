@@ -4,6 +4,7 @@ namespace Civi\Api4;
 
 use Civi\Api4\Action\CreditNote\GetAction;
 use Civi\Api4\Action\CreditNote\VoidAction;
+use Civi\Api4\Action\CreditNote\RefundAction;
 use Civi\Api4\Action\CreditNote\ComputeTotalAction;
 use Civi\Api4\Action\CreditNote\CreditNoteSaveAction;
 use Civi\Api4\Action\CreditNote\DeleteWithItemsAction;
@@ -61,6 +62,20 @@ class CreditNote extends Generic\DAOEntity {
   }
 
   /**
+   * Record a credit note refund.
+   *
+   * @param bool $checkPermissions
+   *  Should permission be checked for the user.
+   *
+   * @return \Civi\Api4\Action\CreditNote\RefundAction
+   *   returns the credit note refund action
+   */
+  public static function refund($checkPermissions = TRUE) {
+    return (new RefundAction(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
    * {@inheritDoc}
    *
    * @param bool $checkPermissions
@@ -91,9 +106,10 @@ class CreditNote extends Generic\DAOEntity {
   public static function permissions() {
     return [
       'meta' => ['access CiviCRM'],
-      'void' => ['access CiviContribute', 'edit contributions'],
-      'computeTotal' => ['access CiviCRM', 'access CiviContribute'],
       'get' => ['access CiviCRM', 'access CiviContribute'],
+      'void' => ['access CiviContribute', 'edit contributions'],
+      'refund' => ['access CiviContribute', 'edit contributions'],
+      'computeTotal' => ['access CiviCRM', 'access CiviContribute'],
       'default' => ['access CiviCRM', 'access CiviContribute', 'edit contributions'],
       'delete' => ['access CiviCRM', 'access CiviContribute', 'delete in CiviContribute'],
       'deleteWithItems' => ['access CiviCRM', 'access CiviContribute', 'delete in CiviContribute'],
