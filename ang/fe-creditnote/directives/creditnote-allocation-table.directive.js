@@ -30,7 +30,7 @@
     $scope.remaining_credit = 0;
     $scope.isView = $scope.context == 'view'
     /*eslint-disable no-undef*/
-    $scope.formatDate = (date) => strftime(CRM['fe-creditnote'].shortDateFormat, date)
+    $scope.formatDate = (date) => strftime(CRM['fe-creditnote'].shortDateFormat,  new Date(date))
     $scope.formatMoney = MoneyFormat.formatMoney;
     $scope.isUpdate = $scope.context == 'update';
     $scope.hasAllocatePermission = CRM['fe-creditnote'].canEditContribution;
