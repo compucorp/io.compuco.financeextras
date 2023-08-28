@@ -137,8 +137,10 @@
           limit: 1,
           chain: {"financialAccount":["FinancialAccount", "get", {"where":[["id", "=", "$financial_account_id"]]}, 0]}
         }).then(function(entityFinancialAccounts) {
-          financialTypesCache.set(financialTypeId, entityFinancialAccounts[0]['financialAccount']);
-          updateFinancialTypeDependentFields(financialTypeId);
+          if (entityFinancialAccounts.length > 0) {
+            financialTypesCache.set(financialTypeId, entityFinancialAccounts[0]['financialAccount']);
+            updateFinancialTypeDependentFields(financialTypeId);
+          }
         });
       }
     }
