@@ -33,8 +33,7 @@ class CRM_Financeextras_Form_Contribute_CreditNoteRefund extends CRM_Contribute_
 
     $this->crid = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->creditNote = $this->getCreditNote();
-
-    $url = CRM_Utils_System::url('civicrm/contribution/creditnote/refund', 'reset=1&id=' . $this->crid);
+    $url = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $this->creditNote['contact_id'] . '&selectedChild=contribute', FALSE);
     $session = CRM_Core_Session::singleton();
     $session->replaceUserContext($url);
     parent::preProcess();
@@ -64,19 +63,19 @@ class CRM_Financeextras_Form_Contribute_CreditNoteRefund extends CRM_Contribute_
       '',
       array_combine(
         array_column(CurrencyUtils::getCurrencies(), 'name'),
-        array_column(CurrencyUtils::getCurrencies(), 'symbol')
+        array_column(CurrencyUtils::getCurrencies(), 'symbol'),
       ),
       FALSE,
-      ['disabled' => TRUE]
+      ['disabled' => TRUE, 'class' => 'form-control']
     );
 
     $this->add(
-      'text',
+      'number',
       'amount',
       ts('Refund Amount'),
-      [],
+      ['class' => 'form-control'],
       TRUE,
-      ['class' => 'form-control']
+      ['min' => 0, 'step' => 0.01]
     );
 
     $this->add(
@@ -96,38 +95,41 @@ class CRM_Financeextras_Form_Contribute_CreditNoteRefund extends CRM_Contribute_
       ts('Payment Method'),
       ['' => ts('- select -')] + CRM_Contribute_BAO_Contribution::buildOptions('payment_instrument_id', 'create'),
       TRUE,
-      ['onChange' => "return showHideByValue('payment_instrument_id', '{$checkPaymentID}','checkNumber','table-row','select',false);"]
+      ['onChange' => "return showHideByValue('payment_instrument_id', '{$checkPaymentID}','checkNumber','table-row','select',false);", 'class' => 'form-control']
     );
 
     $this->add(
       'text',
       'trxn_id',
-      ts('Transaction ID')
+      ts('Transaction ID'),
+      ['class' => 'form-control']
     );
 
     $this->add(
       'text',
       'fee_amount',
-      ts('Fee Amount')
+      ts('Fee Amount'),
+      ['class' => 'form-control']
     );
 
     $this->add(
       'text',
       'reference',
-      ts('Reference')
+      ts('Reference'),
+      ['class' => 'form-control']
     );
 
     parent::buildQuickForm();
 
     $this->addButtons([
       [
-        'type' => 'submit',
-        'name' => E::ts('Create'),
-      ],
-      [
         'type' => 'cancel',
         'name' => E::ts('Cancel'),
         'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'submit',
+        'name' => E::ts('Create'),
       ],
     ]);
   }
