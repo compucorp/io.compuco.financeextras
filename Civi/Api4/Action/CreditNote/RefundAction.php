@@ -24,7 +24,7 @@ class RefundAction extends AbstractAction {
   /**
    * Refund Amount
    *
-   * @var int
+   * @var mixed
    */
   protected $amount;
 

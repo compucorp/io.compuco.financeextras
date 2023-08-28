@@ -178,7 +178,7 @@ class CRM_Financeextras_Form_Contribute_CreditNoteRefund extends CRM_Contribute_
 
       \Civi\Api4\CreditNote::refund()
         ->setId($this->crid)
-        ->setAmount($values['amount'])
+        ->setAmount(round($values['amount'], 2))
         ->setReference($values['reference'])
         ->setDate($values['date'])
         ->setPaymentParam([
