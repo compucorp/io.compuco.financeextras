@@ -39,3 +39,8 @@
 #creditnote__view #creditnote__detail>tbody> tr > td {
   border-top: none;
 }
+#creditnote__list > div > crm-angular-js > afsearch-credit-notes > div > crm-search-display-table > div > table > tbody > tr ul.dropdown-menu li:nth-child(2) > a,
+#creditnote__list > div > crm-angular-js > afsearch-credit-notes > div > crm-search-display-table > div > table > tbody > tr ul.dropdown-menu li:nth-child(8) > a {
+  border-bottom: 1px solid #eee;
+}
+
