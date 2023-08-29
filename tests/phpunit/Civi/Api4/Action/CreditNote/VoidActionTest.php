@@ -142,7 +142,8 @@ class Civi_Api4_CreditNote_VoidActionTest extends BaseHeadlessTest {
         ->addWhere('entity_id', '=', $lineItem['id'])
         ->addWhere('entity_table', '=', \CRM_Financeextras_DAO_CreditNoteLine::$_tableName)
         ->addWhere('currency', '=', $creditNote['currency'])
-        ->addWhere('contact_id', '=', $creditNote['contact_id']);
+        ->addWhere('contact_id', '=', $creditNote['contact_id'])
+        ->addWhere('status_id', '=', 1);
 
       // Financial item should be created for Voided credit note line item.
       $financialItemForMainAmount = (clone $financialItemAPI)->addWhere('amount', '=', ($lineItem['quantity'] * $lineItem['unit_price']))

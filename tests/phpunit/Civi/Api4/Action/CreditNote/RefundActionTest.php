@@ -53,6 +53,17 @@ class Civi_Api4_CreditNote_RefundActionTest extends BaseHeadlessTest {
       ->execute()
       ->getArrayCopy();
 
+    foreach ($creditNote['items'] as $creditNoteLine) {
+      $creditNoteLineEntityFinancialTrxn = \Civi\Api4\EntityFinancialTrxn::get(FALSE)
+        ->addWhere('entity_id', '=', $creditNoteLine['id'])
+        ->addWhere('financial_trxn_id', '=', $refundAllocation['financial_trxn_id'])
+        ->addWhere('entity_table', '=', CRM_Financeextras_BAO_CreditNoteLine::$_tableName)
+        ->execute()
+        ->getArrayCopy();
+
+      $this->assertNotEmpty($creditNoteLineEntityFinancialTrxn);
+    }
+
     $financialTrxn = \Civi\Api4\FinancialTrxn::get(FALSE)
       ->addWhere('total_amount', '=', -1 * $amountToRefund)
       ->addWhere('id', '=', $refundAllocation['financial_trxn_id'])
