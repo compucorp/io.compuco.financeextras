@@ -1,8 +1,11 @@
 <?php
 
 use Civi\Api4\CreditNote;
+use Civi\Api4\CreditNoteAllocation;
+use Civi\Financeextras\Utils\OptionValueUtils;
 use Civi\Financeextras\Test\Helper\CreditNoteTrait;
 use CRM_Financeextras_BAO_CreditNote as CreditNoteBAO;
+use Civi\Financeextras\Setup\Manage\CreditNoteAllocationTypeManager;
 
 /**
  * CreditNote.DeleteWithItemsAction API Test Case.
@@ -171,6 +174,53 @@ class Civi_Api4_CreditNote_DeleteWithItemsAction extends BaseHeadlessTest {
         ->execute()
         ->getArrayCopy()
     );
+  }
+
+  public function testCreditNoteAllocationsAreDeleted() {
+    $creditNote = $this->createCreditNote();
+    $contribution = $this->createContribution($creditNote['contact_id'], 500);
+
+    $allocation = CreditNoteAllocation::allocate()
+      ->setContributionId($contribution['id'])
+      ->setCreditNoteId($creditNote['id'])
+      ->setReference('localhost')
+      ->setTypeId(OptionValueUtils::getValueForOptionValue(CreditNoteAllocationTypeManager::NAME, 'invoice'))
+      ->setAmount(100)
+      ->setCurrency($creditNote['currency'])
+      ->execute()
+      ->first();
+
+    $contribution = \Civi\Api4\Contribution::get()
+      ->addWhere('id', '=', $contribution['id'])
+      ->execute()
+      ->first();
+    $this->assertEquals($contribution['paid_amount'], 100);
+
+    CreditNote::deleteWithItems()
+      ->addWhere('id', '=', $creditNote['id'])
+      ->execute();
+
+    $contribution = \Civi\Api4\Contribution::get()
+      ->addWhere('id', '=', $contribution['id'])
+      ->execute()
+      ->first();
+
+    $this->assertEquals($contribution['paid_amount'], 0);
+
+    $allocation = CreditNoteAllocation::get()->addWhere('id', '=', $allocation)
+      ->execute()
+      ->first();
+    $this->assertEmpty($allocation);
+  }
+
+  private function createContribution($contactId, $contributionAmount) {
+    return \Civi\Api4\Contribution::create()
+      ->addValue('contact_id', $contactId)
+      ->addValue('total_amount', $contributionAmount)
+      ->addValue('contribution_status_id', 2)
+      ->addValue('financial_type_id', 1)
+      ->execute()
+      ->first();
   }
 
 }
