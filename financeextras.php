@@ -2,7 +2,9 @@
 
 require_once 'financeextras.civix.php';
 // phpcs:disable
+
 use CRM_Financeextras_ExtensionUtil as E;
+use Civi\Financeextras\Event\ContributionPaymentUpdatedEvent;
 // phpcs:enable
 
 /**
@@ -15,6 +17,7 @@ function financeextras_civicrm_config(&$config) {
   Civi::dispatcher()->addListener('civi.api.respond', ['Civi\Financeextras\APIWrapper\SearchDisplayRun', 'respond'], -100);
   Civi::dispatcher()->addSubscriber(new Civi\Financeextras\Event\Subscriber\CreditNoteInvoiceSubscriber());
   Civi::dispatcher()->addListener('civi.api.respond', ['Civi\Financeextras\APIWrapper\Contribution', 'respond'], -101);
+  Civi::dispatcher()->addListener('fe.contribution.received_payment', ['\Civi\Financeextras\Event\Listener\ContributionPaymentUpdatedListener', 'handle']);
 }
 
 /**
@@ -138,6 +141,17 @@ function financeextras_civicrm_post($op, $objectName, $objectId, &$objectRef) {
   if ($objectName === 'CreditNoteAllocation' && in_array($op, ['create', 'edit'])) {
     \CRM_Financeextras_BAO_CreditNote::updateCreditNoteStatusPostAllocation($objectId);
   }
+
+  if ($objectName === 'Contribution' && in_array($op, ['create', 'edit'])) {
+    \Civi::dispatcher()->dispatch(ContributionPaymentUpdatedEvent::NAME, new ContributionPaymentUpdatedEvent($objectId));
+    $contribution = \Civi\Api4\Contribution::get()
+      ->addWhere('id', '=', $objectId)
+      ->execute()
+      ->first();
+    if (empty($objectRef->contact_id)) {
+      $objectRef->contact_id = $contribution['contact_id'];
+    }
+  }
 }
 
 /**
@@ -155,5 +169,57 @@ function financeextras_civicrm_fieldOptions($entity, $field, &$options, $params)
 
   if (in_array($entity, ['EntityFinancialTrxn']) && $field == 'entity_table') {
     $options[\CRM_Financeextras_DAO_CreditNote::$_tableName] = ts('Credit Note');
+  }
+}
+
+/**
+ *
+ * Implements hook_civicrm_validateForm().
+ *
+ */
+function financeextras_civicrm_validateForm($formName, &$fields, &$files, &$form, &$errors) {
+  $hooks = [
+    \Civi\Financeextras\Hook\ValidateForm\MembershipCreate::class,
+    \Civi\Financeextras\Hook\ValidateForm\ContributionCreate::class,
+  ];
+
+  foreach ($hooks as $hook) {
+    if ($hook::shouldHandle($form, $formName)) {
+      (new $hook($form, $fields, $errors))->handle();
+    }
+  }
+}
+
+/**
+ * Implements hook_civicrm_postProcess().
+ */
+function financeextras_civicrm_postProcess($formName, $form) {
+  $hooks = [
+    \Civi\Financeextras\Hook\PostProcess\ParticipantPostProcess::class,
+    \Civi\Financeextras\Hook\PostProcess\ContributionPostProcess::class,
+  ];
+
+  foreach ($hooks as $hook) {
+    if ($hook::shouldHandle($form, $formName)) {
+      (new $hook($form))->handle();
+    }
+  }
+}
+
+/**
+ * Implements hook_civicrm_buildForm().
+ */
+function financeextras_civicrm_buildForm($formName, &$form) {
+  $hooks = [
+    \Civi\Financeextras\Hook\BuildForm\ContributionView::class,
+    \Civi\Financeextras\Hook\BuildForm\MembershipCreate::class,
+    \Civi\Financeextras\Hook\BuildForm\ParticipantCreate::class,
+    \Civi\Financeextras\Hook\BuildForm\ContributionCreate::class,
+  ];
+
+  foreach ($hooks as $hook) {
+    if ($hook::shouldHandle($form, $formName)) {
+      (new $hook($form))->handle();
+    }
   }
 }
