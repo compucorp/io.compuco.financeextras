@@ -54,6 +54,7 @@ CRM.$(function ($) {
     $('.crm-event-eventfees-form-block-financial_type_id .description').hide()
     $('.fe-record_contribution-block #currency-symbol').text(window.symbol)
     $('#total_amount').before($('.fe-record_contribution-block #currency-symbol').clone().append(' '))
+    $('#total_amount').after($('#total_amount').clone().attr('id', 'fe_total_amount').attr('name', 'fe_total_amount')).hide()
     $('.crm-event-eventfees-form-block-contribution_status_id').hide();
   }
 
@@ -95,8 +96,10 @@ CRM.$(function ($) {
   }
 
   function setTotalAmount() {
+    $('input[name=fe_total_amount]').val($('#pricevalue').data('raw-total'));
     $('input[name=fe_contribution_amount]').val($('#pricevalue').data('raw-total'));
     $('#pricevalue').on('change', function() {
+      $('input[name=fe_total_amount]').val($('#pricevalue').data('raw-total'));
       $('input[name=fe_contribution_amount]').val($('#pricevalue').data('raw-total'));
     });
   }
