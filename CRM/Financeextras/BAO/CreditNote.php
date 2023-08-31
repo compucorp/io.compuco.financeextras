@@ -186,6 +186,8 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
     $trxn->deleteRecord(['id' => $entityTrxn->financial_trxn_id]);
 
     $entityTrxn->delete();
+
+    CreditNoteAllocationBAO::deleteAccountingEntries($creditNoteId);
   }
 
   /**
