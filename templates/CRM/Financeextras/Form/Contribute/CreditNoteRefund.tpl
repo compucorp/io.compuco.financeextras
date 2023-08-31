@@ -17,7 +17,9 @@
             {$form.amount.label}
           </div>
           <div class="col-sm-7 col-md-5">
-          {$form.currency.html} {$form.amount.html}
+            <div class="row">
+              <div class="col-sm-3">{$form.currency.html}</div> <div class="col-sm-9">{$form.amount.html}</div>
+            </div>
           </div>
         </div>
 
@@ -55,7 +57,9 @@
             {$form.fee_amount.label}
           </div>
           <div class="col-sm-7 col-md-5">
-          {$form.currency.html} {$form.fee_amount.html}
+            <div class="row">
+              <div class="col-sm-3">{$form.currency.html}</div> <div class="col-sm-9">{$form.fee_amount.html}</div>
+            </div>
           </div>
         </div>
 
@@ -75,3 +79,16 @@
     </div>
   </div>
 </div>
+
+{literal}
+  <style>
+  #payment_information div.label {
+    text-align: left;
+    padding-left: 0;
+  }
+
+  #payment_information > fieldset > div div.content {
+  margin-left: 17%;
+  }
+  </style>
+{/literal}
