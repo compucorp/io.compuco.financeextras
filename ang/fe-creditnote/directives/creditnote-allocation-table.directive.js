@@ -22,6 +22,7 @@
    */
   function creditnoteAllocationTableController($scope, crmApi4, MoneyFormat) {
     $scope.ts = CRM.ts();
+    $scope.isVoid = false
     $scope.crmUrl = CRM.url;
     $scope.currency = 'GBP'
     $scope.allocations = [];
@@ -37,11 +38,13 @@
 
     const getAllocations = () => {
       crmApi4('CreditNote', 'get', {
+        select: ["*", "status_id:name"],
         where: [["id", "=", $scope.creditNoteId]],
         chain: {"allocations":["CreditNoteAllocation", "get", {"where":[["credit_note_id", "=", "$id"], ["is_reversed", "=", false]], "select":["*", "type_id:label", "contribution_id.invoice_number"]}]}
       }).then(function(result) {
         const creditnotes = result[0] ?? null;
   
+        $scope.isVoid = creditnotes["status_id:name"] == "void"
         $scope.currency = creditnotes.currency
         $scope.allocations = creditnotes.allocations ?? []
         $scope.total_credit = creditnotes.total_credit

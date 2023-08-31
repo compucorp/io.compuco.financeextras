@@ -15,6 +15,9 @@ CRM.$(function ($) {
       toggleMembershipType();
       recordPaymentAmount.value = $('#total_amount').val();
     });
+    $('#total_amount').on('change', () => {
+      recordPaymentAmount.value = $('#total_amount').val()
+    })
   }
 
   function togglePaymentBlock() {

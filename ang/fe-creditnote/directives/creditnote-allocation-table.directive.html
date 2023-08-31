@@ -5,7 +5,7 @@
       <label class="col-sm-6 control-label">
         {{ts('Allocated')}}
       </label>
-      <div class="col-sm-6" ng-if="hasAllocatePermission && isView">
+      <div class="col-sm-6" ng-if="hasAllocatePermission && isView && !isVoid">
         <a ng-href="{{ crmUrl('civicrm/contribution/creditnote/allocate', {crid: creditNoteId}) }}" class="btn btn-primary pull-right">Allocate Credit</a>
       </div>
     </div>
