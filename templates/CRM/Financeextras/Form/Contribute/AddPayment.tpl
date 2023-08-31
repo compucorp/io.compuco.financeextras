@@ -36,5 +36,20 @@
       width: 149px;
       margin-right: 9px;
     }
+    #payment_information > fieldset > div > div > div.content {
+      margin-left: 0px;
+    }
+    #Contribution > div.crm-block.crm-form-block.crm-contribution-form-block > table > tbody > tr.record_payment-block_row > td {
+      padding-left: 0 !important;
+    }
+    #check_number, #pan_truncation {
+      width: 12em;
+    }
+    #payment_instrument_id {
+      width: 14em;
+    }
+    #payment_information > fieldset > div {
+
+    }
   </style>
 {/literal}
