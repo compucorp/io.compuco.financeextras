@@ -18,15 +18,16 @@ class ParticipantPostProcess {
   }
 
   /**
-   * Creates a contribution record for the participant registeration
+   * Creates a contribution/payment record for the participant registeration
    *
    * Case 1: user selects free ticket, nothing to do, as a contribution shouldn't be created
    * Case 2: user select paid ticket and doesn't record payment,
    *    Create a new contribution here,
    *    Link the contribution to the participant record using ParticipantPayment entity
    * Case 3: user selects paid ticket and also records payment,
-   *    It means a payment has already been created, here we need to ensure
-   *      The contribution has the expected status as per the payment that was made
+   *    It means a pending contribution has been created, here we record payment for the
+   *    contribution and also ensure the contribution has the expected status
+   *    as per the payment value.
    */
   public function recordContribution() {
     $values = $this->form->getSubmitValues();
@@ -43,6 +44,7 @@ class ParticipantPostProcess {
       }
       else {
         $contributionId = $this->getParticipantContribution();
+        $this->recordPayment($contributionId);
       }
     }
     catch (\Throwable $th) {
@@ -126,6 +128,26 @@ class ParticipantPostProcess {
       $lineItem->entity_id = $participantId;
       $lineItem->contribution_id = $contributionId;
       $lineItem->save(FALSE);
+    }
+  }
+
+  private function recordPayment($contributionId) {
+    $values = $this->form->getSubmitValues();
+    if (!empty($values['fe_total_amount'])) {
+      $params = [
+        'is_payment' => 1,
+        'trxn_id' => $values['trxn_id'],
+        'contribution_id' => $contributionId,
+        'total_amount' => $values['fe_total_amount'],
+        'is_send_contribution_notification' => FALSE,
+        'check_number' => $values['check_number'] ?? NULL,
+        'card_type_id' => $values['card_type_id'] ?? NULL,
+        'pan_truncation' => $values['pan_truncation'] ?? NULL,
+        'trxn_date' => $values['receive_date'] ?? date('YmdHis'),
+        'payment_instrument_id' => $values['payment_instrument_id'],
+      ];
+
+      \CRM_Financial_BAO_Payment::create($params);
     }
   }
 

@@ -4,6 +4,7 @@ namespace Civi\Financeextras\Hook\BuildForm;
 
 use CRM_Core_Action;
 use CRM_Financeextras_ExtensionUtil as E;
+use Civi\Financeextras\Utils\OptionValueUtils;
 
 class ParticipantCreate {
 
@@ -37,6 +38,7 @@ class ParticipantCreate {
     $defaults = [
       'fe_ticket_type' => $this->getDefaultTicketType(),
       'fe_contribution_amount' => 0,
+      'contribution_status_id' => OptionValueUtils::getValueForOptionValue('contribution_status', 'pending'),
     ];
     $this->form->setDefaults(array_merge($this->form->_defaultValues, $defaults));
 
