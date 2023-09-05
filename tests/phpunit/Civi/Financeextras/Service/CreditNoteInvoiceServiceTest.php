@@ -10,6 +10,9 @@ use Civi\Financeextras\Test\Helper\CreditNoteTrait;
 use Civi\Financeextras\WorkflowMessage\CreditNoteInvoice;
 use CRM_Financeextras_BAO_CreditNote as CreditNoteBAO;
 
+/**
+ * @group headless
+ */
 class CreditNoteInvoiceServiceTest extends BaseHeadlessTest {
 
   use CreditNoteTrait;

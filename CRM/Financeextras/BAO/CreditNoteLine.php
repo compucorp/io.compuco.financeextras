@@ -1,5 +1,6 @@
 <?php
 
+use Civi\Financeextras\Utils\OptionValueUtils;
 use Civi\Financeextras\Utils\FinancialAccountUtils;
 
 class CRM_Financeextras_BAO_CreditNoteLine extends CRM_Financeextras_DAO_CreditNoteLine {
@@ -162,7 +163,7 @@ class CRM_Financeextras_BAO_CreditNoteLine extends CRM_Financeextras_DAO_CreditN
       'currency' => $creditNote['currency'],
       'amount' => ($lineItem['quantity'] * $lineItem['unit_price']),
       'description' => $lineItem['description'],
-      'status_id' => $status,
+      'status_id' => OptionValueUtils::getValueForOptionValue('financial_item_status', $status),
       'financial_account_id' => $financialAccount,
       'entity_table' => \CRM_Financeextras_DAO_CreditNoteLine::$_tableName,
       'entity_id' => $lineItem['id'],

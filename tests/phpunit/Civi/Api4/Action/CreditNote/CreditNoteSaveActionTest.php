@@ -240,7 +240,8 @@ class Civi_Api4_CreditNote_CreditNoteSaveActionTest extends BaseHeadlessTest {
         ->addWhere('entity_id', '=', $lineItem['id'])
         ->addWhere('entity_table', '=', \CRM_Financeextras_DAO_CreditNoteLine::$_tableName)
         ->addWhere('currency', '=', $creditNote['currency'])
-        ->addWhere('contact_id', '=', $creditNote['contact_id']);
+        ->addWhere('contact_id', '=', $creditNote['contact_id'])
+        ->addWhere('status_id', '=', 3);
 
       $all = \Civi\Api4\FinancialItem::get(FALSE)
         ->addWhere('entity_id', '=', $lineItem['id'])
