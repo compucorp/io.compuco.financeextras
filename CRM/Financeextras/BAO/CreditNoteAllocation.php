@@ -81,6 +81,10 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
     ];
     self::createPayment($account, $params);
 
+    if (!empty($allocation['contribution_id'])) {
+      \Civi::dispatcher()->dispatch(ContributionPaymentUpdatedEvent::NAME, new ContributionPaymentUpdatedEvent($allocation['contribution_id']));
+    }
+
     return $allocation;
   }
 
