@@ -2,6 +2,8 @@
 <ruleset name="PHP Custom Ruleset">
   <description>CiviCRM Coder Ruleset</description>
   <rule ref="bin/civicrm/coder/coder_sniffer/Drupal">
+    <exclude-pattern>tests/phpunit/bootstrap.php</exclude-pattern>
     <exclude-pattern>financeextras.civix.php</exclude-pattern>
+    <exclude-pattern>CRM/Financeextras/Upgrader/Base.php</exclude-pattern>
   </rule>
 </ruleset>

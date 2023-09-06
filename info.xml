@@ -2,7 +2,7 @@
 <extension key="io.compuco.financeextras" type="module">
   <file>financeextras</file>
   <name>Finance Extras</name>
-  <description>This extension provides CiviCRM financial improvement</description>
+  <description>This extension provides CiviCRM financial improvement including improved invoice numbering, credit notes and multi-company accounting</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>Compuco</author>
