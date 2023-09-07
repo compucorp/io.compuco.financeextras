@@ -51,17 +51,23 @@
     }
 
     $scope.deleteAllocation = (id) => {
-      CRM.$.blockUI();
-      crmApi4('CreditNoteAllocation', 'reverse', {
-        id
-      }).then(function() {
-        CRM.alert(ts('Credit note allocation has been successfully deleted'), ts('Success'), 'success');
-        getAllocations();
-      }, function() {
-        CRM.alert(ts('Unable to delete credit note allocation'), ts('Error'), 'error');
-      }).finally(function() {
-        CRM.$.unblockUI();
-      })
+        CRM.confirm({
+          title: 'Confirm',
+          message: ts('Are you sure you want to delete this allocation? Please note that the allocation will be deleted immediately, regardless of whether the credit note is saved or not after this action')
+        })
+        .on('crmConfirm:yes', function() {
+          CRM.$.blockUI();
+          crmApi4('CreditNoteAllocation', 'reverse', {
+            id
+          }).then(function() {
+            CRM.alert(ts('Credit note allocation has been successfully deleted'), ts('Success'), 'success');
+            getAllocations();
+          }, function() {
+            CRM.alert(ts('Unable to delete credit note allocation'), ts('Error'), 'error');
+          }).finally(function() {
+            CRM.$.unblockUI();
+          })
+        })
     }
 
     (function init() {
