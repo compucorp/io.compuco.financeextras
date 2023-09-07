@@ -4,61 +4,71 @@
     CRM.$(function($) {
       const submittedRows = $.parseJSON('{/literal}{$lineItemSubmitted}{literal}');
       const action = '{/literal}{$action}{literal}';
+      isNotQuickConfig = '{/literal}{$pricesetFieldsCount}{literal}'
       const isEmptyPriceSet = !$('#price_set_id').length || $('#price_set_id').val() === ''
 
-      // This dealy ensures the lineitem table has been built before trying to manipulate its field.
-      setTimeout(() => {
-        $('#lineitem-add-block').after(
-          $('<div>').addClass('price-set-alt')
-          .append($('<div>').addClass('price-set-alt-or'))
-          .append($('<div>').addClass('price-set-alt-select'))
-          .append($('#lineitem-add-block > div:last-child'))
-        )
-        $('#totalAmount, #totalAmountORaddLineitem').hide()
-        $('#selectPriceSet').prepend( `<div id="lineItemSwitch" class="crm-hover-button">OR <a href="#">Switch back to using line items</a></div>`)
-        $('#lineItemSwitch').css('display', 'block').on('click', () => $('#price_set_id').val('').change())
+      if (action == 1) {
+        // This dealy ensures the lineitem table has been built before trying to manipulate its field.
+        setTimeout(() => {
+          $('#lineitem-add-block').after(
+            $('<div>').addClass('price-set-alt')
+            .append($('<div>').addClass('price-set-alt-or'))
+            .append($('<div>').addClass('price-set-alt-select'))
+            .append($('#lineitem-add-block > div:last-child'))
+          )
+          $('#totalAmount, #totalAmountORaddLineitem').hide()
+          $('#selectPriceSet').prepend( `<div id="lineItemSwitch" class="crm-hover-button">OR <a href="#">Switch back to using line items</a></div>`)
+          $('#lineItemSwitch').css('display', 'block').on('click', () => $('#price_set_id').val('').change())
 
-        if ((isEmptyPriceSet) && submittedRows.length <= 0) {
-          $('#add-items').click()
+          if ((isEmptyPriceSet) && submittedRows.length <= 0) {
+            $('#add-items').click()
+          }
+          toggleLineItemOrPricesetFields(isEmptyPriceSet);
+
+          $('#price_set_id').on('change', function() {
+            setTimeout(() => {
+              toggleLineItemOrPricesetFields($(this).val() === '');
+            }, 100);
+          });
+
+          $('#add-another-item').on('click', function() {
+            if ($('#price_set_id')) {
+              $('#totalAmountORPriceSet, #price_set_id').show();
+            }
+          });
+        }, 100);
+
+        const toggleLineItemOrPricesetFields = (show) => {
+          if (!show) {
+            $('#lineItemSwitch').show();
+            $('#selectPriceSet').prepend($('#price_set_id'))
+            $('#lineitem-add-block').hide();
+            $('.price-set-alt').hide();
+          } else {
+            $('#lineItemSwitch').hide();
+            $('#lineitem-add-block').show()
+            $('#totalAmount, #totalAmountORaddLineitem, #totalAmountORPriceSet, #price_set_id').css('display', 'none')
+            $('.price-set-alt').show()
+            if (action != 2) {
+              // On edit user can't switch from priceset to lineitem and viceversa.
+              $('.price-set-alt-or').append($('#totalAmountORPriceSet').show())
+              $('.price-set-alt-select').append($('#price_set_id').show())
+            }
+            if (action == 1) {
+              $( "#total_amount").val(0)
+            }
+            $('#Contribution tr.crm-contribution-form-block-total_amount > td.label > label').text('Line Items')
+          }
         }
-        toggleLineItemOrPricesetFields(isEmptyPriceSet);
-
-        $('#price_set_id').on('change', function() {
-          setTimeout(() => {
-            toggleLineItemOrPricesetFields($(this).val() === '');
-          }, 100);
-        });
-
-        $('#add-another-item').on('click', function() {
-          if ($('#price_set_id')) {
-            $('#totalAmountORPriceSet, #price_set_id').show();
-          }
-        });
-      }, 100);
-
-      const toggleLineItemOrPricesetFields = (show) => {
-        if (!show) {
-          $('#lineItemSwitch').show();
-          $('#selectPriceSet').prepend($('#price_set_id'))
-          $('#lineitem-add-block').hide();
-          $('.price-set-alt').hide();
-        } else {
-          $('#lineItemSwitch').hide();
-          $('#lineitem-add-block').show()
-          $('#totalAmount, #totalAmountORaddLineitem, #totalAmountORPriceSet, #price_set_id').css('display', 'none')
-          $('.price-set-alt').show()
-          if (action != 2) {
-            // On edit user can't switch from priceset to lineitem and viceversa.
-            $('.price-set-alt-or').append($('#totalAmountORPriceSet').show())
-            $('.price-set-alt-select').append($('#price_set_id').show())
-          }
-          if (action == 1) {
-            $( "#total_amount").val(0)
-          }
-          $('#Contribution tr.crm-contribution-form-block-total_amount > td.label > label').text('Line Items')
-        }
+        $('#Contribution tr.crm-contribution-form-block-total_amount > td.label > label').text('Line Items')
       }
-      $('#Contribution tr.crm-contribution-form-block-total_amount > td.label > label').text('Line Items')
+
+      if (action == 2) {
+        $('#Contribution > div.crm-block.crm-form-block.crm-contribution-form-block > table > tbody > tr:nth-child(3) > td.label').text('Line Items')
+      }
+      if (!isNotQuickConfig && action == 2) {
+        $('#totalAmount, #totalAmountORaddLineitem, #totalAmountORPriceSet, #price_set_id').css('display', 'none')
+      }
     })
   </script>
 {/literal}
