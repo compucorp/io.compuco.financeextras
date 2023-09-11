@@ -58,10 +58,10 @@ class CRM_Financeextras_Hook_Links_Contribution {
    *
    * @throws \Civi\API\Exception
    */
-  private function isContributionCancelled() {
+  private function contributionHasStatus($statuses) {
     $contribution = \Civi\Api4\Contribution::get()
       ->addWhere('id', '=', $this->contributionId)
-      ->addWhere('contribution_status_id:name', '=', 'Cancelled')
+      ->addWhere('contribution_status_id:name', 'IN', $statuses)
       ->setLimit(1)
       ->execute()
       ->first();
@@ -73,7 +73,7 @@ class CRM_Financeextras_Hook_Links_Contribution {
    * Adds credit note action to contribution links.
    */
   public function alterLinks() {
-    if (!$this->isContributionCancelled()) {
+    if (!$this->contributionHasStatus(['Cancelled', 'Refunded', 'Failed', 'Chargeback'])) {
       $this->links[] = [
         'name' => 'Add Credit Note',
         'url' => 'civicrm/contribution/creditnote',
