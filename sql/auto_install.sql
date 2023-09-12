@@ -29,6 +29,7 @@ SET FOREIGN_KEY_CHECKS=1;
 CREATE TABLE `financeextras_credit_note` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique CreditNote ID',
   `contact_id` int unsigned COMMENT 'FK to Contact',
+  `owner_organization` int unsigned COMMENT 'FK to Contact',
   `cn_number` varchar(11),
   `date` date COMMENT 'Credit Note date',
   `status_id` int unsigned NOT NULL COMMENT 'One of the values of the financeextras_credit_note_status option group',
@@ -40,7 +41,8 @@ CREATE TABLE `financeextras_credit_note` (
   `sales_tax` decimal(20,2) NULL COMMENT 'Credit note sales tax total',
   `total_credit` decimal(20,2) NULL COMMENT 'Total value of the credit note',
   PRIMARY KEY (`id`),
-  CONSTRAINT FK_financeextras_credit_note_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE
+  CONSTRAINT FK_financeextras_credit_note_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE,
+  CONSTRAINT FK_financeextras_credit_note_owner_organization FOREIGN KEY (`owner_organization`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE
 )
 ENGINE=InnoDB;
 
