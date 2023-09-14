@@ -63,7 +63,7 @@
 
       crmApi4('CreditNote', 'get', {
         where: [["id", "=", $scope.id]],
-        select: ['*', 'contact_id.display_name', 'status_id:label'],
+        select: ['*', 'contact_id.display_name', 'status_id:label', 'owner_organization.organization_name'],
         chain: {"items":["CreditNoteLine", "get", {"where":[["credit_note_id", "=", "$id"]], "select": ['*', 'financial_type_id.name']}]}
       }).then(function (result) {
         const creditnotes = result[0] ?? null;
@@ -158,7 +158,7 @@
 
     /**
      * Retrieves the contribution tax term from settings
-     * 
+     *
      * @returns {string} tax term
      */
     async function getTaxTerm() {
