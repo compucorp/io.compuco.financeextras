@@ -305,6 +305,16 @@ function _financeextras_civix_fixNavigationMenuItems(&$nodes, &$maxNavID, $paren
  */
 function _financeextras_civix_civicrm_entityTypes(&$entityTypes) {
   $entityTypes = array_merge($entityTypes, [
+    'CRM_Financeextras_DAO_BatchOwnerOrganisation' => [
+      'name' => 'BatchOwnerOrganisation',
+      'class' => 'CRM_Financeextras_DAO_BatchOwnerOrganisation',
+      'table' => 'financeextras_batch_owner_org',
+    ],
+    'CRM_Financeextras_DAO_Company' => [
+      'name' => 'Company',
+      'class' => 'CRM_Financeextras_DAO_Company',
+      'table' => 'financeextras_company',
+    ],
     'CRM_Financeextras_DAO_CreditNote' => [
       'name' => 'CreditNote',
       'class' => 'CRM_Financeextras_DAO_CreditNote',

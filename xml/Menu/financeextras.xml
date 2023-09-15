@@ -45,4 +45,22 @@
     <page_callback>CRM_Financeextras_Form_Contribute_CreditNoteRefund</page_callback>
     <access_arguments>edit contributions</access_arguments>
   </item>
+  <item>
+    <path>civicrm/admin/financeextras/company</path>
+    <page_callback>CRM_Financeextras_Page_Company</page_callback>
+    <title>Company Listing</title>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/admin/financeextras/company/add</path>
+    <page_callback>CRM_Financeextras_Form_Company_Add</page_callback>
+    <title>Add Company</title>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/admin/financeextras/company/delete</path>
+    <page_callback>CRM_Financeextras_Form_Company_Delete</page_callback>
+    <title>Delete Company</title>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
 </menu>

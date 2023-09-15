@@ -10,8 +10,9 @@ class MembershipCreate {
    * @param \CRM_Member_Form_Membership $form
    * @param array $fields
    * @param array $errors
+   * @param string $formName
    */
-  public function __construct(private \CRM_Member_Form_Membership $form, private array &$fields, private array &$errors) {
+  public function __construct(private \CRM_Member_Form_Membership $form, private array &$fields, private array &$errors, private string $formName) {
   }
 
   public function handle() {
