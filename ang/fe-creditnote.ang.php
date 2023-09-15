@@ -30,8 +30,19 @@ function financeextras_set_credit_note_status(&$options) {
   $options['creditNoteStatus'] = $optionValues->getArrayCopy();
 }
 
+/**
+ * Exposes credit note statuses to Angular.
+ */
+function financeextras_set_companies(&$options) {
+  $options['companies'] = \Civi\Api4\Company::get()
+    ->addSelect('contact_id.organization_name', 'contact_id')
+    ->execute()
+    ->getArrayCopy();
+}
+
 financeextras_set_currency_codes($options);
 financeextras_set_credit_note_status($options);
+financeextras_set_companies($options);
 
 return [
   'js' => [

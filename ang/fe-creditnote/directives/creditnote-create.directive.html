@@ -30,6 +30,7 @@
             <span class="crm-inline-error" ng-show="creditnotesForm.contact.$dirty && creditnotesForm.contact.$invalid && creditnotesForm.contact.$error.required">Contact is required</span>
           </div>
         </div>
+
         <div class="form-group" ng-if="isView || isUpdate">
           <label class="col-sm-2 control-label required-mark">
             {{ ts('Status') }}
@@ -51,6 +52,25 @@
               ng-minlength="1"
               ng-disabled="isView || isUpdate"
             />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-sm-2 control-label required-mark">
+            {{ts('Owner Organisation')}}
+          </label>
+          <div class="col-sm-5">
+            <select class="form-control"
+                    name="owner_organization"
+                    ng-model="creditnotes.owner_organization"
+                    placeholder="Owner Organisation"
+                    ng-disabled="isView || isUpdate || companies.length === 1"
+                    required
+            >
+              <option value="">-{{ ts('select') }}-</option>
+              <option ng-repeat="company in companies track by $index" value="{{ companies[$index].contact_id }}">{{ companies[$index]['contact_id.organization_name'] }}</option>
+            </select>
+            <span class="crm-inline-error" ng-show="creditnotesForm.owner_organization.$dirty && creditnotesForm.owner_organization.$invalid && creditnotesForm.owner_organization.$error.required">Owner Organisation is required</span>
           </div>
         </div>
 
