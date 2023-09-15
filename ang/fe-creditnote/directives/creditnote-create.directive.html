@@ -74,14 +74,14 @@
           </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" ng-hide="!isUpdate">
           <label class="col-sm-2 control-label required-mark">
             {{ ts('Number') }}
           </label>
           <div class="col-sm-5">
               <input
-                class="form-control"" id="creditnotes_number"
-                ng-model="creditnotes.cn_number" placeholder="Number" name="number" type="text" ng-disabled="!isUpdate"/>
+                class="form-control" id="creditnotes_number"
+                ng-model="creditnotes.cn_number" placeholder="Number" name="number" type="text" ng-disabled="isUpdate"/>
           </div>
         </div>
         <div class="form-group">
