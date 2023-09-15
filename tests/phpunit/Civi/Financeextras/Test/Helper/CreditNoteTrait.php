@@ -38,9 +38,15 @@ trait CreditNoteTrait {
    */
   public function getCreditNoteData(array $default = []) {
     $client = ContactFabricator::fabricate();
+    $ownerOrg = \Civi\Api4\Company::get()
+      ->addSelect('contact_id')
+      ->setLimit(1)
+      ->execute()
+      ->first()['contact_id'];
 
     return array_merge([
       'contact_id' => $client['id'],
+      'owner_organization' => $ownerOrg,
       'cn_number' => NULL,
       'reference' => 'NILO',
       'currency' => 'GBP',

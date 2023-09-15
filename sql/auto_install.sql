@@ -29,7 +29,7 @@ SET FOREIGN_KEY_CHECKS=1;
 CREATE TABLE `financeextras_credit_note` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique CreditNote ID',
   `contact_id` int unsigned COMMENT 'FK to Contact',
-  `owner_organization` int unsigned COMMENT 'FK to Contact',
+  `owner_organization` int unsigned NOT NULL COMMENT 'FK to Contact',
   `cn_number` varchar(11),
   `date` date COMMENT 'Credit Note date',
   `status_id` int unsigned NOT NULL COMMENT 'One of the values of the financeextras_credit_note_status option group',
