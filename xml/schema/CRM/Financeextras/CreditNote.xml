@@ -50,6 +50,7 @@
     <name>owner_organization</name>
     <type>int unsigned</type>
     <title>Owner Organisation</title>
+    <required>true</required>
     <export>true</export>
     <comment>FK to Contact</comment>
     <html>

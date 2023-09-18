@@ -27,6 +27,8 @@ abstract class BaseHeadlessTest extends PHPUnit\Framework\TestCase implements
       'invoice_template_id' => 1,
       'invoice_prefix' => "INV{$companyNumber}_",
       'next_invoice_number' => "00000{$companyNumber}",
+      'creditnote_prefix' => "CN{$companyNumber}_",
+      'next_creditnote_number' => "00000{$companyNumber}",
     ];
 
     $params = $defaultParams;
