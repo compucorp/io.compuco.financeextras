@@ -56,7 +56,7 @@
     $scope.deleteAllocation = (id) => {
         CRM.confirm({
           title: 'Confirm',
-          message: ts('Are you sure you want to delete this allocation? Please note that the allocation will be deleted immediately, regardless of whether the credit note is saved or not after this action')
+          message: ts('<p style="text-align:center"><strong>Are you sure you want to delete this allocation?</strong> <br> <br>Please note that the allocation will be deleted immediately, regardless of whether the credit note is saved or not after this action</p>')
         })
         .on('crmConfirm:yes', function() {
           CRM.$.blockUI();
