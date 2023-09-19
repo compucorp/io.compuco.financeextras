@@ -169,6 +169,7 @@ function financeextras_civicrm_fieldOptions($entity, $field, &$options, $params)
 
   if (in_array($entity, ['EntityFinancialTrxn']) && $field == 'entity_table') {
     $options[\CRM_Financeextras_DAO_CreditNote::$_tableName] = ts('Credit Note');
+    $options[\CRM_Financeextras_DAO_CreditNoteLine::$_tableName] = ts('Credit Note Line');
   }
 }
 
