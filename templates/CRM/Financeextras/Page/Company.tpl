@@ -12,6 +12,7 @@
             <th>{ts}Invoice Template{/ts}</th>
             <th>{ts}Invoice Prefix{/ts}</th>
             <th>{ts}Next Invoice Number{/ts}</th>
+            <th>{ts}Credit Note Template{/ts}</th>
             <th>{ts}Credit Note Prefix{/ts}</th>
             <th>{ts}Next Credit Note Number{/ts}</th>
             <th></th>
@@ -23,6 +24,7 @@
                 <td>{$row.invoice_template_name}</td>
                 <td>{$row.invoice_prefix}</td>
                 <td>{$row.next_invoice_number}</td>
+                <td>{$row.creditnote_template_name}</td>
                 <td>{$row.creditnote_prefix}</td>
                 <td>{$row.next_creditnote_number}</td>
                 <td>{$row.action|replace:'xx':$row.id}</td>

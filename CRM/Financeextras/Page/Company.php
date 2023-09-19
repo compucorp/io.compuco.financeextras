@@ -9,9 +9,10 @@ class CRM_Financeextras_Page_Company extends CRM_Core_Page {
   }
 
   public function browse() {
-    $getQuery = 'SELECT fc.*, cc.display_name as company_name, mt.msg_title as invoice_template_name FROM financeextras_company fc
+    $getQuery = 'SELECT fc.*, cc.display_name as company_name, mt.msg_title as invoice_template_name, mt2.msg_title as creditnote_template_name FROM financeextras_company fc
                  LEFT JOIN civicrm_contact cc on cc.id = fc.contact_id
                  LEFT JOIN civicrm_msg_template mt ON mt.id = fc.invoice_template_id
+                 LEFT JOIN civicrm_msg_template mt2 ON mt2.id = fc.creditnote_template_id
                  ';
     $company = CRM_Core_DAO::executeQuery($getQuery);
     $rows = [];
