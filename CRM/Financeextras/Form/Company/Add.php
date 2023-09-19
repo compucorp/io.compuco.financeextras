@@ -52,6 +52,19 @@ class CRM_Financeextras_Form_Company_Add extends CRM_Core_Form {
 
     $this->add('text', 'next_invoice_number', 'Next Invoice Number', ['maxlength' => 11], TRUE);
 
+    $this->addEntityRef('creditnote_template_id', ts('Credit Note Template'), [
+      'entity' => 'MessageTemplate',
+      'api' => [
+        'search_field' => 'msg_title',
+        'label_field' => 'msg_title',
+        'params' => [
+          'is_default' => 1,
+        ],
+      ],
+      'select' => ['minimumInputLength' => 0],
+      'placeholder' => ts('Select Credit Note Template'),
+    ], TRUE);
+
     $this->add('text', 'creditnote_prefix', 'Credit Note Prefix', ['maxlength' => 11]);
 
     $this->add('text', 'next_creditnote_number', 'Next Credit Note Number', ['maxlength' => 11], TRUE);
@@ -81,6 +94,7 @@ class CRM_Financeextras_Form_Company_Add extends CRM_Core_Form {
     $values['invoice_template_id'] = $company->invoice_template_id;
     $values['invoice_prefix'] = $company->invoice_prefix;
     $values['next_invoice_number'] = $company->next_invoice_number;
+    $values['creditnote_template_id'] = $company->creditnote_template_id;
     $values['creditnote_prefix'] = $company->creditnote_prefix;
     $values['next_creditnote_number'] = $company->next_creditnote_number;
 
@@ -127,6 +141,7 @@ class CRM_Financeextras_Form_Company_Add extends CRM_Core_Form {
     $params['invoice_template_id'] = $submittedValues['invoice_template_id'];
     $params['invoice_prefix'] = $submittedValues['invoice_prefix'];
     $params['next_invoice_number'] = $submittedValues['next_invoice_number'];
+    $params['creditnote_template_id'] = $submittedValues['creditnote_template_id'];
     $params['creditnote_prefix'] = $submittedValues['creditnote_prefix'];
     $params['next_creditnote_number'] = $submittedValues['next_creditnote_number'];
 
