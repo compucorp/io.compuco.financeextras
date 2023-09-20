@@ -70,6 +70,22 @@
   </field>
 
   <field>
+    <name>creditnote_template_id</name>
+    <title>Credit Note Template ID</title>
+    <type>int unsigned</type>
+    <comment>FK to the message template.</comment>
+    <html>
+      <label>Credit Note Template</label>
+    </html>
+  </field>
+  <foreignKey>
+    <name>creditnote_template_id</name>
+    <table>civicrm_msg_template</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+
+  <field>
     <name>creditnote_prefix</name>
     <title>Credit Note Prefix</title>
     <type>varchar</type>

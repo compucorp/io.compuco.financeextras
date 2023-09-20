@@ -11,6 +11,7 @@ class CRM_Financeextras_Form_Company_AddTest extends BaseHeadlessTest {
       'invoice_template_id' => '',
       'invoice_prefix' => '',
       'next_invoice_number' => '',
+      'creditnote_template_id' => '',
       'creditnote_prefix' => '',
       'next_creditnote_number' => '',
     ];
@@ -21,6 +22,7 @@ class CRM_Financeextras_Form_Company_AddTest extends BaseHeadlessTest {
       'contact_id' => 'Organisation is a required field.',
       'invoice_template_id' => 'Invoice Template is a required field.',
       'next_invoice_number' => 'Next Invoice Number is a required field.',
+      'creditnote_template_id' => 'Credit Note Template is a required field.',
       'next_creditnote_number' => 'Next Credit Note Number is a required field.',
     ];
 
@@ -33,6 +35,7 @@ class CRM_Financeextras_Form_Company_AddTest extends BaseHeadlessTest {
       'invoice_template_id' => 1,
       'invoice_prefix' => 'INV_',
       'next_invoice_number' => 'YAYAYA',
+      'creditnote_template_id' => 1,
       'creditnote_prefix' => 'CN_',
       'next_creditnote_number' => 'YAYAYA',
     ];
@@ -54,6 +57,7 @@ class CRM_Financeextras_Form_Company_AddTest extends BaseHeadlessTest {
       'invoice_template_id' => 1,
       'invoice_prefix' => 'INV_',
       'next_invoice_number' => '00001',
+      'creditnote_template_id' => 1,
       'creditnote_prefix' => 'CN_',
       'next_creditnote_number' => '00002',
     ];
@@ -77,6 +81,7 @@ class CRM_Financeextras_Form_Company_AddTest extends BaseHeadlessTest {
       'invoice_template_id' => 1,
       'invoice_prefix' => 'INV_',
       'next_invoice_number' => '000001',
+      'creditnote_template_id' => 1,
       'creditnote_prefix' => 'CN_',
       'next_creditnote_number' => '000002',
     ];

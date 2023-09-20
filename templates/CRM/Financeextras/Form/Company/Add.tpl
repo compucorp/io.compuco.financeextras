@@ -22,6 +22,11 @@
     </tr>
 
     <tr>
+      <td class="label">{$form.creditnote_template_id.label}</td>
+      <td>{$form.creditnote_template_id.html}</td>
+    </tr>
+
+    <tr>
       <td class="label">{$form.creditnote_prefix.label}</td>
       <td>{$form.creditnote_prefix.html}</td>
     </tr>
