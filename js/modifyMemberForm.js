@@ -17,6 +17,10 @@ CRM.$(function ($) {
     });
     $('#total_amount').on('change', () => {
       recordPaymentAmount.value = $('#total_amount').val()
+
+      if ($('#total_amount').val() == 0) {
+        $('input[name=record_contribution]').prop("checked", false).trigger('change')
+      }
     })
   }
 
@@ -31,9 +35,9 @@ CRM.$(function ($) {
 
   function toggleMembershipType() {
     if ($('input[name=record_contribution]').is(':checked')) {
-      $('input[name=fe_member_type][value=paid_member]').prop("checked", true)
+      $('input[name=fe_member_type][value=paid_member]').prop("checked", true).trigger('change')
     } else {
-      $('input[name=fe_member_type][value=free_member]').prop("checked", true)
+      $('input[name=fe_member_type][value=free_member]').prop("checked", true).trigger('change')
     }
   }
 
