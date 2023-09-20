@@ -40,7 +40,7 @@ class ContributionPostProcess {
     }
     catch (\Throwable $th) {
       $transaction->rollback();
-      \CRM_Core_Session::setStatus('Error creating contribution payment', ts('Contribution Payemnt Error'), 'error');
+      \CRM_Core_Session::setStatus('Error creating contribution payment', ts('Contribution Payment Error'), 'error');
       \Civi::log()->error('Error creating contribution payment: ' . $th->getMessage());
     }
 
