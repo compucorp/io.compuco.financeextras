@@ -2,6 +2,7 @@
 
 namespace Civi\Financeextras\Service;
 
+use Civi\Api4\Company;
 use CRM_Utils_Array;
 use CRM_Core_Config;
 use Civi\Api4\Contact;
@@ -52,7 +53,7 @@ class CreditNoteInvoiceService {
     $this->template->setDomainLocation($this->getContactLocation($domain->contact_id));
     $this->template->setContactLocation($this->getContactLocation($creditNote['contact_id']));
 
-    $rendered = $this->template->renderTemplate();
+    $rendered = $this->template->renderTemplate(['messageTemplateID' => $creditNote['company']['creditnote_template_id']]);
     $rendered['format'] = $rendered['format'] ?? $this->defaultInvoiceFormat();
 
     return $rendered;
@@ -81,6 +82,9 @@ class CreditNoteInvoiceService {
       )
       ->addChain('contact', Contact::get()
         ->addWhere('id', '=', '$contact_id'), 0
+      )
+      ->addChain('company', Company::get()
+        ->addWhere('contact_id', '=', '$owner_organization'), 0
       )
       ->execute()
       ->first();
