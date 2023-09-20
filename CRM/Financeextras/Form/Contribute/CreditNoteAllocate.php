@@ -103,9 +103,9 @@ class CRM_Financeextras_Form_Contribute_CreditNoteAllocate extends CRM_Core_Form
         ->execute();
     }
 
-    CRM_Core_Session::setStatus('Credits allocated successfully.', '', 'success');
+    CRM_Core_Session::setStatus(ts('Credits allocated successfully.'), ts('Success'), 'success');
     $url = CRM_Utils_System::url('civicrm/contact/view',
-    ['cid' => $this->creditNote['contact_id'], 'selectedChild' => 'contribute']
+      ['reset' => 1, 'cid' => $this->creditNote['contact_id'], 'selectedChild' => 'contribute']
     );
     CRM_Utils_System::redirect($url);
 
@@ -123,14 +123,14 @@ class CRM_Financeextras_Form_Contribute_CreditNoteAllocate extends CRM_Core_Form
    */
   public function validateAllocation($amounts) {
     if (!empty(array_filter($amounts, fn($n) => $n <= 0))) {
-      CRM_Core_Session::setStatus('Amount to be refunded must be greater than zero.', 'Error', 'error');
+      CRM_Core_Session::setStatus(ts('Amount to be refunded must be greater than zero.'), ts('Error'), 'error');
       return FALSE;
     }
 
     $creditsToAllocate = array_sum($amounts);
 
     if ($creditsToAllocate > $this->creditNote['remaining_credit']) {
-      CRM_Core_Session::setStatus('Amount to be refunded cannot exceed the remaining credit.', 'Error', 'error');
+      CRM_Core_Session::setStatus(ts('Amount to be refunded cannot exceed the remaining credit.'), ts('Error'), 'error');
       return FALSE;
     }
 
