@@ -39,6 +39,11 @@ class CreditNoteInvoiceServiceTest extends BaseHeadlessTest {
       ->execute()
       ->first());
 
+    $ownerOrg = (object) (Contact::get(FALSE)
+      ->addWhere('id', '=', $creditNote->owner_organization)
+      ->execute()
+      ->first());
+
     $invoiceService = new CreditNoteInvoiceService(new CreditNoteInvoice());
     $invoice = $invoiceService->render($creditNote->id);
 
@@ -46,6 +51,7 @@ class CreditNoteInvoiceServiceTest extends BaseHeadlessTest {
     $totalCredit = \CRM_Utils_Money::format($creditNote->total_credit, $creditNote->currency);
     $this->assertArrayHasKey("html", $invoice);
     $this->assertRegExp('/' . $contact->display_name . '/', $invoice['html']);
+    $this->assertRegExp('/' . $ownerOrg->organization_name . '/', $invoice['html']);
     $this->assertRegExp('/Supplementary Address 1/', $invoice['html']);
     $this->assertRegExp('/Supplementary Address 2/', $invoice['html']);
     $this->assertRegExp('/' . str_replace(' ', '', $subtotal) . '/', $invoice['html']);
