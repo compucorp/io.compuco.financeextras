@@ -330,4 +330,22 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
     return $financialTrxn;
   }
 
+  /**
+   * Gets the company record associated
+   * with the credit note owner organisation.
+   *
+   * @param int $creditNoteId
+   * @return array
+   */
+  public static function getOwnerOrganisationCompany($creditNoteId) {
+    $OwnerOrgQuery = "SELECT contact.organization_name as name, contact.image_URL as logo_url, company.* FROM financeextras_credit_note cn
+                      INNER JOIN financeextras_company company ON cn.owner_organization = company.contact_id
+                      INNER JOIN civicrm_contact contact ON company.contact_id = contact.id
+                      WHERE cn.id = {$creditNoteId}
+                      LIMIT 1";
+    $cnOwnerCompany = CRM_Core_DAO::executeQuery($OwnerOrgQuery);
+    $cnOwnerCompany->fetch();
+    return $cnOwnerCompany->toArray();
+  }
+
 }

@@ -22,6 +22,12 @@ abstract class BaseHeadlessTest extends PHPUnit\Framework\TestCase implements
   }
 
   public function createCompany($companyNumber, $alternativeParams = []) {
+    $creditNoteTemplateId = \Civi\Api4\MessageTemplate::get()
+      ->addSelect('id')
+      ->addWhere('msg_title', '=', 'Credit Note Invoice')
+      ->execute()
+      ->first()['id'];
+
     $defaultParams = [
       'name' => "testorg{$companyNumber}",
       'invoice_template_id' => 1,
@@ -29,6 +35,7 @@ abstract class BaseHeadlessTest extends PHPUnit\Framework\TestCase implements
       'next_invoice_number' => "00000{$companyNumber}",
       'creditnote_prefix' => "CN{$companyNumber}_",
       'next_creditnote_number' => "00000{$companyNumber}",
+      'creditnote_template_id' => $creditNoteTemplateId,
     ];
 
     $params = $defaultParams;

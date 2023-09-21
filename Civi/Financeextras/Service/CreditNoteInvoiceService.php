@@ -2,11 +2,9 @@
 
 namespace Civi\Financeextras\Service;
 
-use Civi\Api4\Company;
 use CRM_Utils_Array;
 use CRM_Core_Config;
 use Civi\Api4\Contact;
-use CRM_Core_BAO_Domain;
 use Civi\Api4\CreditNote;
 use Civi\Api4\Contribution;
 use Civi\Api4\CreditNoteLine;
@@ -37,21 +35,15 @@ class CreditNoteInvoiceService {
   public function render(int $id): array {
     $creditNote = $this->getCreditNoteData($id);
 
-    $domain = CRM_Core_BAO_Domain::getDomain();
-    $organisation = Contact::get()
-      ->addSelect('image_URL')
-      ->addWhere('id', '=', $domain->contact_id)
-      ->execute()
-      ->first();
-
     $this->template->setCreditNoteId($id);
     $this->template->setCreditNote($creditNote);
     $this->template->setTaxTerm($this->getTaxTerm());
-    $this->template->setDomainName($domain->name ?? '');
-    $this->template->setDomainLogo($organisation['image_URL']);
     $this->template->setBaseURL(CRM_Core_Config::singleton()->userFrameworkBaseURL);
-    $this->template->setDomainLocation($this->getContactLocation($domain->contact_id));
     $this->template->setContactLocation($this->getContactLocation($creditNote['contact_id']));
+
+    $this->template->setDomainName($creditNote['company']['name']);
+    $this->template->setDomainLogo($creditNote['company']['logo_url']);
+    $this->template->setDomainLocation($this->getContactLocation($creditNote['company']['contact_id']));
 
     $rendered = $this->template->renderTemplate(['messageTemplateID' => $creditNote['company']['creditnote_template_id']]);
     $rendered['format'] = $rendered['format'] ?? $this->defaultInvoiceFormat();
@@ -83,9 +75,6 @@ class CreditNoteInvoiceService {
       ->addChain('contact', Contact::get()
         ->addWhere('id', '=', '$contact_id'), 0
       )
-      ->addChain('company', Company::get()
-        ->addWhere('contact_id', '=', '$owner_organization'), 0
-      )
       ->execute()
       ->first();
 
@@ -116,11 +105,14 @@ class CreditNoteInvoiceService {
 
     $creditNote['taxRates'] = CreditNoteBAO::computeTotalAmount($creditNote['items'])['taxRates'] ?? [];
 
+    $creditNote['company'] = CreditNoteBAO::getOwnerOrganisationCompany($id);
+
     return $creditNote;
   }
 
   /**
-   * Gets contact location.
+   * Gets contact location which
+   * also includes phone and email.
    *
    * @return array
    *   An array of address lines.
@@ -128,12 +120,10 @@ class CreditNoteInvoiceService {
   private function getContactLocation($contactId): array {
     $locParams = ['contact_id' => $contactId];
     $locationDefaults = \CRM_Core_BAO_Location::getValues($locParams);
-    if (empty($locationDefaults['address'][1])) {
-      return [];
-    }
+
     $stateProvinceId = $locationDefaults['address'][1]['state_province_id'] ?? NULL;
     $stateProvinceAbbreviationDomain = !empty($stateProvinceId) ? \CRM_Core_PseudoConstant::stateProvinceAbbreviation($stateProvinceId) : '';
-    $countryId = $locationDefaults['address'][1]['country_id'];
+    $countryId = $locationDefaults['address'][1]['country_id'] ?? NULL;
     $countryDomain = !empty($countryId) ? \CRM_Core_PseudoConstant::country($countryId) : '';
 
     return [
@@ -145,6 +135,8 @@ class CreditNoteInvoiceService {
       'postal_code' => CRM_Utils_Array::value('postal_code', CRM_Utils_Array::value('1', $locationDefaults['address'])),
       'state' => $stateProvinceAbbreviationDomain,
       'country' => $countryDomain,
+      'email' => CRM_Utils_Array::value('email', CRM_Utils_Array::value('1', $locationDefaults['email'])),
+      'phone' => CRM_Utils_Array::value('phone', CRM_Utils_Array::value('1', $locationDefaults['phone'])),
     ];
   }
 
