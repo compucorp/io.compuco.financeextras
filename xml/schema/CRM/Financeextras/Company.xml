@@ -37,6 +37,11 @@
     <name>invoice_template_id</name>
     <title>Invoice Template ID</title>
     <type>int unsigned</type>
+    <pseudoconstant>
+      <table>civicrm_msg_template</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>msg_title</labelColumn>
+    </pseudoconstant>
     <comment>FK to the message template.</comment>
     <html>
       <label>Invoice Template</label>
@@ -73,6 +78,11 @@
     <name>creditnote_template_id</name>
     <title>Credit Note Template ID</title>
     <type>int unsigned</type>
+    <pseudoconstant>
+      <table>civicrm_msg_template</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>msg_title</labelColumn>
+    </pseudoconstant>
     <comment>FK to the message template.</comment>
     <html>
       <label>Credit Note Template</label>
