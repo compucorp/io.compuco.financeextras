@@ -5,6 +5,8 @@ require_once 'financeextras.civix.php';
 
 use CRM_Financeextras_ExtensionUtil as E;
 use Civi\Financeextras\Event\ContributionPaymentUpdatedEvent;
+use Civi\Financeextras\Hook\AlterMailParams\AlterContributionReceipt;
+
 // phpcs:enable
 
 /**
@@ -222,5 +224,29 @@ function financeextras_civicrm_buildForm($formName, &$form) {
     if ($hook::shouldHandle($form, $formName)) {
       (new $hook($form))->handle();
     }
+  }
+}
+
+/**
+ * Implements hook_civicrm_alterMailParams().
+ */
+function financeextras_civicrm_alterMailParams(&$params, $context) {
+  $hooks = [
+    AlterContributionReceipt::class,
+  ];
+
+  foreach ($hooks as $hook) {
+    if ($hook::shouldHandle($params, $context)) {
+      (new $hook($params, $context))->handle();
+    }
+  }
+}
+
+/**
+ * Implements hook_civicrm_alterMailContent().
+ */
+function financeextras_civicrm_alterMailContent(&$content) {
+  if (($content['workflow_name'] ?? NULL) === 'contribution_offline_receipt') {
+    $content['html'] = str_replace('$formValues.total_amount', '$contribution.total_amount', $content['html']);
   }
 }
