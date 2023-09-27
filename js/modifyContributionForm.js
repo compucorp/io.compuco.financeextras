@@ -11,21 +11,21 @@ CRM.$(function ($) {
   function setTotalAmount() {
     const recordPaymentAmount = document.querySelector("input[name=fe_record_payment_amount]");
     $('#total_amount').on("change", function() {
-      recordPaymentAmount.value = $('#total_amount').val();
+      recordPaymentAmount.value = Number($('#total_amount').val()).toFixed(2);
     });
   
     $('#price_set_id').on('change', function() {
-      recordPaymentAmount.value = $('#line-total').data('raw-total');
+      recordPaymentAmount.value = Number($('#line-total').data('raw-total')).toFixed(2);
       if (($(this).val() !== '')) {
-        recordPaymentAmount.value = $('#pricevalue').data('raw-total');
+        recordPaymentAmount.value = Number($('#pricevalue').data('raw-total')).toFixed(2);
         $('#pricevalue').on('change', function() {
-          recordPaymentAmount.value = $('#pricevalue').data('raw-total');
+          recordPaymentAmount.value = Number($('#pricevalue').data('raw-total')).toFixed(2);
         });
       }
     })
 
     $('#line-total').on('datachanged', function() {
-      recordPaymentAmount.value = $('#line-total').data('raw-total');
+      recordPaymentAmount.value = Number($('#line-total').data('raw-total')).toFixed(2);
     });
   }
 
@@ -85,5 +85,9 @@ CRM.$(function ($) {
     );
     $('tr.crm-contribution-fe-billing_row').after($('tr.crm-contribution-form-block-receipt_date'));
     $('#payment_information > fieldset > legend').hide();
+
+    $('tr#email-receipt label').text('Send Email Confirmation')
+    const email = $('tr#email-receipt #email-address')
+    $('tr#email-receipt .description').text('Automatically email a confirmation of this transaction to ').append(email).append('?')
   }
 });
