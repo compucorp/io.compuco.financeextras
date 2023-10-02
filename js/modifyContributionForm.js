@@ -1,4 +1,5 @@
 CRM.$(function ($) {
+const totalChanged = new CustomEvent("totalChanged", {});
 
   (function() {
     setTotalAmount();
@@ -12,20 +13,25 @@ CRM.$(function ($) {
     const recordPaymentAmount = document.querySelector("input[name=fe_record_payment_amount]");
     $('#total_amount').on("change", function() {
       recordPaymentAmount.value = Number($('#total_amount').val()).toFixed(2);
+      recordPaymentAmount.dispatchEvent(totalChanged)
     });
   
     $('#price_set_id').on('change', function() {
       recordPaymentAmount.value = Number($('#line-total').data('raw-total')).toFixed(2);
+      recordPaymentAmount.dispatchEvent(totalChanged)
       if (($(this).val() !== '')) {
         recordPaymentAmount.value = Number($('#pricevalue').data('raw-total')).toFixed(2);
+        recordPaymentAmount.dispatchEvent(totalChanged)
         $('#pricevalue').on('change', function() {
           recordPaymentAmount.value = Number($('#pricevalue').data('raw-total')).toFixed(2);
+          recordPaymentAmount.dispatchEvent(totalChanged)
         });
       }
     })
 
     $('#line-total').on('datachanged', function() {
       recordPaymentAmount.value = Number($('#line-total').data('raw-total')).toFixed(2);
+      recordPaymentAmount.dispatchEvent(totalChanged)
     });
   }
 

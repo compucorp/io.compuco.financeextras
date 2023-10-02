@@ -103,6 +103,18 @@ class ContributionCreate {
       'template' => 'CRM/Financeextras/Form/Contribute/CustomLineItem.tpl',
       'region' => 'page-body',
     ]);
+
+    if ($this->isEdit()) {
+      $contribution = \Civi\Api4\Contribution::get()
+        ->addSelect('currency', 'total_amount')
+        ->addWhere('id', '=', $this->form->_id)
+        ->execute()
+        ->first();
+
+      $total = \CRM_Utils_Money::format($contribution['total_amount'], $contribution['currency']);
+      \Civi::resources()->addVars('financeextras', ['contrib_currency' => $contribution['currency']]);
+      \Civi::resources()->addVars('financeextras', ['contrib_total' => $total]);
+    }
   }
 
   /**
