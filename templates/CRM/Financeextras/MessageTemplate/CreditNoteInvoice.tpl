@@ -124,11 +124,9 @@
                   <tr>
                     <td colspan="2" style="border: none;"></td>
                     <td colspan="2" style="text-align:right;white-space: nowrap; border: none;"><font size="1"><b>{ts}Less Credit to {/ts}</b> 
-                    {capture assign=contribUrl}{crmURL p='civicrm/contact/view/contribution'
-                    q="reset=1&id=`$allocation.contribution_id`&action=view&context=fulltext" h=0 a=1 fe=1}{/capture}
-                      <a href="{$contribUrl}">
+                      <span>
                         {ts}Invoice{/ts} {$allocation.contribution.invoice_number}
-                      </a>
+                      </span>
                       </font>
                     </td>
                     <td style="text-align:right;white-space: nowrap; border: none;"><font size="1">{$allocation.amount|crmMoney:$credit_note.currency}</font></td>
