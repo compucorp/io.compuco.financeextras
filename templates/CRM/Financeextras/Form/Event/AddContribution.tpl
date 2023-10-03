@@ -36,5 +36,11 @@
     #payment_information fieldset.pay-later_info-group legend {
       display: none;
     }
+    #check_number {
+      margin-left: 3px;
+    }
+    #fe_total_amount {
+      width: 80%;
+    }
 </style>
 {/literal}

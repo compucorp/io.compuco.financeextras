@@ -62,7 +62,7 @@ class CRM_Financeextras_Form_Contribute_CreditNoteAllocate extends CRM_Core_Form
     $this->addButtons([
       [
         'type' => 'cancel',
-        'name' => E::ts('Cancel'),
+        'name' => E::ts('Skip'),
         'isDefault' => TRUE,
       ],
       [

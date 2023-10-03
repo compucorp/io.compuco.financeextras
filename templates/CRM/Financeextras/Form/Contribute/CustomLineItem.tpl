@@ -8,6 +8,18 @@
       const isEmptyPriceSet = !$('#price_set_id').length || $('#price_set_id').val() === ''
 
       if (action == 1) {
+        $('tr.crm-contribution-form-block-financial_type_id').after(
+          $('<tr>').addClass('currency-select').append(
+            $('<td>').addClass('label').append(
+              $('<label>').text('Currency')
+            )
+          ).append(
+            $('<td>').append($('#currency').show())
+          )
+        )
+      }
+
+      if (action == 1) {
         // This dealy ensures the lineitem table has been built before trying to manipulate its field.
         setTimeout(() => {
           $('#lineitem-add-block').after(
