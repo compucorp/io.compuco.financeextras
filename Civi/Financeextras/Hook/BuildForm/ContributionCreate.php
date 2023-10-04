@@ -63,6 +63,9 @@ class ContributionCreate {
         'region' => 'page-body',
       ]);
       \Civi::resources()->addVars('financeextras', ['currencies' => \CRM_Core_OptionGroup::values('currencies_enabled')]);
+      \Civi::resources()->addVars('financeextras', ['mode' => $this->form->_mode]);
+      $template = \CRM_Core_Smarty::singleton();
+      $template->assign_by_ref('contribution_mode', $this->form->_mode);
     }
   }
 

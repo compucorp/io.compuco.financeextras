@@ -3,9 +3,13 @@ CRM.$(function ($) {
   (function() {
     setTotalAmount();
     hideStatusField();
-    setAmountCurencySymbol();
-    toggleRecordPaymentBlock();
-    placePaymentFieldsTogether();
+    const mode = CRM.vars.financeextras.mode ?? null
+
+    if (!mode) {
+      setAmountCurencySymbol();
+      toggleRecordPaymentBlock();
+      placePaymentFieldsTogether();
+    }
   })();
 
   function setTotalAmount() {
