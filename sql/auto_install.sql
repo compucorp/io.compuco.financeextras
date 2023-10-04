@@ -109,7 +109,7 @@ CREATE TABLE `financeextras_company` (
   `next_creditnote_number` varchar(11),
   PRIMARY KEY (`id`),
   CONSTRAINT FK_financeextras_company_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE,
-  CONSTRAINT FK_financeextras_company_invoice_template_id FOREIGN KEY (`invoice_template_id`) REFERENCES `civicrm_msg_template`(`id`) ON DELETE SET NULL
+  CONSTRAINT FK_financeextras_company_invoice_template_id FOREIGN KEY (`invoice_template_id`) REFERENCES `civicrm_msg_template`(`id`) ON DELETE SET NULL,
   CONSTRAINT FK_financeextras_company_creditnote_template_id FOREIGN KEY (`creditnote_template_id`) REFERENCES `civicrm_msg_template`(`id`) ON DELETE SET NULL
 )
 ENGINE=InnoDB;
