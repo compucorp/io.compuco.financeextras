@@ -200,6 +200,7 @@ function financeextras_civicrm_postProcess($formName, $form) {
   $hooks = [
     \Civi\Financeextras\Hook\PostProcess\ParticipantPostProcess::class,
     \Civi\Financeextras\Hook\PostProcess\ContributionPostProcess::class,
+    \Civi\Financeextras\Hook\PostProcess\AdditionalPaymentPostProcess::class,
   ];
 
   foreach ($hooks as $hook) {
