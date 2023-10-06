@@ -79,7 +79,9 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
       'total_amount' => $amount,
       'trxn_date' => $allocation['date'],
     ];
-    self::createPayment($account, $params);
+    $transaction = self::createPayment($account, $params);
+
+    self::createAllocationEntityTransactions($allocation['id'], $transaction->id, $amount);
 
     if (!empty($allocation['contribution_id'])) {
       \Civi::dispatcher()->dispatch(ContributionPaymentUpdatedEvent::NAME, new ContributionPaymentUpdatedEvent($allocation['contribution_id']));
@@ -103,13 +105,13 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
       $entityTrxn = new \CRM_Financial_DAO_EntityFinancialTrxn();
       $entityTrxn->entity_table = self::$_tableName;
       $entityTrxn->entity_id = $allocation['id'];
-      $entityTrxn->find(TRUE);
+      $entityTrxn->find();
 
-      $trxn = new \CRM_Financial_DAO_FinancialTrxn();
-      $trxn->id = $entityTrxn->financial_trxn_id;
-      $trxn->find(TRUE);
-
-      $trxn->delete();
+      while ($entityTrxn->fetch()) {
+        $trxn = new \CRM_Financial_DAO_FinancialTrxn();
+        $trxn->id = $entityTrxn->financial_trxn_id;
+        $trxn->delete();
+      }
       $entityTrxn->delete();
 
       if (!empty($allocation['contribution_id'])) {
