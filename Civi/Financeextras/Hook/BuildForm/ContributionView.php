@@ -62,7 +62,7 @@ class ContributionView {
    * @return bool
    */
   public static function shouldHandle($form, $formName) {
-    return $formName === "CRM_Contribute_Form_ContributionView";
+    return $formName === "CRM_Contribute_Form_ContributionView" && ($form->getAction() & \CRM_Core_Action::VIEW);
   }
 
 }
