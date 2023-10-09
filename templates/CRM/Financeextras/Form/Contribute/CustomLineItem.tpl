@@ -1,3 +1,13 @@
+<div>
+  <table>
+    <tbody>
+      <tr class="crm-contribution-form-block-financeextras_custom_total_amount">
+        <td class="label"></td>
+        <td><span class="label"><strong>Total Amount:</strong>&nbsp;&nbsp;</span><span id="custom-total">0.00</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 {literal}
   <script>
@@ -20,7 +30,7 @@
       }
 
       if (action == 1) {
-        // This dealy ensures the lineitem table has been built before trying to manipulate its field.
+        // This ensures the lineitem table has been built before trying to manipulate its field.
         setTimeout(() => {
           $('#lineitem-add-block').after(
             $('<div>').addClass('price-set-alt')
@@ -72,15 +82,52 @@
             $('#Contribution tr.crm-contribution-form-block-total_amount > td.label > label').text('Line Items')
           }
         }
+
         $('#Contribution tr.crm-contribution-form-block-total_amount > td.label > label').text('Line Items')
+        const recordPaymentAmount = $("input[name=fe_record_payment_amount]");
+        recordPaymentAmount.on("totalChanged", function() {
+          setCustomTotalAmount(recordPaymentAmount.val())
+        })
+        $('select[name=currency]').on('change', function() {
+          setCustomTotalAmount(recordPaymentAmount.val())
+        });
       }
+      $('tr.crm-contribution-form-block-total_amount').after(
+        $('tr.crm-contribution-form-block-financeextras_custom_total_amount')
+      )
+      $('#line-total').parent().hide()
 
       if (action == 2) {
         $("#add_item option[value='new']").remove();
         $('#Contribution > div.crm-block.crm-form-block.crm-contribution-form-block > table > tbody > tr:nth-child(3) > td.label').text('Line Items')
+        
+        $('#line-total').on('datachanged', function() {
+          setCustomTotalAmount($('#line-total').data('raw-total'));
+        });
+      }
+      if (isNotQuickConfig && action == 2) {
+        $('#line-total').parent().show();
+        $('#line-total').after($('#custom-total'));
+        $('tr.crm-contribution-form-block-financeextras_custom_total_amount').hide();
+        $('.total_amount-section > div:first-child').text('Contribution total: '+CRM.vars.financeextras.contrib_total);
       }
       if (!isNotQuickConfig && action == 2) {
         $('#totalAmount, #totalAmountORaddLineitem, #totalAmountORPriceSet, #price_set_id').css('display', 'none')
+      }
+      if (action == 2 && !isEmptyPriceSet) {
+        $('#line-total').parent().show();
+        $('tr.crm-contribution-form-block-financeextras_custom_total_amount').hide();
+      }
+
+      function setCustomTotalAmount(amount) {
+        const currencySelect = $('#currency').val() ?? CRM.vars.financeextras.contrib_currency ?? '';
+        
+        CRM.api4('Currency', 'format', {
+          currency: currencySelect,
+          value: amount
+        }).then(function(results) {
+          $('#custom-total').text(results[0]);
+        });
       }
     })
   </script>
@@ -127,6 +174,9 @@
   }
   .float-right {
     float: right;
+  }
+  #pricesetTotal, #line-total {
+    display: none;
   }
 </style>
 {/literal}
