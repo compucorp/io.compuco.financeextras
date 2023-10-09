@@ -78,6 +78,7 @@ class CreditNoteInvoiceService {
       ->addChain('allocations', CreditNoteAllocation::get()
         ->addWhere('credit_note_id', '=', '$id')
         ->addSelect('*', 'type_id:label')
+        ->addWhere('is_reversed', '=', FALSE)
       )
       ->addChain('contact', Contact::get()
         ->addWhere('id', '=', '$contact_id'), 0
