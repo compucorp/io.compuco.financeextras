@@ -4,6 +4,7 @@ CRM.$(function ($) {
     $('.fe-record_contribution-block').hide();
 
     observeEventFeeIsDisplayed();
+    $('tr.crm-participant-form-block-note').parent().parent().parent().prepend('<legend>Registration Notes</legend>')
   })();
 
   /**
