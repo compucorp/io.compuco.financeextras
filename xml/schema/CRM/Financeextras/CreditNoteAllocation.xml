@@ -45,6 +45,7 @@
     <name>contribution_id</name>
     <table>civicrm_contribution</table>
     <key>id</key>
+    <onDelete>CASCADE</onDelete>
   </foreignKey>
 
   <field>
