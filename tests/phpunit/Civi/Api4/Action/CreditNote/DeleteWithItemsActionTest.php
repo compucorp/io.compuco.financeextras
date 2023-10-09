@@ -213,6 +213,49 @@ class Civi_Api4_CreditNote_DeleteWithItemsAction extends BaseHeadlessTest {
     $this->assertEmpty($allocation);
   }
 
+  public function testContributionStatusIsCorrectAfterDeletingAVoidedCreditNote() {
+    $creditNote = $this->createCreditNote();
+    $contribution = $this->createContribution($creditNote['contact_id'], 500);
+
+    $allocation = CreditNoteAllocation::allocate()
+      ->setContributionId($contribution['id'])
+      ->setCreditNoteId($creditNote['id'])
+      ->setReference('localhost')
+      ->setTypeId(OptionValueUtils::getValueForOptionValue(CreditNoteAllocationTypeManager::NAME, 'invoice'))
+      ->setAmount(100)
+      ->setCurrency($creditNote['currency'])
+      ->execute()
+      ->first();
+
+    $contribution = \Civi\Api4\Contribution::get()
+      ->addWhere('id', '=', $contribution['id'])
+      ->execute()
+      ->first();
+    $this->assertEquals($contribution['paid_amount'], 100);
+    $this->assertEquals($contribution['contribution_status_id'], OptionValueUtils::getValueForOptionValue('contribution_status', 'Partially paid'));
+
+    CreditNoteAllocation::reverse()
+      ->setId($allocation)
+      ->execute();
+    CreditNote::void()->setId($creditNote['id'])->execute();
+    $contribution = \Civi\Api4\Contribution::get()
+      ->addWhere('id', '=', $contribution['id'])
+      ->execute()
+      ->first();
+    $this->assertEquals($contribution['paid_amount'], 0);
+    $this->assertEquals($contribution['contribution_status_id'], OptionValueUtils::getValueForOptionValue('contribution_status', 'Pending'));
+
+    CreditNote::deleteWithItems()
+      ->addWhere('id', '=', $creditNote['id'])
+      ->execute();
+    $contribution = \Civi\Api4\Contribution::get()
+      ->addWhere('id', '=', $contribution['id'])
+      ->execute()
+      ->first();
+    $this->assertEquals($contribution['paid_amount'], 0);
+    $this->assertEquals($contribution['contribution_status_id'], OptionValueUtils::getValueForOptionValue('contribution_status', 'Pending'));
+  }
+
   private function createContribution($contactId, $contributionAmount) {
     return \Civi\Api4\Contribution::create()
       ->addValue('contact_id', $contactId)

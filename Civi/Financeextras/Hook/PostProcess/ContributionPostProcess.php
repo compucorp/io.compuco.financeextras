@@ -56,7 +56,8 @@ class ContributionPostProcess {
    * @return bool
    */
   public static function shouldHandle($form, $formName) {
-    return $formName === "CRM_Contribute_Form_Contribution";
+    $addOrUpdate = ($form->getAction() & \CRM_Core_Action::ADD) || ($form->getAction() & \CRM_Core_Action::UPDATE);
+    return $formName === "CRM_Contribute_Form_Contribution" && $addOrUpdate;
   }
 
 }
