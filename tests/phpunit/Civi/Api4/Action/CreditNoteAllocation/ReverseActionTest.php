@@ -5,6 +5,7 @@ use Civi\Api4\CreditNote;
 use Civi\Api4\CreditNoteAllocation;
 use Civi\Financeextras\Utils\FinancialAccountUtils;
 use Civi\Financeextras\Test\Helper\CreditNoteTrait;
+use Civi\Financeextras\Utils\OptionValueUtils;
 
 /**
  * CreditNote.ReverseAction API Test Case.
@@ -43,6 +44,7 @@ class Civi_Api4_CreditNoteAllocation_ReverseActionTest extends BaseHeadlessTest 
 
     $this->assertNotEmpty($entityFinancialTrxn);
 
+    $creditNoteInstrument = OptionValueUtils::getValueForOptionValue('payment_instrument', 'credit_note');
     $financialTrxn = \Civi\Api4\FinancialTrxn::get(FALSE)
       ->addWhere('from_financial_account_id', '=', $expectedAccount)
       ->addWhere('to_financial_account_id', '=', $expectedAccount)
@@ -50,7 +52,7 @@ class Civi_Api4_CreditNoteAllocation_ReverseActionTest extends BaseHeadlessTest 
       ->addWhere('id', '=', $entityFinancialTrxn['financial_trxn_id'])
       ->addWhere('status_id', '=', 7)
       ->addWhere('payment_processor_id', 'IS NULL')
-      ->addWhere('payment_instrument_id', '=', 1)
+      ->addWhere('payment_instrument_id', '=', $creditNoteInstrument)
       ->addWhere('check_number', 'IS NULL')
       ->execute()
       ->first();
