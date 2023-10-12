@@ -1,8 +1,9 @@
 <?php
 
 use Civi\Api4\CreditNoteAllocation;
-use Civi\Financeextras\Event\ContributionPaymentUpdatedEvent;
+use Civi\Financeextras\Utils\OptionValueUtils;
 use Civi\Financeextras\Utils\FinancialAccountUtils;
+use Civi\Financeextras\Event\ContributionPaymentUpdatedEvent;
 
 class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_CreditNoteAllocation {
 
@@ -175,8 +176,7 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
     $params = array_merge([
       'is_send_contribution_notification' => FALSE,
       'payment_processor_id' => NULL,
-    // Defaulting to 1 as payment instrument value doesn't matter for credit allocation
-      'payment_instrument_id' => 1,
+      'payment_instrument_id' => OptionValueUtils::getValueForOptionValue('payment_instrument', 'credit_note'),
     ], $paymentParams);
     $transaction = \CRM_Financial_BAO_Payment::create($params);
 
@@ -228,6 +228,8 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
     $entityTrxn = new \CRM_Financial_DAO_EntityFinancialTrxn();
     $entityTrxn->entity_table = \CRM_Financeextras_DAO_CreditNoteAllocation::$_tableName;
     $entityTrxn->entity_id = $id;
+    $entityTrxn->orderBy('id DESC');
+    $entityTrxn->limit(1);
     $entityTrxn->find(TRUE);
     if (empty($entityTrxn->financial_trxn_id)) {
       return NULL;
