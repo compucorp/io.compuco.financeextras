@@ -11,7 +11,7 @@
   <div style="padding-top:25px;margin-right:50px;border-style: none; font-family: Arial, Verdana, sans-serif;">
     <table style="margin-top:5px;padding-bottom:5px; width:100%;" cellpadding="5" cellspacing="0">
       <tr>
-        <td style="text-align:right;"><img src="{$domain_logo}" style="width: width: auto; max-height: 120px;"></td>
+        <td style="text-align:right;"><img src="{$domain_logo}" style="width: auto; max-height: 120px;"></td>
       </tr>
     </table>
 
@@ -56,13 +56,17 @@
         </tr>
         <tr>
           <td><font size="1" align="center">
-            {if !empty($contact_location.city)  }{$contact_location.city }{if !empty($contact_location.state) }{, }{$contact_location.state}{/if}{/if}
+            {if !empty($contact_location.city)  }{$contact_location.city }{/if}
+            {if !empty($contact_location.city) && !empty($contact_location.state) }, {/if}
+            {if !empty($contact_location.state) }{$contact_location.state}{/if}
               <span style="vertical-align:-57%"><br />
             {if !empty($contact_location.postal_code) }{$contact_location.postal_code}{/if}
           </font></td>
           <td style="vertical-align: top;"><font size="1" align="right">{$credit_note.cn_number}</font></td>
           <td style="white-space: nowrap"><font size="1">
-            {if !empty($domain_location.city) }{$domain_location.city }{if !empty($domain_location.state) }{$domain_location.state}{/if}{/if}
+            {if !empty($domain_location.city) }{$domain_location.city }{/if}
+            {if !empty($domain_location.city) && !empty($domain_location.state) }, {/if}
+            {if !empty($domain_location.state) }, {$domain_location.state}{/if}
               <span style="vertical-align:-57%"><br />
             {if !empty($domain_location.postal_code) }{$domain_location.postal_code}{/if}
           </font></td>
@@ -118,7 +122,7 @@
               {/foreach}
               <tr>
                 <td colspan="2" style="border: none;"></td>
-                <td colspan="3" style="border: none;"><hr></hr></td>
+                <td colspan="3" style="border: none;"><hr /></td>
               </tr>
               <tr>
                 <td colspan="2" style="border: none;"></td>
@@ -148,7 +152,7 @@
               {if !empty($credit_note.refund_allocations)}
                 <tr>
                   <td colspan="2" style="border: none;"></td>
-                  <td colspan="3" style="border: none;"><hr></hr></td>
+                  <td colspan="3" style="border: none;"><hr /></td>
                 </tr>
                 {foreach from=$credit_note.refund_allocations item=allocation}
                   <tr>
@@ -169,7 +173,7 @@
               {if !empty($credit_note.invoice_allocations) || !empty($credit_note.refund_allocations) }
                 <tr>
                   <td colspan="2" style="border: none;"></td>
-                  <td colspan="3" style="border: none;"><hr></hr></td>
+                  <td colspan="3" style="border: none;"><hr /></td>
                 </tr>
                 <tr>
                   <td colspan="2" style="border: none;"></td>
@@ -207,7 +211,7 @@
           </tr>
           <tr>
             <td colspan="4" style="border: none;"></td>
-            <td colspan="2" style="border: none;"><hr></hr></td>
+            <td colspan="2" style="border: none;"><hr /></td>
           </tr>
           <tr>
             <td colspan="4" style="border: none;"></td>
