@@ -99,6 +99,7 @@
 
       if (action == 2) {
         $("#add_item option[value='new']").remove();
+        $("#add-another-item").css('display', 'none');
         $('#Contribution > div.crm-block.crm-form-block.crm-contribution-form-block > table > tbody > tr:nth-child(3) > td.label').text('Line Items')
         
         $('#line-total').on('datachanged', function() {
