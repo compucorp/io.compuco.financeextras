@@ -294,5 +294,11 @@ function _financeextras_civix_fixNavigationMenuItems(&$nodes, &$maxNavID, $paren
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
  */
 function _financeextras_civix_civicrm_entityTypes(&$entityTypes) {
-  $entityTypes = array_merge($entityTypes, []);
+  $entityTypes = array_merge($entityTypes, [
+    'CRM_Financeextras_DAO_ExchangeRate' => [
+      'name' => 'ExchangeRate',
+      'class' => 'CRM_Financeextras_DAO_ExchangeRate',
+      'table' => 'financeextras_exchange_rate',
+    ],
+  ]);
 }
