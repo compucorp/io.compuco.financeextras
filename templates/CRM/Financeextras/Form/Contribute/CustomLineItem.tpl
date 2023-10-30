@@ -99,7 +99,6 @@
 
       if (action == 2) {
         $("#add_item option[value='new']").remove();
-        $("#add-another-item").css('display', 'none');
         $('#Contribution > div.crm-block.crm-form-block.crm-contribution-form-block > table > tbody > tr:nth-child(3) > td.label').text('Line Items')
         
         $('#line-total').on('datachanged', function() {
@@ -109,6 +108,7 @@
       if (isNotQuickConfig && action == 2) {
         $('#line-total').parent().show();
         $('#line-total').after($('#custom-total'));
+        $("#add-another-item").css('display', 'none');
         $('tr.crm-contribution-form-block-financeextras_custom_total_amount').hide();
         $('.total_amount-section > div:first-child').text('Contribution total: '+CRM.vars.financeextras.contrib_total);
       }
