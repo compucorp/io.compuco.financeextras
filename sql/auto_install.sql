@@ -11,6 +11,7 @@ DROP TABLE IF EXISTS `financeextras_credit_note_allocation`;
 DROP TABLE IF EXISTS `financeextras_credit_note`;
 DROP TABLE IF EXISTS `financeextras_company`;
 DROP TABLE IF EXISTS `financeextras_batch_owner_org`;
+DROP TABLE IF EXISTS `financeextras_exchange_rate`;
 
 SET FOREIGN_KEY_CHECKS=1;
 -- /*******************************************************
@@ -128,5 +129,21 @@ CREATE TABLE `financeextras_batch_owner_org` (
   PRIMARY KEY (`id`),
   CONSTRAINT FK_financeextras_batch_owner_org_batch_id FOREIGN KEY (`batch_id`) REFERENCES `civicrm_batch`(`id`) ON DELETE CASCADE,
   CONSTRAINT FK_financeextras_batch_owner_org_owner_org_id FOREIGN KEY (`owner_org_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE
+
+-- /*******************************************************
+-- *
+-- * financeextras_exchange_rate
+-- *
+-- * Exchange Rate Entity
+-- *
+-- *******************************************************/
+CREATE TABLE `financeextras_exchange_rate` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique ExchangeRate ID',
+  `exchange_date` date COMMENT 'Exchange rate date',
+  `base_currency` varchar(3) DEFAULT NULL COMMENT '3 character string, value from config setting or input via user.',
+  `conversion_currency` varchar(3) DEFAULT NULL COMMENT '3 character string, value from config setting or input via user.',
+  `base_to_conversion_rate` decimal(20,2) NULL COMMENT 'The number of the converted currency to the base currency.',
+  `conversion_to_base_rate` decimal(20,2) NULL COMMENT 'The number of the Base currency to the converted currency.',
+  PRIMARY KEY (`id`)
 )
 ENGINE=InnoDB;
