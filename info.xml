@@ -24,5 +24,9 @@
   <civix>
     <namespace>CRM/Financeextras</namespace>
     <angularModule>crmFinanceextras</angularModule>
+    <format>22.05.2</format>
   </civix>
+  <mixins>
+    <mixin>menu-xml@1.0.0</mixin>
+  </mixins>
 </extension>
