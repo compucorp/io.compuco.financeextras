@@ -6,4 +6,10 @@
     <title>Record a credit card refund</title>
     <access_arguments>edit contributions</access_arguments>
   </item>
+  <item>
+    <path>civicrm/admin/setting/exchange-rate</path>
+    <page_callback>CRM_Financeextras_Form_ExchangeRateSettings</page_callback>
+    <title>Excahnge Rate Settings</title>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
 </menu>
