@@ -110,3 +110,20 @@ function financeextras_civicrm_buildForm($formName, &$form) {
     $hook->buildForm();
   }
 }
+
+/**
+ * Implements hook_civicrm_navigationMenu().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_navigationMenu/
+ */
+function financeextras_civicrm_navigationMenu(&$menu) {
+  _financeextras_civix_insert_navigation_menu($menu, 'Administer/CiviContribute', [
+    'label' => E::ts('Currency Exchange Settings'),
+    'name' => 'financeextras_exchangerate_settings',
+    'url' => 'civicrm/admin/setting/exchange-rate',
+    'permission' => 'administer CiviCRM',
+    'operator' => 'OR',
+    'separator' => 0,
+  ]);
+  _financeextras_civix_navigationMenu($menu);
+}
