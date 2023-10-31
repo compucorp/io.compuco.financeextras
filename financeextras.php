@@ -288,7 +288,17 @@ function financeextras_civicrm_navigationMenu(&$menu) {
     'separator' => 2,
   ];
 
-  _membershipextras_civix_insert_navigation_menu($menu, 'Administer/CiviContribute', $companyMenuItem);
+  _financeextras_civix_insert_navigation_menu($menu, 'Administer/CiviContribute', $companyMenuItem);
+
+  _financeextras_civix_insert_navigation_menu($menu, 'Administer/CiviContribute', [
+    'label' => E::ts('Currency Exchange Settings'),
+    'name' => 'financeextras_exchangerate_settings',
+    'url' => 'civicrm/admin/setting/exchange-rate',
+    'permission' => 'administer CiviCRM',
+    'operator' => 'OR',
+    'separator' => 0,
+  ]);
+  _financeextras_civix_navigationMenu($menu);
 }
 
 /**

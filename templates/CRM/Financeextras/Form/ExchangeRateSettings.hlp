@@ -1,0 +1,6 @@
+{htxt id="display_on_invoice"}
+  {ts}Enabling this will display a section on an invoice or credit note with the currency conversation for any tax amounts from the invoice currency to the CiviCRM default currency.{/ts}
+{/htxt}
+{htxt id="sales_tax_currency"}
+  {ts}Specify the sales tax currency that any new invoice or credit note will display a currency conversion to.{/ts}
+{/htxt}

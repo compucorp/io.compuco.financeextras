@@ -67,6 +67,12 @@
     <path>civicrm/admin/financeextras/company/delete</path>
     <page_callback>CRM_Financeextras_Form_Company_Delete</page_callback>
     <title>Delete Company</title>
+        <access_arguments>administer CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/admin/setting/exchange-rate</path>
+    <page_callback>CRM_Financeextras_Form_ExchangeRateSettings</page_callback>
+    <title>Excahnge Rate Settings</title>
     <access_arguments>administer CiviCRM</access_arguments>
   </item>
 </menu>
