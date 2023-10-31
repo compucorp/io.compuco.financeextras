@@ -31,10 +31,15 @@ class MembershipCreate {
       $this->form->addElement('radio', 'fe_member_type', NULL, ts('Free Membership'), 'free_member');
       $this->form->add('checkbox', 'fe_record_payment_check', ts('Record Payment'), NULL);
       $this->form->add('text', 'fe_record_payment_amount', ts('Amount'), ['readonly' => TRUE]);
+
+      $accountsReceivablePaymentMethodId = array_search('accounts_receivable', \CRM_Contribute_BAO_Contribution::buildOptions('payment_instrument_id', 'validate'));
+      \Civi::resources()->addVars('financeextras', ['accounts_receivable_payment_method' => $accountsReceivablePaymentMethodId]);
+
       \Civi::resources()->add([
         'scriptFile' => [E::LONG_NAME, 'js/modifyMemberForm.js'],
         'region' => 'page-header',
       ]);
+
       \Civi::resources()->add([
         'template' => 'CRM/Financeextras/Form/Member/AddPayment.tpl',
         'region' => 'page-body',

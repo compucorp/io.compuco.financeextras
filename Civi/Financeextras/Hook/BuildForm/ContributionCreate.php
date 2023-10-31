@@ -62,6 +62,10 @@ class ContributionCreate {
         'template' => 'CRM/Financeextras/Form/Contribute/AddPayment.tpl',
         'region' => 'page-body',
       ]);
+
+      $accountsReceivablePaymentMethodId = array_search('accounts_receivable', \CRM_Contribute_BAO_Contribution::buildOptions('payment_instrument_id', 'validate'));
+      \Civi::resources()->addVars('financeextras', ['accounts_receivable_payment_method' => $accountsReceivablePaymentMethodId]);
+
       \Civi::resources()->addVars('financeextras', ['currencies' => \CRM_Core_OptionGroup::values('currencies_enabled')]);
       \Civi::resources()->addVars('financeextras', ['mode' => $this->form->_mode]);
       $template = \CRM_Core_Smarty::singleton();

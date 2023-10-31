@@ -2,7 +2,7 @@
 
 namespace Civi\Financeextras\Setup\Manage;
 
-class AccountsReceivablePaymentMethod extends AbstractSetupManager {
+class AccountsReceivablePaymentMethod extends AbstractManager {
 
   /**
    * The machine name of the payment method.
