@@ -9,7 +9,13 @@
   <item>
     <path>civicrm/admin/setting/exchange-rate</path>
     <page_callback>CRM_Financeextras_Form_ExchangeRateSettings</page_callback>
-    <title>Excahnge Rate Settings</title>
+    <title>Exchange Rate Settings</title>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/exchange-rate</path>
+    <page_callback>CRM_Financeextras_Page_ExchangeRate_List</page_callback>
+    <title>Exchange Rates</title>
     <access_arguments>administer CiviCRM</access_arguments>
   </item>
 </menu>
