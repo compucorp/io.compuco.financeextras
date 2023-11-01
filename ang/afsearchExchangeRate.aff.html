@@ -1,0 +1,15 @@
+<div af-fieldset="">
+  <div class="row" style="margin-bottom: 1em;">
+    <div class="col-md-12">
+      <af-field name="exchange_date" defn="{input_attrs: {time: false}, search_range: true, label: 'Exchange Rates For'}" class="col-md-4 civicase__ui-range"/>
+    </div>
+  </div>
+  <crm-search-display-table search-name="Exchange_Rate_Search" display-name="Exchange_Rate_Search_Table_1"></crm-search-display-table>
+</div>
+
+<style>
+  #bootstrap-theme crm-search-display-table p.alert-info {
+    background-color: transparent;
+    border: none;
+  }
+</style>
