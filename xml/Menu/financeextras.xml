@@ -87,4 +87,10 @@
     <title>Add Exchange Rate Value</title>
     <access_arguments>administer CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/exchange-rate/delete</path>
+    <page_callback>CRM_Financeextras_Form_ExchangeRate_Delete</page_callback>
+    <title>Delete Exchange Rate Value</title>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
 </menu>
