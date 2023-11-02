@@ -125,5 +125,14 @@ function financeextras_civicrm_navigationMenu(&$menu) {
     'operator' => 'OR',
     'separator' => 0,
   ]);
+
+  _financeextras_civix_insert_navigation_menu($menu, 'Administer/CiviContribute', [
+    'label' => E::ts('Exchange Rates'),
+    'name' => 'financeextras_exchangerate_settings',
+    'url' => 'civicrm/exchange-rate',
+    'permission' => 'administer CiviCRM',
+    'operator' => 'OR',
+    'separator' => 0,
+  ]);
   _financeextras_civix_navigationMenu($menu);
 }

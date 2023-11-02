@@ -7,6 +7,11 @@
   <comment>Exchange Rate Entity</comment>
   <log>true</log>
 
+  <paths>
+    <update>civicrm/exchange-rate/add?reset=1&amp;id=[id]</update>
+    <delete>civicrm/exchange-rate/delete?reset=1&amp;id=[id]</delete>
+  </paths>
+
   <field>
     <name>id</name>
     <type>int unsigned</type>
