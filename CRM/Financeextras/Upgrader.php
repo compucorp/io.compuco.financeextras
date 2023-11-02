@@ -4,6 +4,8 @@ use Civi\Financeextras\Setup\Manage\CreditNoteStatusManager;
 use Civi\Financeextras\Setup\Manage\CreditNoteActivityTypeManager;
 use Civi\Financeextras\Setup\Manage\CreditNoteAllocationTypeManager;
 use Civi\Financeextras\Setup\Manage\CreditNoteInvoiceTemplateManager;
+use Civi\Financeextras\Setup\Manage\ContributionOwnerOrganizationManager;
+use Civi\Financeextras\Setup\Configure\SetDefaultCompany;
 use Civi\Financeextras\Setup\Manage\CreditNotePaymentInstrumentManager;
 
 /**
@@ -15,16 +17,23 @@ class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
    * Tasks to perform when the extension is installed.
    */
   public function install() {
-    $steps = [
+    $manageSteps = [
       new CreditNoteStatusManager(),
       new CreditNoteActivityTypeManager(),
       new CreditNoteAllocationTypeManager(),
       new CreditNoteInvoiceTemplateManager(),
+      new ContributionOwnerOrganizationManager(),
       new CreditNotePaymentInstrumentManager(),
     ];
+    foreach ($manageSteps as $manageStep) {
+      $manageStep->create();
+    }
 
-    foreach ($steps as $step) {
-      $step->create();
+    $configurationSteps = [
+      new SetDefaultCompany(),
+    ];
+    foreach ($configurationSteps as $configurationStep) {
+      $configurationStep->apply();
     }
   }
 
@@ -37,6 +46,7 @@ class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
       new CreditNoteActivityTypeManager(),
       new CreditNoteAllocationTypeManager(),
       new CreditNoteInvoiceTemplateManager(),
+      new ContributionOwnerOrganizationManager(),
       new CreditNotePaymentInstrumentManager(),
     ];
 
@@ -54,6 +64,7 @@ class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
       new CreditNoteActivityTypeManager(),
       new CreditNoteAllocationTypeManager(),
       new CreditNoteInvoiceTemplateManager(),
+      new ContributionOwnerOrganizationManager(),
       new CreditNotePaymentInstrumentManager(),
     ];
 
@@ -71,12 +82,38 @@ class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
       new CreditNoteActivityTypeManager(),
       new CreditNoteAllocationTypeManager(),
       new CreditNoteInvoiceTemplateManager(),
+      new ContributionOwnerOrganizationManager(),
       new CreditNotePaymentInstrumentManager(),
     ];
 
     foreach ($steps as $step) {
       $step->disable();
     }
+  }
+
+  public function upgrade_1000() {
+    $this->executeSqlFile('sql/auto_install.sql');
+    $this->executeCustomDataFile('xml/customFields_install.xml');
+
+    $manageSteps = [
+      new CreditNoteStatusManager(),
+      new CreditNoteActivityTypeManager(),
+      new CreditNoteAllocationTypeManager(),
+      new CreditNoteInvoiceTemplateManager(),
+      new ContributionOwnerOrganizationManager(),
+    ];
+    foreach ($manageSteps as $manageStep) {
+      $manageStep->create();
+    }
+
+    $configurationSteps = [
+      new SetDefaultCompany(),
+    ];
+    foreach ($configurationSteps as $configurationStep) {
+      $configurationStep->apply();
+    }
+
+    return TRUE;
   }
 
 }

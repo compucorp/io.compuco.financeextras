@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Financeextras</base>
+  <class>BatchOwnerOrganisation</class>
+  <name>financeextras_batch_owner_org</name>
+  <comment>The financial batch owner organisations</comment>
+  <log>true</log>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique BatchOwnerOrganisation ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>batch_id</name>
+    <type>int unsigned</type>
+    <comment>FK to Batch.</comment>
+    <html>
+      <label>Batch</label>
+    </html>
+  </field>
+  <foreignKey>
+    <name>batch_id</name>
+    <table>civicrm_batch</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>owner_org_id</name>
+    <type>int unsigned</type>
+    <comment>FK to Contact</comment>
+  </field>
+  <foreignKey>
+    <name>owner_org_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+
+</table>

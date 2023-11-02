@@ -20,6 +20,7 @@ function financeextras_civicrm_config(&$config) {
   Civi::dispatcher()->addSubscriber(new Civi\Financeextras\Event\Subscriber\CreditNoteInvoiceSubscriber());
   Civi::dispatcher()->addListener('civi.api.respond', ['Civi\Financeextras\APIWrapper\Contribution', 'respond'], -101);
   Civi::dispatcher()->addListener('fe.contribution.received_payment', ['\Civi\Financeextras\Event\Listener\ContributionPaymentUpdatedListener', 'handle']);
+  Civi::dispatcher()->addListener('civi.api.prepare', ['Civi\Financeextras\APIWrapper\BatchListPage', 'preApiCall']);
 }
 
 /**
@@ -144,6 +145,11 @@ function financeextras_civicrm_post($op, $objectName, $objectId, &$objectRef) {
     \CRM_Financeextras_BAO_CreditNote::updateCreditNoteStatusPostAllocation($objectId);
   }
 
+  if ($objectName === 'Contribution' && $op === 'create') {
+    $hook = new \Civi\Financeextras\Hook\Post\ContributionCreation($objectId);
+    $hook->run();
+  }
+
   if ($objectName === 'Contribution' && in_array($op, ['create', 'edit'])) {
     \Civi::dispatcher()->dispatch(ContributionPaymentUpdatedEvent::NAME, new ContributionPaymentUpdatedEvent($objectId));
     $contribution = \Civi\Api4\Contribution::get()
@@ -184,11 +190,15 @@ function financeextras_civicrm_validateForm($formName, &$fields, &$files, &$form
   $hooks = [
     \Civi\Financeextras\Hook\ValidateForm\MembershipCreate::class,
     \Civi\Financeextras\Hook\ValidateForm\ContributionCreate::class,
+    \Civi\Financeextras\Hook\ValidateForm\OwnerOrganizationValidator::class,
+    \Civi\Financeextras\Hook\ValidateForm\PriceSetValidator::class,
+    \Civi\Financeextras\Hook\ValidateForm\FinancialTypeAccount::class,
+    \Civi\Financeextras\Hook\ValidateForm\LineItemEdit::class,
   ];
 
   foreach ($hooks as $hook) {
     if ($hook::shouldHandle($form, $formName)) {
-      (new $hook($form, $fields, $errors))->handle();
+      (new $hook($form, $fields, $errors, $formName))->handle();
     }
   }
 }
@@ -201,6 +211,7 @@ function financeextras_civicrm_postProcess($formName, $form) {
     \Civi\Financeextras\Hook\PostProcess\ParticipantPostProcess::class,
     \Civi\Financeextras\Hook\PostProcess\ContributionPostProcess::class,
     \Civi\Financeextras\Hook\PostProcess\AdditionalPaymentPostProcess::class,
+    \Civi\Financeextras\Hook\PostProcess\FinancialBatchPostProcess::class,
   ];
 
   foreach ($hooks as $hook) {
@@ -219,6 +230,10 @@ function financeextras_civicrm_buildForm($formName, &$form) {
     \Civi\Financeextras\Hook\BuildForm\MembershipCreate::class,
     \Civi\Financeextras\Hook\BuildForm\ParticipantCreate::class,
     \Civi\Financeextras\Hook\BuildForm\ContributionCreate::class,
+    \Civi\Financeextras\Hook\BuildForm\FinancialBatch::class,
+    \Civi\Financeextras\Hook\BuildForm\BatchTransaction::class,
+    \Civi\Financeextras\Hook\BuildForm\FinancialBatchSearch::class,
+    \Civi\Financeextras\Hook\BuildForm\FinancialAccount::class,
   ];
 
   foreach ($hooks as $hook) {
@@ -234,6 +249,7 @@ function financeextras_civicrm_buildForm($formName, &$form) {
 function financeextras_civicrm_alterMailParams(&$params, $context) {
   $hooks = [
     AlterContributionReceipt::class,
+    \Civi\Financeextras\Hook\AlterMailParams\InvoiceTemplate::class,
   ];
 
   foreach ($hooks as $hook) {
@@ -249,5 +265,43 @@ function financeextras_civicrm_alterMailParams(&$params, $context) {
 function financeextras_civicrm_alterMailContent(&$content) {
   if (($content['workflow_name'] ?? NULL) === 'contribution_offline_receipt') {
     $content['html'] = str_replace('$formValues.total_amount', '$contribution.total_amount', $content['html']);
+  }
+}
+
+/**
+ * Implements hook_civicrm_navigationMenu().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_navigationMenu/
+ */
+function financeextras_civicrm_navigationMenu(&$menu) {
+  $companyMenuItem = [
+    'name' => 'financeextras_company',
+    'label' => ts('Companies (For Multi-company accounting)'),
+    'url' => 'civicrm/admin/financeextras/company',
+    'permission' => 'administer CiviCRM',
+    'separator' => 2,
+  ];
+
+  _membershipextras_civix_insert_navigation_menu($menu, 'Administer/CiviContribute', $companyMenuItem);
+}
+
+/**
+ * Implements hook_civicrm_alterContent().
+ */
+function financeextras_civicrm_alterContent(&$content, $context, $tplName, &$object) {
+  if ($tplName == 'CRM/Financial/Page/BatchTransaction.tpl') {
+    $hook = new \Civi\Financeextras\Hook\AlterContent\BatchTransaction($content);
+    $hook->run();
+  }
+}
+
+/**
+ * Implements hook_civicrm_selectWhereClause().
+ */
+function financeextras_civicrm_selectWhereClause($entity, &$clauses) {
+  $ownerOrganisationToFilterIds = CRM_Utils_Request::retrieve('financeextras_owner_org_id', 'CommaSeparatedIntegers');
+  if ($entity == 'Batch' && !empty($ownerOrganisationToFilterIds)) {
+    $hook = new \Civi\Financeextras\Hook\SelectWhereClause\BatchList($clauses);
+    $hook->filterBasedOnOwnerOrganisations($ownerOrganisationToFilterIds);
   }
 }

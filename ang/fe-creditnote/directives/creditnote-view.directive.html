@@ -18,6 +18,10 @@
           <td>{{creditnotes['status_id:label']}}</td>
         </tr>
         <tr>
+          <td>{{ ts('Owner Organisation') }}</td>
+          <td><span><a href="{{getContactLink(creditnotes.owner_organization)}}" target="_blank">{{creditnotes['owner_organization.organization_name']}}</a></span></td>
+        </tr>
+        <tr>
           <td>{{ ts('Number') }}</td>
           <td>{{ creditnotes.cn_number }}</td>
         </tr>

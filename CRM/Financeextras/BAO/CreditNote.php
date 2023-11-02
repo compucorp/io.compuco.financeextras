@@ -19,12 +19,58 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
     $hook = empty($params['id']) ? 'create' : 'edit';
 
     CRM_Utils_Hook::pre($hook, $entityName, CRM_Utils_Array::value('id', $params), $params);
+
+    if (empty($params['cn_number']) && $hook == 'create') {
+      $params['cn_number'] = self::generateCreditNoteNumber($params['owner_organization']);
+    }
+
     $instance = new $className();
     $instance->copyValues($params);
     $instance->save();
+
     CRM_Utils_Hook::post($hook, $entityName, $instance->id, $instance);
 
     return $instance;
+  }
+
+  private static function generateCreditNoteNumber($ownerOrganization) {
+    $companyRecord = \CRM_Core_DAO::executeQuery("SELECT creditnote_prefix, next_creditnote_number FROM financeextras_company WHERE contact_id = {$ownerOrganization} FOR UPDATE");
+    $companyRecord->fetch();
+
+    $creditNoteNumber = $companyRecord->next_creditnote_number;
+    if (!empty($companyRecord->creditnote_prefix)) {
+      $creditNoteNumber = $companyRecord->creditnote_prefix . $companyRecord->next_creditnote_number;
+    }
+
+    $creditUpdateSQLFormula = self::getCreditNoteNumberSQLUpdateFormula($companyRecord->next_creditnote_number);
+    \CRM_Core_DAO::executeQuery("UPDATE financeextras_company SET next_creditnote_number = {$creditUpdateSQLFormula}  WHERE contact_id = {$ownerOrganization}");
+
+    return $creditNoteNumber;
+  }
+
+  /**
+   * Gets the SQL formula to update the credit
+   * number, where if the next credit note number
+   * starts with a zero, then it means it has a leading zero(s)
+   * and thus they should be respected, or otherwise
+   * the credit note number would be incremented normally.
+   *
+   * @param string $creditNumberNumericPart
+   *
+   * @return string
+   */
+  private static function getCreditNoteNumberSQLUpdateFormula($creditNumberNumericPart) {
+    $firstZeroLocation = strpos($creditNumberNumericPart, '0');
+    $isThereLeadingZero = $firstZeroLocation === 0;
+    if ($isThereLeadingZero) {
+      $creditNumberCharCount = strlen($creditNumberNumericPart);
+      $creditUpdateFormula = "LPAD((next_creditnote_number + 1), {$creditNumberCharCount}, '0')";
+    }
+    else {
+      $creditUpdateFormula = "(next_creditnote_number + 1)";
+    }
+
+    return $creditUpdateFormula;
   }
 
   /**
@@ -282,6 +328,24 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
     }
 
     return $financialTrxn;
+  }
+
+  /**
+   * Gets the company record associated
+   * with the credit note owner organisation.
+   *
+   * @param int $creditNoteId
+   * @return array
+   */
+  public static function getOwnerOrganisationCompany($creditNoteId) {
+    $OwnerOrgQuery = "SELECT contact.organization_name as name, contact.image_URL as logo_url, company.* FROM financeextras_credit_note cn
+                      INNER JOIN financeextras_company company ON cn.owner_organization = company.contact_id
+                      INNER JOIN civicrm_contact contact ON company.contact_id = contact.id
+                      WHERE cn.id = {$creditNoteId}
+                      LIMIT 1";
+    $cnOwnerCompany = CRM_Core_DAO::executeQuery($OwnerOrgQuery);
+    $cnOwnerCompany->fetch();
+    return $cnOwnerCompany->toArray();
   }
 
 }

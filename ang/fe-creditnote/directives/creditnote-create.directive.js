@@ -37,8 +37,9 @@
    * @param {object} crmUiHelp crm ui help service
    * @param {object} crmApi4 crm api V4 service
    * @param {object} CreditNoteStatus service
+   * @param {object} Company service
    */
-  function creditnoteCreateController ($scope, $location, $window, CurrencyCodes, crmUiHelp, crmApi4, CreditNoteStatus) {
+  function creditnoteCreateController ($scope, $location, $window, CurrencyCodes, crmUiHelp, crmApi4, CreditNoteStatus, Company) {
     const defaultCurrency = 'GBP';
     const financialTypesCache = new Map();
 
@@ -53,6 +54,7 @@
     $scope.saveCreditnotes = saveCreditnotes;
     $scope.calculateSubtotal = calculateSubtotal;
     $scope.isUpdate = $scope.context == 'update';
+    $scope.companies = Company.getAll();
     $scope.currencyCodes = CurrencyCodes.getAll();
     $scope.handleFinancialTypeChange = handleFinancialTypeChange;
     $scope.hs = crmUiHelp({ file: 'CRM/Financeextras/CreditNoteCtrl' });
@@ -77,6 +79,7 @@
       $scope.creditnotes = {
         currency: defaultCurrency,
         contact_id: null,
+        owner_organization: $scope.companies.length === 1 ? String($scope.companies[0].contact_id) : null,
         cn_number: null,
         date: $.datepicker.formatDate('yy-mm-dd', new Date()),
         status_id: CreditNoteStatus.getValueByName('open'),
@@ -106,6 +109,7 @@
       }
 
       crmApi4('Contribution', 'get', {
+        select: ["*", "financeextras_contribution_owner.owner_organization"],
         where: [["id", "=", $scope.contributionId]],
         chain: {"items":["LineItem", "get", {"where":[["contribution_id", "=", "$id"]]}]}
       }).then(function (result) {
@@ -117,6 +121,7 @@
 
         $scope.contactId = contribution.contact_id
         $scope.creditnotes.contact_id = contribution.contact_id
+        $scope.creditnotes.owner_organization = String(contribution['financeextras_contribution_owner.owner_organization'])
         $scope.creditnotes.currency = contribution.currency
         $scope.disableCurrency = true
         $scope.currencySymbol = CurrencyCodes.getSymbol(contribution.currency);
@@ -127,8 +132,8 @@
         const duePercent = (100 * dueAmount) /contribution.total_amount
         for (let i = 0; i < lineItems.length; i++) {
           const qty = (duePercent == 100) ? lineItems[i].qty : 1
-          let unitPrice = (duePercent == 100) ? 
-            lineItems[i].unit_price : 
+          let unitPrice = (duePercent == 100) ?
+            lineItems[i].unit_price :
             (duePercent/100) * (lineItems[i].unit_price * lineItems[i].qty);
           unitPrice = Number(unitPrice.toFixed(2))
           $scope.creditnotes.items[i] = {
@@ -175,6 +180,7 @@
         const creditnotes = result[0] ?? null;
         $scope.creditnotes.id = creditnotes.id
         $scope.creditnotes.contact_id = creditnotes.contact_id
+        $scope.creditnotes.owner_organization = String(creditnotes.owner_organization)
         $scope.creditnotes.currency = creditnotes.currency
         $scope.currencySymbol = CurrencyCodes.getSymbol(creditnotes.currency);
         $scope.creditnotes.cn_number = creditnotes.cn_number
@@ -262,7 +268,7 @@
 
     /**
      * Handles page rediection after successfully creating creditnotes.
-     * 
+     *
      * @param {boolean} the credit note ID
      */
     function redirectToAppropraitePage (creditNoteId) {
@@ -360,7 +366,7 @@
 
     /**
      * Retrieves the contribution tax term from settings
-     * 
+     *
      * @returns {string} tax term
      */
     async function getTaxTerm() {
