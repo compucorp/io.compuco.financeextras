@@ -6,6 +6,7 @@ use Civi\Financeextras\Setup\Manage\CreditNoteAllocationTypeManager;
 use Civi\Financeextras\Setup\Manage\CreditNoteInvoiceTemplateManager;
 use Civi\Financeextras\Setup\Manage\ContributionOwnerOrganizationManager;
 use Civi\Financeextras\Setup\Configure\SetDefaultCompany;
+use Civi\Financeextras\Setup\Manage\CreditNotePaymentInstrumentManager;
 
 /**
  * Collection of upgrade steps.
@@ -22,6 +23,7 @@ class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
       new CreditNoteAllocationTypeManager(),
       new CreditNoteInvoiceTemplateManager(),
       new ContributionOwnerOrganizationManager(),
+      new CreditNotePaymentInstrumentManager(),
     ];
     foreach ($manageSteps as $manageStep) {
       $manageStep->create();
@@ -45,6 +47,7 @@ class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
       new CreditNoteAllocationTypeManager(),
       new CreditNoteInvoiceTemplateManager(),
       new ContributionOwnerOrganizationManager(),
+      new CreditNotePaymentInstrumentManager(),
     ];
 
     foreach ($steps as $step) {
@@ -62,6 +65,7 @@ class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
       new CreditNoteAllocationTypeManager(),
       new CreditNoteInvoiceTemplateManager(),
       new ContributionOwnerOrganizationManager(),
+      new CreditNotePaymentInstrumentManager(),
     ];
 
     foreach ($steps as $step) {
@@ -79,6 +83,7 @@ class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
       new CreditNoteAllocationTypeManager(),
       new CreditNoteInvoiceTemplateManager(),
       new ContributionOwnerOrganizationManager(),
+      new CreditNotePaymentInstrumentManager(),
     ];
 
     foreach ($steps as $step) {

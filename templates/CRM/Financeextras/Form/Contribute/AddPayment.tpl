@@ -18,6 +18,8 @@
     </tbody>
   </table>
 </div>
+
+{if empty($contribution_mode)}
 {literal}
   <style>
     #payment_information > fieldset > legend {
@@ -53,3 +55,15 @@
     }
   </style>
 {/literal}
+{else}
+{literal}
+  <style>
+    div.record_payment-block_check {
+      display: none;
+    }
+    div.record_payment-block {
+      display: none;
+    }
+  </style>
+{/literal}
+{/if}

@@ -88,7 +88,11 @@
   }
 
   #payment_information > fieldset > div div.content {
-  margin-left: 17%;
+    margin-left: 17%;
+  }
+
+  #payment_information > fieldset > legend {
+    display: none;
   }
   </style>
 {/literal}

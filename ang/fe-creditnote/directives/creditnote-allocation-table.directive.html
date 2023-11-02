@@ -38,7 +38,7 @@
       <td>{{ allocation['reference'] }}</td>
       <td>{{ allocation['paid_from'] }}</td>
       <td>{{ formatMoney(allocation['amount'], currency, true) }}</td>
-      <td ng-if="isUpdate">
+      <td ng-if="isUpdate && allocation['type_id:label'] == 'Invoice'">
         <div class="btn-group btn-group-sm">
           <button
             type="button"

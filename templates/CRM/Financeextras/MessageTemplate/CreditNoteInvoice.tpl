@@ -11,7 +11,7 @@
   <div style="padding-top:25px;margin-right:50px;border-style: none; font-family: Arial, Verdana, sans-serif;">
     <table style="margin-top:5px;padding-bottom:5px; width:100%;" cellpadding="5" cellspacing="0">
       <tr>
-        <td style="text-align:right;"><img src="{$domain_logo}" style="width: width: auto; max-height: 120px;"></td>
+        <td style="text-align:right;"><img src="{$domain_logo}" style="width: auto; max-height: 120px;"></td>
       </tr>
     </table>
 
@@ -25,54 +25,64 @@
       <table style="font-family: Arial, Verdana, sans-serif;" width="100%" height="100" border="0" cellpadding="5" cellspacing="0">
         <tr>
           <td width="30%"><b><font size="1" align="center">{$credit_note.contact.display_name}</font></b></td>
-          <td width="50%" valign="bottom"><b><font size="1" align="center">Credit Note Date</font></b></td>
+          <td width="50%" valign="top" style="vertical-align: top;"><b><font size="1" align="center">Credit Note Date</font></b></td>
           <td valign="bottom" style="white-space: nowrap"><b><font size="1" align="right">{$domain_name}</font></b></td>
         </tr>
         <tr>
           <td><font size="1" align="center">
             {if !empty($contact_location.street_address) }{$contact_location.street_address}{/if}
+              <span style="vertical-align:-57%"><br />
             {if !empty($contact_location.supplemental_address_1) }{$contact_location.supplemental_address_1}{/if}
           </font></td>
-          <td><font size="1" align="right">{$credit_note.date}</font></td>
+          <td style="vertical-align: top;"><font size="1" align="right">{$credit_note.date}</font></td>
           <td style="white-space: nowrap"><font size="1" align="right">
             {if !empty($domain_location.street_address) }{$domain_location.street_address}{/if}
+              <span style="vertical-align:-57%"><br />
             {if !empty($domain_location.supplemental_address_1) }{$domain_location.supplemental_address_1}{/if}
           </font></td>
         </tr>
         <tr>
           <td><font size="1" align="center">
             {if !empty($contact_location.supplemental_address_2)  }{$contact_location.supplemental_address_2 }{/if}
-            {if !empty($contact_location.state) }{$contact_location.state}{/if}
+              <span style="vertical-align:-57%"><br />
+            {if !empty($contact_location.supplemental_address_3)  }{$contact_location.supplemental_address_3 }{/if}
           </font></td>
-          <td><b><font size="1" align="right">Credit Note Number</font></b></td>
+          <td style="vertical-align: top;"><b><font size="1" align="right">Credit Note Number</font></b></td>
           <td style="white-space: nowrap"><font size="1">
             {if !empty($domain_location.supplemental_address_2)  }{$domain_location.supplemental_address_2 }{/if}
-            {if !empty($domain_location.state) }{$domain_location.state}{/if}
+              <span style="vertical-align:-57%"><br />
+            {if !empty($domain_location.supplemental_address_3)  }{$domain_location.supplemental_address_3 }{/if}
           </font></td>
         </tr>
         <tr>
           <td><font size="1" align="center">
             {if !empty($contact_location.city)  }{$contact_location.city }{/if}
+            {if !empty($contact_location.city) && !empty($contact_location.state) }, {/if}
+            {if !empty($contact_location.state) }{$contact_location.state}{/if}
+              <span style="vertical-align:-57%"><br />
             {if !empty($contact_location.postal_code) }{$contact_location.postal_code}{/if}
           </font></td>
-          <td><font size="1" align="right">{$credit_note.cn_number}</font></td>
+          <td style="vertical-align: top;"><font size="1" align="right">{$credit_note.cn_number}</font></td>
           <td style="white-space: nowrap"><font size="1">
             {if !empty($domain_location.city) }{$domain_location.city }{/if}
+            {if !empty($domain_location.city) && !empty($domain_location.state) }, {/if}
+            {if !empty($domain_location.state) }, {$domain_location.state}{/if}
+              <span style="vertical-align:-57%"><br />
             {if !empty($domain_location.postal_code) }{$domain_location.postal_code}{/if}
           </font></td>
         </tr>
         <tr>
           <td><font size="1" align="center">
-            {if !empty($contact_address.country)  }{$sales_order.clientAddress.country}{/if}
+            {if !empty($contact_location.country)  }{$contact_location.country}{/if}
           </font></td>
-          <td><b><font size="1" align="right">Reference:</font></b></td>
+          <td style="vertical-align: top;"><b><font size="1" align="right">Reference:</font></b></td>
           <td style="white-space: nowrap"><font size="1">
             {if !empty($domain_location.country) }{$domain_location.country }{/if}
           </font></td>
         </tr>
         <tr>
           <td></td>
-          <td><font size="1" align="right">{$credit_note.reference}</font></td>
+          <td style="vertical-align: top;"><font size="1" align="right">{$credit_note.reference}</font></td>
           <td></td>
         </tr>
       </table>
@@ -112,7 +122,7 @@
               {/foreach}
               <tr>
                 <td colspan="2" style="border: none;"></td>
-                <td colspan="3" style="border: none;"><hr></hr></td>
+                <td colspan="3" style="border: none;"><hr /></td>
               </tr>
               <tr>
                 <td colspan="2" style="border: none;"></td>
@@ -124,11 +134,9 @@
                   <tr>
                     <td colspan="2" style="border: none;"></td>
                     <td colspan="2" style="text-align:right;white-space: nowrap; border: none;"><font size="1"><b>{ts}Less Credit to {/ts}</b> 
-                    {capture assign=contribUrl}{crmURL p='civicrm/contact/view/contribution'
-                    q="reset=1&id=`$allocation.contribution_id`&action=view&context=fulltext" h=0 a=1 fe=1}{/capture}
-                      <a href="{$contribUrl}">
+                      <span>
                         {ts}Invoice{/ts} {$allocation.contribution.invoice_number}
-                      </a>
+                      </span>
                       </font>
                     </td>
                     <td style="text-align:right;white-space: nowrap; border: none;"><font size="1">{$allocation.amount|crmMoney:$credit_note.currency}</font></td>
@@ -144,7 +152,7 @@
               {if !empty($credit_note.refund_allocations)}
                 <tr>
                   <td colspan="2" style="border: none;"></td>
-                  <td colspan="3" style="border: none;"><hr></hr></td>
+                  <td colspan="3" style="border: none;"><hr /></td>
                 </tr>
                 {foreach from=$credit_note.refund_allocations item=allocation}
                   <tr>
@@ -165,7 +173,7 @@
               {if !empty($credit_note.invoice_allocations) || !empty($credit_note.refund_allocations) }
                 <tr>
                   <td colspan="2" style="border: none;"></td>
-                  <td colspan="3" style="border: none;"><hr></hr></td>
+                  <td colspan="3" style="border: none;"><hr /></td>
                 </tr>
                 <tr>
                   <td colspan="2" style="border: none;"></td>
@@ -203,7 +211,7 @@
           </tr>
           <tr>
             <td colspan="4" style="border: none;"></td>
-            <td colspan="2" style="border: none;"><hr></hr></td>
+            <td colspan="2" style="border: none;"><hr /></td>
           </tr>
           <tr>
             <td colspan="4" style="border: none;"></td>

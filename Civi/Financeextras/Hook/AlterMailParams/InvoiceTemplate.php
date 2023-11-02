@@ -16,12 +16,12 @@ class InvoiceTemplate {
 
   private $contributionOwnerCompany;
 
-  public function __construct(&$templateParams) {
+  public function __construct(&$templateParams, $context) {
     $this->templateParams = &$templateParams;
     $this->contributionId = $templateParams['tplParams']['id'];
   }
 
-  public function run() {
+  public function handle() {
     $this->contributionOwnerCompany = ContributionOwnerOrganisation::getOwnerOrganisationCompany($this->contributionId);
     if (empty($this->contributionOwnerCompany)) {
       return;
@@ -29,6 +29,26 @@ class InvoiceTemplate {
 
     $this->useContributionOwnerOrganisationInvoiceTemplate();
     $this->replaceDomainTokensWithOwnerOrganisationTokens();
+  }
+
+   /**
+   * Determines if the hook will run.
+   *
+   * @param array $params
+   *   Mail parameters.
+   * @param string $context
+   *   Mail context.
+   *
+   * @return bool
+   *   returns TRUE if hook should run, FALSE otherwise.
+   */
+  public static function shouldHandle($params, $context) {
+    // 'contribution_invoice_receipt' is CiviCRM standard invoice template
+    if (empty($params['valueName']) || $params['valueName'] != 'contribution_invoice_receipt') {
+      return FALSE;
+    }
+
+    return TRUE;
   }
 
   /**

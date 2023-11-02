@@ -160,7 +160,8 @@ class ParticipantPostProcess {
    * @return bool
    */
   public static function shouldHandle($form, $formName) {
-    return $formName === "CRM_Event_Form_Participant";
+    $addOrUpdate = ($form->getAction() & \CRM_Core_Action::ADD) || ($form->getAction() & \CRM_Core_Action::UPDATE);
+    return $formName === "CRM_Event_Form_Participant" && $addOrUpdate;
   }
 
 }

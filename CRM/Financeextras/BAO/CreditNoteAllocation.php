@@ -1,8 +1,9 @@
 <?php
 
 use Civi\Api4\CreditNoteAllocation;
-use Civi\Financeextras\Event\ContributionPaymentUpdatedEvent;
+use Civi\Financeextras\Utils\OptionValueUtils;
 use Civi\Financeextras\Utils\FinancialAccountUtils;
+use Civi\Financeextras\Event\ContributionPaymentUpdatedEvent;
 
 class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_CreditNoteAllocation {
 
@@ -79,7 +80,13 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
       'total_amount' => $amount,
       'trxn_date' => $allocation['date'],
     ];
-    self::createPayment($account, $params);
+    $transaction = self::createPayment($account, $params);
+
+    self::createAllocationEntityTransactions($allocation['id'], $transaction->id, $amount);
+
+    if (!empty($allocation['contribution_id'])) {
+      \Civi::dispatcher()->dispatch(ContributionPaymentUpdatedEvent::NAME, new ContributionPaymentUpdatedEvent($allocation['contribution_id']));
+    }
 
     return $allocation;
   }
@@ -99,13 +106,13 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
       $entityTrxn = new \CRM_Financial_DAO_EntityFinancialTrxn();
       $entityTrxn->entity_table = self::$_tableName;
       $entityTrxn->entity_id = $allocation['id'];
-      $entityTrxn->find(TRUE);
+      $entityTrxn->find();
 
-      $trxn = new \CRM_Financial_DAO_FinancialTrxn();
-      $trxn->id = $entityTrxn->financial_trxn_id;
-      $trxn->find(TRUE);
-
-      $trxn->delete();
+      while ($entityTrxn->fetch()) {
+        $trxn = new \CRM_Financial_DAO_FinancialTrxn();
+        $trxn->id = $entityTrxn->financial_trxn_id;
+        $trxn->delete();
+      }
       $entityTrxn->delete();
 
       if (!empty($allocation['contribution_id'])) {
@@ -169,8 +176,7 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
     $params = array_merge([
       'is_send_contribution_notification' => FALSE,
       'payment_processor_id' => NULL,
-    // Defaulting to 1 as payment instrument value doesn't matter for credit allocation
-      'payment_instrument_id' => 1,
+      'payment_instrument_id' => OptionValueUtils::getValueForOptionValue('payment_instrument', 'credit_note'),
     ], $paymentParams);
     $transaction = \CRM_Financial_BAO_Payment::create($params);
 
@@ -222,6 +228,8 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
     $entityTrxn = new \CRM_Financial_DAO_EntityFinancialTrxn();
     $entityTrxn->entity_table = \CRM_Financeextras_DAO_CreditNoteAllocation::$_tableName;
     $entityTrxn->entity_id = $id;
+    $entityTrxn->orderBy('id DESC');
+    $entityTrxn->limit(1);
     $entityTrxn->find(TRUE);
     if (empty($entityTrxn->financial_trxn_id)) {
       return NULL;

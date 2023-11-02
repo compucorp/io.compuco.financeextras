@@ -5,6 +5,8 @@ require_once 'financeextras.civix.php';
 
 use CRM_Financeextras_ExtensionUtil as E;
 use Civi\Financeextras\Event\ContributionPaymentUpdatedEvent;
+use Civi\Financeextras\Hook\AlterMailParams\AlterContributionReceipt;
+
 // phpcs:enable
 
 /**
@@ -175,6 +177,7 @@ function financeextras_civicrm_fieldOptions($entity, $field, &$options, $params)
 
   if (in_array($entity, ['EntityFinancialTrxn']) && $field == 'entity_table') {
     $options[\CRM_Financeextras_DAO_CreditNote::$_tableName] = ts('Credit Note');
+    $options[\CRM_Financeextras_DAO_CreditNoteLine::$_tableName] = ts('Credit Note Line');
   }
 }
 
@@ -207,6 +210,7 @@ function financeextras_civicrm_postProcess($formName, $form) {
   $hooks = [
     \Civi\Financeextras\Hook\PostProcess\ParticipantPostProcess::class,
     \Civi\Financeextras\Hook\PostProcess\ContributionPostProcess::class,
+    \Civi\Financeextras\Hook\PostProcess\AdditionalPaymentPostProcess::class,
     \Civi\Financeextras\Hook\PostProcess\FinancialBatchPostProcess::class,
   ];
 
@@ -240,6 +244,31 @@ function financeextras_civicrm_buildForm($formName, &$form) {
 }
 
 /**
+ * Implements hook_civicrm_alterMailParams().
+ */
+function financeextras_civicrm_alterMailParams(&$params, $context) {
+  $hooks = [
+    AlterContributionReceipt::class,
+    \Civi\Financeextras\Hook\AlterMailParams\InvoiceTemplate::class,
+  ];
+
+  foreach ($hooks as $hook) {
+    if ($hook::shouldHandle($params, $context)) {
+      (new $hook($params, $context))->handle();
+    }
+  }
+}
+
+/**
+ * Implements hook_civicrm_alterMailContent().
+ */
+function financeextras_civicrm_alterMailContent(&$content) {
+  if (($content['workflow_name'] ?? NULL) === 'contribution_offline_receipt') {
+    $content['html'] = str_replace('$formValues.total_amount', '$contribution.total_amount', $content['html']);
+  }
+}
+
+/**
  * Implements hook_civicrm_navigationMenu().
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_navigationMenu/
@@ -254,19 +283,6 @@ function financeextras_civicrm_navigationMenu(&$menu) {
   ];
 
   _membershipextras_civix_insert_navigation_menu($menu, 'Administer/CiviContribute', $companyMenuItem);
-}
-
-/**
- * Implements hook_civicrm_alterMailParams().
- */
-function financeextras_civicrm_alterMailParams(&$params, $context) {
-  // 'contribution_invoice_receipt' is CiviCRM standard invoice template
-  if (empty($params['valueName']) || $params['valueName'] != 'contribution_invoice_receipt') {
-    return;
-  }
-
-  $hook = new \Civi\Financeextras\Hook\AlterMailParams\InvoiceTemplate($params);
-  $hook->run();
 }
 
 /**

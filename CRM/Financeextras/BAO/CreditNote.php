@@ -320,10 +320,10 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
     $data['is_payment'] = 1;
     $financialTrxn = self::createAccountingEntries($data, 'Completed');
 
-    $ratio = $data['amount'] / $creditNote['total_credit'];
+    $percent = 100 * $data['amount'] / $creditNote['total_credit'];
 
     foreach ($creditNote['line'] as $creditNoteLine) {
-      $amount = $creditNoteLine['line_total'] * $ratio * -1;
+      $amount = ($creditNoteLine['line_total'] + $creditNoteLine['tax_amount']) * $percent * 0.01 * -1;
       CRM_Financeextras_BAO_CreditNoteLine::refundAccountingEntries($creditNoteLine['id'], $financialTrxn['id'], $amount);
     }
 

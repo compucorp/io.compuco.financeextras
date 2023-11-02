@@ -48,6 +48,7 @@
     $scope.crmUrl = CRM.url;
     $scope.formValid = true;
     $scope.roundTo = roundTo;
+    $scope.disableCurrency = false;
     $scope.formatMoney = formatMoney;
     $scope.isView = $scope.context == 'view'
     $scope.saveCreditnotes = saveCreditnotes;
@@ -122,6 +123,7 @@
         $scope.creditnotes.contact_id = contribution.contact_id
         $scope.creditnotes.owner_organization = String(contribution['financeextras_contribution_owner.owner_organization'])
         $scope.creditnotes.currency = contribution.currency
+        $scope.disableCurrency = true
         $scope.currencySymbol = CurrencyCodes.getSymbol(contribution.currency);
 
         const lineItems = contribution.items;

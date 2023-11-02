@@ -73,9 +73,8 @@ class CRM_Financeextras_Form_Contribute_CreditNoteRefund extends CRM_Contribute_
       'number',
       'amount',
       ts('Refund Amount'),
-      ['class' => 'form-control'],
-      TRUE,
-      ['min' => 0, 'step' => 0.01]
+      ['class' => 'form-control', 'min' => 0, 'step' => 0.01],
+      TRUE
     );
 
     $this->add(
@@ -106,10 +105,11 @@ class CRM_Financeextras_Form_Contribute_CreditNoteRefund extends CRM_Contribute_
     );
 
     $this->add(
-      'text',
+      'number',
       'fee_amount',
       ts('Fee Amount'),
-      ['class' => 'form-control']
+      ['class' => 'form-control', 'min' => 0, 'step' => 0.01],
+      TRUE
     );
 
     $this->add(

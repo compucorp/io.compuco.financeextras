@@ -63,6 +63,9 @@ class ContributionCreate {
         'region' => 'page-body',
       ]);
       \Civi::resources()->addVars('financeextras', ['currencies' => \CRM_Core_OptionGroup::values('currencies_enabled')]);
+      \Civi::resources()->addVars('financeextras', ['mode' => $this->form->_mode]);
+      $template = \CRM_Core_Smarty::singleton();
+      $template->assign_by_ref('contribution_mode', $this->form->_mode);
     }
   }
 
@@ -103,6 +106,18 @@ class ContributionCreate {
       'template' => 'CRM/Financeextras/Form/Contribute/CustomLineItem.tpl',
       'region' => 'page-body',
     ]);
+
+    if ($this->isEdit()) {
+      $contribution = \Civi\Api4\Contribution::get()
+        ->addSelect('currency', 'total_amount')
+        ->addWhere('id', '=', $this->form->_id)
+        ->execute()
+        ->first();
+
+      $total = \CRM_Utils_Money::format($contribution['total_amount'], $contribution['currency']);
+      \Civi::resources()->addVars('financeextras', ['contrib_currency' => $contribution['currency']]);
+      \Civi::resources()->addVars('financeextras', ['contrib_total' => $total]);
+    }
   }
 
   /**
@@ -114,7 +129,8 @@ class ContributionCreate {
    * @return bool
    */
   public static function shouldHandle($form, $formName) {
-    return $formName === "CRM_Contribute_Form_Contribution";
+    $addOrUpdate = ($form->getAction() & CRM_Core_Action::ADD) || ($form->getAction() & CRM_Core_Action::UPDATE);
+    return $formName === "CRM_Contribute_Form_Contribution" &&  $addOrUpdate;
   }
 
 }

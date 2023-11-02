@@ -1,31 +1,41 @@
 CRM.$(function ($) {
+const totalChanged = new CustomEvent("totalChanged", {});
 
   (function() {
     setTotalAmount();
     hideStatusField();
-    setAmountCurencySymbol();
-    toggleRecordPaymentBlock();
-    placePaymentFieldsTogether();
+    const mode = CRM.vars.financeextras.mode ?? null
+
+    if (!mode) {
+      setAmountCurencySymbol();
+      toggleRecordPaymentBlock();
+      placePaymentFieldsTogether();
+    }
   })();
 
   function setTotalAmount() {
     const recordPaymentAmount = document.querySelector("input[name=fe_record_payment_amount]");
     $('#total_amount').on("change", function() {
-      recordPaymentAmount.value = $('#total_amount').val();
+      recordPaymentAmount.value = Number($('#total_amount').val()).toFixed(2);
+      recordPaymentAmount.dispatchEvent(totalChanged)
     });
   
     $('#price_set_id').on('change', function() {
-      recordPaymentAmount.value = $('#line-total').data('raw-total');
+      recordPaymentAmount.value = Number($('#line-total').data('raw-total')).toFixed(2);
+      recordPaymentAmount.dispatchEvent(totalChanged)
       if (($(this).val() !== '')) {
-        recordPaymentAmount.value = $('#pricevalue').data('raw-total');
+        recordPaymentAmount.value = Number($('#pricevalue').data('raw-total')).toFixed(2);
+        recordPaymentAmount.dispatchEvent(totalChanged)
         $('#pricevalue').on('change', function() {
-          recordPaymentAmount.value = $('#pricevalue').data('raw-total');
+          recordPaymentAmount.value = Number($('#pricevalue').data('raw-total')).toFixed(2);
+          recordPaymentAmount.dispatchEvent(totalChanged)
         });
       }
     })
 
     $('#line-total').on('datachanged', function() {
-      recordPaymentAmount.value = $('#line-total').data('raw-total');
+      recordPaymentAmount.value = Number($('#line-total').data('raw-total')).toFixed(2);
+      recordPaymentAmount.dispatchEvent(totalChanged)
     });
   }
 
@@ -85,5 +95,9 @@ CRM.$(function ($) {
     );
     $('tr.crm-contribution-fe-billing_row').after($('tr.crm-contribution-form-block-receipt_date'));
     $('#payment_information > fieldset > legend').hide();
+
+    $('tr#email-receipt label').text('Send Email Confirmation')
+    const email = $('tr#email-receipt #email-address')
+    $('tr#email-receipt .description').text('Automatically email a confirmation of this transaction to ').append(email).append('?')
   }
 });
