@@ -136,7 +136,7 @@ class CRM_Financeextras_BAO_CreditNoteLine extends CRM_Financeextras_DAO_CreditN
       ->execute()
       ->first();
 
-    $totalLineItemPaid = \Civi\Api4\EntityFinancialTrxn::get()
+    $totalLineItemPaid = \Civi\Api4\EntityFinancialTrxn::get(FALSE)
       ->addSelect('SUM(amount) AS sum')
       ->addWhere('entity_table:name', '=', 'civicrm_financial_item')
       ->addWhere('entity_id', '=', $financialItem['id'])
@@ -172,7 +172,7 @@ class CRM_Financeextras_BAO_CreditNoteLine extends CRM_Financeextras_DAO_CreditN
 
     if (!empty($lineItem['tax_amount']) && abs($lineItem['tax_amount']) > 0) {
       $taxAccount = FinancialAccountUtils::getFinancialTypeAccount($lineItem['financial_type_id'], 'Sales Tax Account is');
-      $taxAccountDesc = \Civi\Api4\FinancialAccount::get()
+      $taxAccountDesc = \Civi\Api4\FinancialAccount::get(FALSE)
         ->addSelect('description')
         ->addWhere('id', '=', $taxAccount)
         ->execute()

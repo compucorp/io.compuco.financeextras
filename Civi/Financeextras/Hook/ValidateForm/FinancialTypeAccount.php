@@ -60,7 +60,7 @@ class FinancialTypeAccount {
    * Gets the Financial Accounts based on financial type id sent by the form
    */
   private function getExistingFinancialTypeAccountsCountAndOwner($financialTypeId) {
-    $result = \Civi\Api4\EntityFinancialAccount::get()
+    $result = \Civi\Api4\EntityFinancialAccount::get(FALSE)
       ->addSelect('COUNT(*) AS count', 'financial_account.contact_id')
       ->setJoin([['FinancialAccount AS financial_account', 'INNER', NULL, ['financial_account_id', '=', 'financial_account.id']]])
       ->setGroupBy(['financial_account.contact_id'])
@@ -79,7 +79,7 @@ class FinancialTypeAccount {
    * Gets the owner of the financial account from the submitted fields
    */
   private function getSelectedFinancialAccountOwnerOrganisationId() {
-    $result = \Civi\Api4\FinancialAccount::get()
+    $result = \Civi\Api4\FinancialAccount::get(FALSE)
       ->addSelect('contact_id')
       ->addWhere('id', '=', $this->fields['financial_account_id'])
       ->execute()

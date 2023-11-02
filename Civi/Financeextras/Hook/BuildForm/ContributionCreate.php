@@ -108,7 +108,7 @@ class ContributionCreate {
     ]);
 
     if ($this->isEdit()) {
-      $contribution = \Civi\Api4\Contribution::get()
+      $contribution = \Civi\Api4\Contribution::get(FALSE)
         ->addSelect('currency', 'total_amount')
         ->addWhere('id', '=', $this->form->_id)
         ->execute()

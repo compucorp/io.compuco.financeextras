@@ -176,7 +176,7 @@ class CRM_Financeextras_Form_Contribute_CreditNoteRefund extends CRM_Contribute_
     try {
       $values = $this->getSubmitValues();
 
-      \Civi\Api4\CreditNote::refund()
+      \Civi\Api4\CreditNote::refund(FALSE)
         ->setId($this->crid)
         ->setAmount(round($values['amount'], 2))
         ->setReference($values['reference'])

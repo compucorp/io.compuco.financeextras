@@ -18,7 +18,7 @@ class SetDefaultCompany implements ConfigurerInterface {
 
   public function apply() {
     try {
-      \Civi\Api4\Company::create()
+      \Civi\Api4\Company::create(FALSE)
         ->addValue('contact_id', $this->getDefaultDomainContact())
         ->addValue('invoice_template_id:name', 'Contributions - Invoice')
         ->addValue('invoice_prefix', $this->getDefaultInvoicePrefix())

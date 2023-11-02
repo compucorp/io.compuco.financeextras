@@ -43,7 +43,7 @@ class ContributionView {
    * @throws \Civi\API\Exception
    */
   private function isContributionCancelled() {
-    $contribution = \Civi\Api4\Contribution::get()
+    $contribution = \Civi\Api4\Contribution::get(FALSE)
       ->addWhere('id', '=', $this->id)
       ->addWhere('contribution_status_id:name', '=', 'Cancelled')
       ->setLimit(1)

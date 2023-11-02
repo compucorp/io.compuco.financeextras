@@ -151,7 +151,7 @@ class CreditNoteInvoiceService {
    *   The allocation type value
    */
   private function getAllocationType(string $name): int|null {
-    $allocationTypes = \Civi\Api4\OptionValue::get()
+    $allocationTypes = \Civi\Api4\OptionValue::get(FALSE)
       ->addSelect('value', 'name')
       ->addWhere('option_group_id:name', '=', 'financeextras_credit_note_allocation_type')
       ->addWhere('name', '=', $name)

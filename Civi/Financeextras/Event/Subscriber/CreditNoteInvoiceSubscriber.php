@@ -58,7 +58,7 @@ class CreditNoteInvoiceSubscriber implements EventSubscriberInterface {
   private function createActivity($targetContactIds, $type, $subject, $attachment, $details) {
     $now = (new DateTime())->format('YmdHis');
     $currentUser = \CRM_Core_Session::singleton()->get('userID');
-    \Civi\Api4\Activity::create()
+    \Civi\Api4\Activity::create(FALSE)
       ->addValue('subject', $subject)
       ->addValue('target_contact_id', $targetContactIds)
       ->addValue('source_contact_id', $currentUser)
@@ -99,7 +99,7 @@ class CreditNoteInvoiceSubscriber implements EventSubscriberInterface {
    *   Credit Note contact ID
    */
   private function getCreditNoteContactId($id) {
-    return \Civi\Api4\CreditNote::get()
+    return \Civi\Api4\CreditNote::get(FALSE)
       ->addSelect('contact_id')
       ->addWhere('id', '=', $id)
       ->execute()

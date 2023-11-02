@@ -72,7 +72,7 @@ class ParticipantCreate {
     }
 
     // Check if the event is a paid event based on its configuration
-    $event = \Civi\Api4\Event::get()
+    $event = \Civi\Api4\Event::get(FALSE)
       ->addSelect('is_monetary')
       ->addWhere('id', '=', $this->form->_eID)
       ->execute()

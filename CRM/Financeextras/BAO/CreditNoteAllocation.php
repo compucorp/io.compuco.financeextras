@@ -148,7 +148,7 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
       'trxn_date' => $date,
     ];
 
-    $creditNoteLine = \Civi\Api4\CreditNoteLine::get()
+    $creditNoteLine = \Civi\Api4\CreditNoteLine::get(FALSE)
       ->addWhere('credit_note_id.id', '=', $creditNoteId)
       ->execute()
       ->first();
@@ -235,7 +235,7 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
       return NULL;
     }
 
-    $financialTrxn = \Civi\Api4\FinancialTrxn::get()
+    $financialTrxn = \Civi\Api4\FinancialTrxn::get(FALSE)
       ->addWhere('id', '=', $entityTrxn->financial_trxn_id)
       ->addSelect('to_financial_account_id:label')
       ->execute()
@@ -259,10 +259,10 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
    *
    */
   private static function getCreditNoteAllocationById(int $id): array {
-    return \Civi\Api4\CreditNoteAllocation::get()
+    return \Civi\Api4\CreditNoteAllocation::get(FALSE)
       ->addWhere('id', '=', $id)
       ->addSelect('*', 'credit_note_id.contact_id')
-      ->addChain('line', \Civi\Api4\CreditNoteLine::get()
+      ->addChain('line', \Civi\Api4\CreditNoteLine::get(FALSE)
         ->addWhere('credit_note_id', '=', '$credit_note_id')
         )
       ->execute()

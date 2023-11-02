@@ -243,9 +243,9 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
    *  The credit note for which allocation was made.
    */
   public static function updateCreditNoteStatusPostAllocation($allocationId) {
-    $allocation = \Civi\Api4\CreditNoteAllocation::get()
+    $allocation = \Civi\Api4\CreditNoteAllocation::get(FALSE)
       ->addWhere('id', '=', $allocationId)
-      ->addChain('credit_note', \Civi\Api4\CreditNote::get()
+      ->addChain('credit_note', \Civi\Api4\CreditNote::get(FALSE)
         ->addWhere('id', '=', '$credit_note_id')
         ->addWhere('status_id:name', 'IN', ['open', 'fully_allocated'])
         )
@@ -262,7 +262,7 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
       default => 'open'
     };
 
-    \Civi\Api4\CreditNote::update()
+    \Civi\Api4\CreditNote::update(FALSE)
       ->addValue('status_id:name', $status)
       ->addWhere('id', '=', $creditNote['id'])
       ->execute();
@@ -282,9 +282,9 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
    *   The credit note refund allocation data
    */
   public static function refund($creditNoteId, $allocationParam, $paymentParam) {
-    $creditNote = \Civi\Api4\CreditNote::get()
+    $creditNote = \Civi\Api4\CreditNote::get(FALSE)
       ->addWhere('id', '=', $creditNoteId)
-      ->addChain('line', \Civi\Api4\CreditNoteLine::get()
+      ->addChain('line', \Civi\Api4\CreditNoteLine::get(FALSE)
         ->addWhere('credit_note_id', '=', '$id')
       )
       ->execute()
@@ -301,7 +301,7 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
   }
 
   private static function createRefundAllocation(array $creditNote, array $data) {
-    return \Civi\Api4\CreditNoteAllocation::create()
+    return \Civi\Api4\CreditNoteAllocation::create(FALSE)
       ->addValue('credit_note_id', $creditNote['id'])
       ->addValue('type_id:name', 'manual_refund_payment')
       ->addValue('currency', $creditNote['currency'])

@@ -58,7 +58,7 @@ class SearchDisplayRun {
    */
   private static function alterCreditNoteSearchDisplay(&$result) {
     foreach ($result as &$display) {
-      $creditNote = \Civi\Api4\CreditNote::get()
+      $creditNote = \Civi\Api4\CreditNote::get(FALSE)
         ->addSelect('status_id:name', 'total_credit', 'currency')
         ->addWhere('id', '=', $display['data']['id'])
         ->execute()

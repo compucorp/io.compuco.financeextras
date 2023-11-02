@@ -37,7 +37,7 @@ class GetAction extends DAOGetAction {
   }
 
   private function getAllocations($id) {
-    $allocations = \Civi\Api4\CreditNoteAllocation::get()
+    $allocations = \Civi\Api4\CreditNoteAllocation::get(FALSE)
       ->addSelect('*', 'type_id:name')
       ->addWhere('credit_note_id', '=', $id)
       ->addWhere('is_reversed', '=', FALSE)

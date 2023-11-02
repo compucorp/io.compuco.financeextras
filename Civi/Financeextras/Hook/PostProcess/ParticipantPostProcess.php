@@ -105,7 +105,7 @@ class ParticipantPostProcess {
       return $this->form->getSubmitValues()['source'];
     }
 
-    $event = \Civi\Api4\Event::get()
+    $event = \Civi\Api4\Event::get(FALSE)
       ->addSelect('title')
       ->addWhere('id', '=', $this->form->_eventId)
       ->execute()->first();
@@ -117,7 +117,7 @@ class ParticipantPostProcess {
   }
 
   private function syncLineItem($contributionId, $participantId) {
-    $lineItems = \Civi\Api4\LineItem::get()
+    $lineItems = \Civi\Api4\LineItem::get(FALSE)
       ->addWhere('entity_table', '=', 'civicrm_participant')
       ->addWhere('entity_id', '=', $participantId)
       ->execute();

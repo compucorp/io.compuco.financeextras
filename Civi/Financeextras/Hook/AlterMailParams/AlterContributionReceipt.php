@@ -21,7 +21,7 @@ class AlterContributionReceipt {
    */
   public function handle() {
     if (empty($this->params['tplParams']['contribution']) && !empty($this->params['tokenContext']['contributionId'])) {
-      $contribution = \Civi\Api4\Contribution::get()
+      $contribution = \Civi\Api4\Contribution::get(FALSE)
         ->addWhere('id', '=', $this->params['tokenContext']['contributionId'])
         ->execute()
         ->first();
