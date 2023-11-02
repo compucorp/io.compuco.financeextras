@@ -31,7 +31,7 @@ class InvoiceTemplate {
     $this->replaceDomainTokensWithOwnerOrganisationTokens();
   }
 
-   /**
+  /**
    * Determines if the hook will run.
    *
    * @param array $params

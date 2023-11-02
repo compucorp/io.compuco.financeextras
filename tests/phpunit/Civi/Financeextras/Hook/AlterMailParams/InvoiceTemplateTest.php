@@ -29,8 +29,8 @@ class InvoiceTemplateTest extends BaseHeadlessTest {
 
     $templateParams['messageTemplateID'] = NULL;
     $templateParams['tplParams']['id'] = $contribution['id'];
-    $alterInvoiceParams = new \Civi\Financeextras\Hook\AlterMailParams\InvoiceTemplate($templateParams);
-    $alterInvoiceParams->run();
+    $alterInvoiceParams = new \Civi\Financeextras\Hook\AlterMailParams\InvoiceTemplate($templateParams, '');
+    $alterInvoiceParams->handle();
 
     $this->assertEquals($this->company['invoice_template_id'], $templateParams['messageTemplateID']);
   }
@@ -74,8 +74,8 @@ class InvoiceTemplateTest extends BaseHeadlessTest {
 
     $templateParams['tplParams'] = NULL;
     $templateParams['tplParams']['id'] = $contribution['id'];
-    $alterInvoiceParams = new \Civi\Financeextras\Hook\AlterMailParams\InvoiceTemplate($templateParams);
-    $alterInvoiceParams->run();
+    $alterInvoiceParams = new \Civi\Financeextras\Hook\AlterMailParams\InvoiceTemplate($templateParams, '');
+    $alterInvoiceParams->handle();
     unset($templateParams['tplParams']['id']);
 
     $expectedParams = [
@@ -114,8 +114,8 @@ class InvoiceTemplateTest extends BaseHeadlessTest {
 
     $templateParams['tplParams'] = NULL;
     $templateParams['tplParams']['id'] = $contribution['id'];
-    $alterInvoiceParams = new \Civi\Financeextras\Hook\AlterMailParams\InvoiceTemplate($templateParams);
-    $alterInvoiceParams->run();
+    $alterInvoiceParams = new \Civi\Financeextras\Hook\AlterMailParams\InvoiceTemplate($templateParams, '');
+    $alterInvoiceParams->handle();
 
     $this->assertEquals($fakeOrganisationImageURL, $templateParams['tplParams']['domain_logo']);
   }
