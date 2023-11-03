@@ -152,7 +152,7 @@ function financeextras_civicrm_post($op, $objectName, $objectId, &$objectRef) {
 
   if ($objectName === 'Contribution' && in_array($op, ['create', 'edit'])) {
     \Civi::dispatcher()->dispatch(ContributionPaymentUpdatedEvent::NAME, new ContributionPaymentUpdatedEvent($objectId));
-    $contribution = \Civi\Api4\Contribution::get()
+    $contribution = \Civi\Api4\Contribution::get(FALSE)
       ->addWhere('id', '=', $objectId)
       ->execute()
       ->first();

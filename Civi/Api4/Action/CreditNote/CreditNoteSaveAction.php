@@ -91,7 +91,7 @@ class CreditNoteSaveAction extends AbstractSaveAction {
    *   created credit note entity
    */
   private function createCreditNote(array $data) {
-    $optionValues = \Civi\Api4\OptionValue::get()
+    $optionValues = \Civi\Api4\OptionValue::get(FALSE)
       ->addSelect('value')
       ->addWhere('option_group_id:name', '=', 'financeextras_credit_note_status')
       ->addWhere('name', '=', 'open')

@@ -59,7 +59,7 @@ class CRM_Financeextras_Hook_Links_Contribution {
    * @throws \Civi\API\Exception
    */
   private function contributionHasStatus($statuses) {
-    $contribution = \Civi\Api4\Contribution::get()
+    $contribution = \Civi\Api4\Contribution::get(FALSE)
       ->addWhere('id', '=', $this->contributionId)
       ->addWhere('contribution_status_id:name', 'IN', $statuses)
       ->setLimit(1)

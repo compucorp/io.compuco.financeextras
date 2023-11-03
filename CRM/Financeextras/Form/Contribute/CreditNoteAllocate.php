@@ -179,7 +179,7 @@ class CRM_Financeextras_Form_Contribute_CreditNoteAllocate extends CRM_Core_Form
    *   The allocation type value.
    */
   private function getAllocationTypeValueByName($name) {
-    $optionValues = \Civi\Api4\OptionValue::get()
+    $optionValues = \Civi\Api4\OptionValue::get(FALSE)
       ->addSelect('value')
       ->addWhere('option_group_id:name', '=', 'financeextras_credit_note_allocation_type')
       ->addWhere('name', '=', $name)

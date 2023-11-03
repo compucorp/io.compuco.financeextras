@@ -47,7 +47,7 @@ class CRM_Financeextras_Hook_PageRun_ContributionPageTab implements PageRunInter
    */
   private function setCreditNoteCounts($page) {
     $contactId = $page->getVar('_contactId');
-    $creditNotes = \Civi\Api4\CreditNote::get()
+    $creditNotes = \Civi\Api4\CreditNote::get(FALSE)
       ->selectRowCount()
       ->addSelect('COUNT(id) AS count')
       ->addWhere('contact_id', '=', $contactId)

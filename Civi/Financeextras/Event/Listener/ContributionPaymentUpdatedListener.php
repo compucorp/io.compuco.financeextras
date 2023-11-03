@@ -16,7 +16,7 @@ class ContributionPaymentUpdatedListener {
     $status = 'Pending';
     $allowedStatus = ['Pending', 'Completed', 'Partially paid', 'Refunded', 'Pending refund'];
 
-    $contribution = \Civi\Api4\Contribution::get()
+    $contribution = \Civi\Api4\Contribution::get(FALSE)
       ->addWhere('id', '=', $contributionId)
       ->addWhere('contribution_status_id:name', 'IN', $allowedStatus)
       ->execute()
