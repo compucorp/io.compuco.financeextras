@@ -43,7 +43,7 @@ class CRM_Financeextras_Form_ExchangeRate_Add extends CRM_Core_Form {
       'number',
       'base_to_conversion_rate',
       ts('Base to Conversion Rate'),
-      ['class' => 'form-control', 'min' => 0, 'step' => 0.01],
+      ['class' => 'form-control', 'min' => 0, 'step' => 0.01, 'required' => TRUE],
       TRUE
     );
 
@@ -51,7 +51,7 @@ class CRM_Financeextras_Form_ExchangeRate_Add extends CRM_Core_Form {
       'number',
       'conversion_to_base_rate',
       ts('Conversion to Base Rate'),
-      ['class' => 'form-control', 'min' => 0, 'step' => 0.01],
+      ['class' => 'form-control', 'min' => 0, 'step' => 0.01, 'required' => TRUE],
       TRUE
     );
 
@@ -84,6 +84,11 @@ class CRM_Financeextras_Form_ExchangeRate_Add extends CRM_Core_Form {
       $values['id'] = $this->_id;
     }
 
+    if ($this->exchangeRateValueExist($values)) {
+      CRM_Core_Session::setStatus('Exchange Rate values exists for the given currencies for same date. Please change the currency or date to proceed', '', 'error');
+      return;
+    }
+
     civicrm_api4('ExchangeRate', 'save', [
       'records' => [
         $values,
@@ -102,7 +107,7 @@ class CRM_Financeextras_Form_ExchangeRate_Add extends CRM_Core_Form {
       return [];
     }
 
-    $exchangeRate = \Civi\Api4\ExchangeRate::get()
+    $exchangeRate = \Civi\Api4\ExchangeRate::get(FALSE)
       ->addWhere('id', '=', $this->_id)
       ->setLimit(1)
       ->execute()
@@ -133,6 +138,31 @@ class CRM_Financeextras_Form_ExchangeRate_Add extends CRM_Core_Form {
       }
     }
     return $elementNames;
+  }
+
+  /**
+   * Checks the excahnge rate value already exists
+   *
+   * @param array $values
+   *  Exchange rate data
+   *
+   * @return bool
+   */
+  public function exchangeRateValueExist($values) {
+    $exchangeRateQuery = \Civi\Api4\ExchangeRate::get(FALSE)
+      ->addWhere('exchange_date', '=', $values['exchange_date'])
+      ->addWhere('base_currency', '=', $values['base_currency'])
+      ->addWhere('conversion_currency', '=', $values['conversion_currency'])
+      ->setLimit(1);
+
+    if (!empty($values['id'])) {
+      $exchangeRateQuery->addWhere('id', '!=', $values['id']);
+    }
+
+    $exchangeRate = $exchangeRateQuery->execute()
+      ->first();
+
+    return !empty($exchangeRate);
   }
 
 }

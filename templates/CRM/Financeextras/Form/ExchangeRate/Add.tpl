@@ -36,7 +36,9 @@
 
       $.fn.preventDoubleSubmission = function () {
         CRM.$(this).on('submit', function (e) {
-          CRM.$.blockUI();
+          if ( $(this)[0].checkValidity() ) {
+            CRM.$.blockUI();
+          }
         });
 
         return this;

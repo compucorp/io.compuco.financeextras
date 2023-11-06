@@ -129,6 +129,8 @@ CREATE TABLE `financeextras_batch_owner_org` (
   PRIMARY KEY (`id`),
   CONSTRAINT FK_financeextras_batch_owner_org_batch_id FOREIGN KEY (`batch_id`) REFERENCES `civicrm_batch`(`id`) ON DELETE CASCADE,
   CONSTRAINT FK_financeextras_batch_owner_org_owner_org_id FOREIGN KEY (`owner_org_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE
+)
+ENGINE=InnoDB;
 
 -- /*******************************************************
 -- *
