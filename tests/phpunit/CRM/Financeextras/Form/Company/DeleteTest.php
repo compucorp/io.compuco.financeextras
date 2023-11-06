@@ -22,6 +22,8 @@ class CRM_Financeextras_Form_Company_DeleteTest extends BaseHeadlessTest {
 
     $company = new CRM_Financeextras_DAO_Company();
     $company->contact_id = 1;
+    $company->invoice_prefix = 'INV_';
+    $company->next_invoice_number = '000001';
     $company->find();
     $records = $company->fetchAll();
 
