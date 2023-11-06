@@ -66,6 +66,8 @@ class CRM_Financeextras_Form_Company_AddTest extends BaseHeadlessTest {
 
     $company = new CRM_Financeextras_DAO_Company();
     $company->contact_id = 1;
+    $company->invoice_prefix = 'INV_';
+    $company->next_invoice_number = '00001';
     $company->find();
     $records = $company->fetchAll();
 
@@ -95,6 +97,8 @@ class CRM_Financeextras_Form_Company_AddTest extends BaseHeadlessTest {
 
     $company = new CRM_Financeextras_DAO_Company();
     $company->contact_id = 1;
+    $company->invoice_prefix = 'XYZ';
+    $company->next_invoice_number = '000025';
     $company->find();
     $records = $company->fetchAll();
 

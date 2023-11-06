@@ -16,7 +16,7 @@ class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
   /**
    * Tasks to perform when the extension is installed.
    */
-  public function install() {
+  public function postInstall() {
     $manageSteps = [
       new CreditNoteStatusManager(),
       new CreditNoteActivityTypeManager(),

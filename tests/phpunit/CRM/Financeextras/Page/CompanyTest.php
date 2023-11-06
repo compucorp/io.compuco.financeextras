@@ -34,13 +34,16 @@ class CRM_Financeextras_Page_CompanyTest extends BaseHeadlessTest {
     $page->run();
 
     $rowsToShowInPage = $page->get_template_vars('rows');
-    $this->assertCount(2, $rowsToShowInPage);
-    $this->assertEquals('Default Organization', current($rowsToShowInPage)['company_name']);
-    $this->assertEquals($params1['next_invoice_number'], current($rowsToShowInPage)['next_invoice_number']);
+    // we look for 3 records because there is a one created
+    // by default when installing the extension.
+    $this->assertCount(3, $rowsToShowInPage);
+    $secondRowAfterDefaultRecord = next($rowsToShowInPage);
+    $this->assertEquals('Default Organization', $secondRowAfterDefaultRecord['company_name']);
+    $this->assertEquals($params1['next_invoice_number'], $secondRowAfterDefaultRecord['next_invoice_number']);
 
-    $secondRow = next($rowsToShowInPage);
-    $this->assertEquals('Default Organization', $secondRow['company_name']);
-    $this->assertEquals($params2['next_invoice_number'], $secondRow['next_invoice_number']);
+    $thirdRow = next($rowsToShowInPage);
+    $this->assertEquals('Default Organization', $thirdRow['company_name']);
+    $this->assertEquals($params2['next_invoice_number'], $thirdRow['next_invoice_number']);
   }
 
   private function disableReturningPageResult($page) {
