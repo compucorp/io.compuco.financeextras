@@ -97,6 +97,21 @@ function financeextras_civicrm_links($op, $objectName, $objectId, &$links, &$mas
 }
 
 /**
+ * Implements hook_civicrm_postProcess().
+ */
+function financeextras_civicrm_postProcess($formName, $form) {
+  $hooks = [
+    \Civi\Financeextras\Hook\PostProcess\UpdateContributionExchangeRate::class,
+  ];
+
+  foreach ($hooks as $hook) {
+    if ($hook::shouldHandle($form, $formName)) {
+      (new $hook($form))->handle();
+    }
+  }
+}
+
+/**
  * Implements hook_civicrm_buildForm().
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_buildForm
