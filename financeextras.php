@@ -122,9 +122,14 @@ function financeextras_civicrm_pageRun($page) {
  * Implements hook_civicrm_links().
  */
 function financeextras_civicrm_links($op, $objectName, $objectId, &$links, &$mask, &$values) {
-  if (CRM_Financeextras_Hook_Links_Contribution::shouldHandle($op, $objectName)) {
-    $contributionHook = new CRM_Financeextras_Hook_Links_Contribution($objectId, $links);
-    $contributionHook->alterLinks();
+  $hooks = [
+    \Civi\Financeextras\Hook\Links\Contribution::class,
+  ];
+
+  foreach ($hooks as $hook) {
+    if ($hook::shouldHandle($op, $objectName)) {
+      (new $hook($op, $objectId, $objectName, $links))->handle();
+    }
   }
 }
 
@@ -234,6 +239,7 @@ function financeextras_civicrm_buildForm($formName, &$form) {
     \Civi\Financeextras\Hook\BuildForm\BatchTransaction::class,
     \Civi\Financeextras\Hook\BuildForm\FinancialBatchSearch::class,
     \Civi\Financeextras\Hook\BuildForm\FinancialAccount::class,
+    \Civi\Financeextras\Hook\BuildForm\AdditionalPaymentButton::class,
   ];
 
   foreach ($hooks as $hook) {

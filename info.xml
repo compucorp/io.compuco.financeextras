@@ -8,13 +8,16 @@
     <author>Compuco</author>
     <email>hello@compuco.io</email>
   </maintainer>
-  <releaseDate>2022-05-16</releaseDate>
-  <version>1.0</version>
-  <develStage>alpha</develStage>
+  <releaseDate>2023-05-30</releaseDate>
+  <version>1.0.0</version>
+  <develStage>stable</develStage>
   <compatibility>
-    <ver>5.39</ver>
+    <ver>5.51</ver>
   </compatibility>
-  <comments>This extension is under development</comments>
+  <comments> 
+    Supported CiviCRM versions  :
+    - CiviCRM 5.51.3
+  </comments>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
