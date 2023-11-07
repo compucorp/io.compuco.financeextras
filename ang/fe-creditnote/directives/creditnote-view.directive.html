@@ -1,0 +1,94 @@
+<div id="bootstrap-theme" class="creditnote__container">
+  <h1 class="hidden" crm-page-title>{{ ts('View Credit Note') }}</h1>
+
+  <div class="panel panel-default" id="creditnote__view">
+    <div class="panel-body">
+      <div class="row" ng-if="hasEditPermission">
+        <div class="col-md-12">
+          <a ng-href="{{ crmUrl('civicrm/contribution/creditnote/update', {reset: 1, id: creditnotes.id, action: 'update'}) }}" class="btn btn-primary pull-right">Edit Credit Note</a>
+        </div>
+      </div>
+      <table class="table" id="creditnote__detail">
+        <tr>
+          <td style="width: 200px">{{ ts('Contact') }}</td>
+          <td><span><a href="{{getContactLink(creditnotes.contact_id)}}" target="_blank">{{creditnotes['contact_id.display_name']}}</a></span></td>
+        </tr>
+        <tr>
+          <td>{{ ts('Status') }}</td>
+          <td>{{creditnotes['status_id:label']}}</td>
+        </tr>
+        <tr>
+          <td>{{ ts('Owner Organisation') }}</td>
+          <td><span><a href="{{getContactLink(creditnotes.owner_organization)}}" target="_blank">{{creditnotes['owner_organization.organization_name']}}</a></span></td>
+        </tr>
+        <tr>
+          <td>{{ ts('Number') }}</td>
+          <td>{{ creditnotes.cn_number }}</td>
+        </tr>
+        <tr>
+          <td>{{ ts('Description') }}</td>
+          <td><span ng-bind-html="creditnotes.description "></span></td>
+        </tr>
+        <tr>
+          <td>{{ ts('Date') }}</td>
+          <td>{{ creditnotes.date }}</td>
+        </tr>
+        <tr>
+          <td>{{ ts('Reference') }}</td>
+          <td>{{ creditnotes.reference }}</td>
+        </tr>
+        <tr>
+          <td>{{ts('Currency')}}</td>
+          <td>{{currency}}</td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <div class="">
+              <creditnote-line-table credit-note="{{ creditnotes }}" />
+            </div>
+            <div class="row">
+              <div class="col-sm-4 pull-right">
+                <table class="table table-striped">
+                  <tr><th>Subtotal</th><td>{{ currencySymbol }} {{ formatMoney(creditnotes.total, creditnotes.currency) }}</td></tr>
+                    <tr ng-repeat="i in taxRates">
+                      <th>*{{ taxTerm }} @ {{ i.rate }}%</th>
+                      <td>{{ currencySymbol }} {{ formatMoney(i.value, creditnotes.currency) }}</td>
+                    </tr>
+                  <tr><th>Total</th><td>{{ currencySymbol }} {{formatMoney(creditnotes.grandTotal, creditnotes.currency)}}</td></tr>
+                </table>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" class="no-bold">
+            <b>{{ts('Comment')}}</b>
+            <br>
+            <br>
+            <p>{{ creditnotes.comment }}</p>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <div>
+              <creditnote-allocation-table ng-if="creditnotes.id" credit-note-id="{{creditnotes.id}}" context="view" />
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="panel-footer flex-between crm-submit-buttons">
+        <a type="button" class="btn btn-primary crm-form-submit crm-button crm-button-type-submit" ng-href="{{ crmUrl('civicrm/contact/view', {reset: 1, cid: creditnotes.contact_id, selectedChild: 'contribute'}) }}" >
+          <span class="btn-icon"></span> {{ts('Cancel')}}</a>
+    </div>
+  </div>
+</div>
+
+<style>
+  #creditnote__view .table>tbody>tr>td {
+    padding: 10px 10px;
+  }
+  #creditnote__view .table tr:first-child > td {
+    border-top: none;
+  }
+</style>

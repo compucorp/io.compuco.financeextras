@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Financeextras</base>
+  <class>CreditNoteLine</class>
+  <name>financeextras_credit_note_line</name>
+  <comment>Credit note line items</comment>
+  <log>true</log>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique CreditNoteLine ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>credit_note_id</name>
+    <type>int unsigned</type>
+    <comment>FK to CreditNote</comment>
+    <html>
+      <type>EntityRef</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>credit_note_id</name>
+    <table>financeextras_credit_note</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>financial_type_id</name>
+    <type>int unsigned</type>
+    <comment>FK to CiviCRM Financial Type</comment>
+    <html>
+      <label>Financial Type</label>
+      <type>EntityRef</type>
+    </html>
+  </field>
+  <pseudoconstant>
+      <table>civicrm_financial_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+  <foreignKey>
+    <name>financial_type_id</name>
+    <table>civicrm_financial_type</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>description</name>
+    <type>text</type>
+    <required>false</required>
+    <comment>line item description</comment>
+    <html>
+      <label>Item Description</label>
+      <type>TextArea</type>
+    </html>
+  </field>
+
+  <field>
+    <name>quantity</name>
+    <type>decimal</type>
+    <comment>Quantity</comment>
+    <html>
+      <label>Quantity</label>
+      <type>Text</type>
+    </html>
+  </field>
+
+  <field>
+    <name>unit_price</name>
+    <type>decimal</type>
+    <comment>Unit Price</comment>
+    <html>
+      <label>Unit Price</label>
+      <type>Text</type>
+    </html>
+  </field>
+
+  <field>
+    <name>tax_amount</name>
+    <type>decimal</type>
+    <comment>Tax amount for the line item</comment>
+    <html>
+      <label>Tax</label>
+      <type>Text</type>
+    </html>
+  </field>
+
+  <field>
+    <name>line_total</name>
+    <type>decimal</type>
+    <comment>Line Total</comment>
+    <html>
+      <label>Line Total</label>
+      <type>Text</type>
+    </html>
+  </field>
+
+</table>

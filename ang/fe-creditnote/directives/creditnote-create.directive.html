@@ -1,0 +1,263 @@
+<div id="bootstrap-theme" class="creditnote__container">
+  <h1 class="hidden" crm-page-title>{{ ts('New Credit Note') }}</h1>
+
+  <div class="panel panel-default" id="creditnote__create">
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-md-12" ng-if="isView && creditnotes.id">
+          <a ng-href="{{ crmUrl('civicrm/contribution/creditnote/update', {reset: 1, id: creditnotes.id, action: 'update'}) }}" class="btn btn-primary-outline pull-right">Edit Credit Note</a>
+        </div>
+      </div>
+      <form name="creditnotesForm" class="form-horizontal">
+        <div class="form-group">
+          <label class="col-sm-2 control-label required-mark">
+            {{ ts('Contact') }}
+          </label>
+          <div class="col-sm-5">
+            <input class="form-control"
+              ng-model="creditnotes.contact_id"
+              placeholder="Select Contact"
+              name="contact"
+              crm-entityref="{
+                create: true,
+                entity: 'Contact',
+                select: { multiple: false, allowClear: true }
+              }"
+              required
+              ng-minlength="1"
+              ng-disabled="isView || isUpdate"
+            />
+            <span class="crm-inline-error" ng-show="creditnotesForm.contact.$dirty && creditnotesForm.contact.$invalid && creditnotesForm.contact.$error.required">Contact is required</span>
+          </div>
+        </div>
+
+        <div class="form-group" ng-if="isView || isUpdate">
+          <label class="col-sm-2 control-label required-mark">
+            {{ ts('Status') }}
+          </label>
+          <div class="col-sm-5">
+            <input class="form-control"
+              name="status_id"
+              ng-model="creditnotes.status_id"
+              crm-entityref="{
+                create: true,
+                entity: 'OptionValue',
+                api: {
+                  description_field: null,
+                  params: {active: true, option_group_id: 'financeextras_credit_note_status'}
+                },
+                select: { multiple: false, allowClear: false }
+              }"
+              required
+              ng-minlength="1"
+              ng-disabled="isView || isUpdate"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-sm-2 control-label required-mark">
+            {{ts('Owner Organisation')}}
+          </label>
+          <div class="col-sm-5">
+            <select class="form-control"
+                    name="owner_organization"
+                    ng-model="creditnotes.owner_organization"
+                    placeholder="Owner Organisation"
+                    ng-disabled="isView || isUpdate || companies.length === 1"
+                    required
+            >
+              <option value="">-{{ ts('select') }}-</option>
+              <option ng-repeat="company in companies track by $index" value="{{ companies[$index].contact_id }}">{{ companies[$index]['contact_id.organization_name'] }}</option>
+            </select>
+            <span class="crm-inline-error" ng-show="creditnotesForm.owner_organization.$dirty && creditnotesForm.owner_organization.$invalid && creditnotesForm.owner_organization.$error.required">Owner Organisation is required</span>
+          </div>
+        </div>
+
+        <div class="form-group" ng-hide="!isUpdate">
+          <label class="col-sm-2 control-label required-mark">
+            {{ ts('Number') }}
+          </label>
+          <div class="col-sm-5">
+              <input
+                class="form-control" id="creditnotes_number"
+                ng-model="creditnotes.cn_number" placeholder="Number" name="number" type="text" ng-disabled="isUpdate"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label required-mark">
+            {{ ts('Date') }}
+          </label>
+          <div class="col-sm-5 creditnotes__ui-range">
+              <input
+                ng-disabled="isView"
+                class="form-control" crm-ui-datepicker="{time: false}" id="creditnotes_date"
+                ng-model="creditnotes.date" placeholder="Date" name="date" required/>
+                <span class="crm-inline-error" ng-show="creditnotesForm.date.$dirty && creditnotesForm.date.$invalid">Date is required</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">
+            {{ ts('Description') }}
+            <a crm-ui-help="hs({title:ts('Description'), id:'creditnotes_description'})"></a>
+          </label>
+          <div class="col-sm-5">
+            <textarea name="description" ng-model="creditnotes.description" class="crm-form-wysiwyg" id="creditnotes-description" ng-disabled="isView"></textarea>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">
+            {{ ts('Reference') }}
+          </label>
+          <div class="col-sm-5 civicase__ui-range">
+              <input
+                class="form-control"" id="creditnotes_reference"
+                ng-model="creditnotes.reference" placeholder="Reference" name="reference" type="text" ng-disabled="isView"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label required-mark">
+            {{ts('Currency')}}
+          </label>
+          <div class="col-sm-5">
+            <select class="form-control"
+              ng-model="creditnotes.currency"
+              ng-change="handleCurrencyChange()"
+              placeholder="Currency"
+              name="currency"
+              ng-disabled="isView || isUpdate || disableCurrency"
+              required
+            >
+            <option value="">{{ ts('Currency') }}</option>
+            <option ng-repeat="currency in currencyCodes track by $index" value="{{ currencyCodes[$index].name }}">{{ currencyCodes[$index].name }}</option>
+            </select>
+            <span class="crm-inline-error" ng-show="creditnotesForm.currency.$dirty && creditnotesForm.currency.$invalid && creditnotesForm.currency.$error.required">Currency is required</span>
+          </div>
+        </div>
+
+        <div ng-if="!(isView || isUpdate)">
+          <div class="row">
+            <label class="col-sm-2 control-label required-mark">
+              {{ts('Line Items:')}}
+            </label>
+            <br />
+            <br />
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12" style="overflow: scroll;">
+             <table class="table table-bordered">
+              <tr>
+                <th class="required-mark">Item</th>
+                <th class="required-mark">Financial Type</th>
+                <th class="required-mark">Quantity</th>
+                <th class="required-mark">Unit Price</th>
+                <th>Tax</th>
+                <th>Subtotal</th>
+                <th></th>
+              </tr>
+              <tr ng-repeat="item in creditnotes.items track by $index">
+                <td>
+                  <input type="text" name="description_{{$index}}" ng-model="creditnotes.items[$index].description" class="form-control" style="resize: none" required />
+                  <br />
+                  <span class="crm-inline-error" ng-show="creditnotesForm.description_{{$index}}.$dirty && creditnotesForm.description_{{$index}}.$invalid && creditnotesForm.description_{{$index}}.$error.required">Description is required</span>
+                </td>
+                <td style="max-width: 15em;">
+                  <input class="form-control"
+                  style="width: 100%"
+                    ng-model="creditnotes.items[$index].financial_type_id"
+                    ng-change="handleFinancialTypeChange($index)"
+                    name="financial_type_{{$index}}"
+                    placeholder="Financial Type"
+                    crm-entityref="{
+                      entity: 'Financial Type',
+                      select: { allowClear: true, 'minimumInputLength': 0 }
+                    }"
+                    required
+                    ng-minlength="1"
+                  />
+                  <br />
+                  <span class="crm-inline-error" ng-show="creditnotesForm.financial_type_{{$index}}.$dirty && creditnotesForm.financial_type_{{$index}}.$invalid && creditnotesForm.financial_type_{{$index}}.$error.required">Financial Type is required</span>
+                </td>
+                <td>
+                  <input type="number" min="0" name="quantity_{{$index}}" required placeholder="Quantity" ng-model="creditnotes.items[$index].quantity" class="form-control" ng-change="calculateSubtotal($index)" style="width: 6em" step="0.0001" />
+                  <br />
+                  <span class="crm-inline-error" ng-show="creditnotesForm.quantity_{{$index}}.$dirty && (creditnotesForm.quantity_{{$index}}.$invalid || creditnotesForm.quantity_{{$index}}.$error.required)">Quantity is invalid</span>
+                </td>
+                <td>
+                  <div class="input-group" style="width: 10em">
+                    <input type="number" min="0" name="unit_price_{{$index}}" required placeholder="Unit Price" ng-model="creditnotes.items[$index].unit_price" ng-change="calculateSubtotal($index)" class="form-control" step="0.01" />
+                  </div>
+                  <br />
+                  <span class="crm-inline-error" ng-show="creditnotesForm.unit_price_{{$index}}.$dirty && (creditnotesForm.unit_price_{{$index}}.$invalid || creditnotesForm.unit_price_{{$index}}.$error.required)">Unit price is invalid</span>
+                </td>
+                <td style="width: 10em">
+                  <input type="text" value="{{ creditnotes.items[$index].tax_rate > 0 ? roundTo(creditnotes.items[$index].tax_rate, 4)+'%' : '' }}" class="form-control" disabled>
+                </td>
+                <td style="width: 10em">
+                  <input type="text" value="{{ formatMoney(creditnotes.items[$index].line_total, creditnotes.currency) }}" class="form-control" disabled>
+                </td>
+                <td><a ng-if="creditnotes.items.length > 1" href ng-click="removeCreditnotesItem($index)" ><i class="fa fa-trash"></i></a></td>
+              </tr>
+             </table>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-3">
+              <button class="btn btn-secondary" ng-click="newCreditnotesItem()" type="button"><span><i class="fa fa-plus"></i></span>{{ ts(' Add another item') }}</button>
+            </div>
+            <label class="col-sm-2"></label>
+          </div>
+        </div>
+        <div ng-if="isView || isUpdate">
+          <creditnote-line-table credit-note="{{ creditnotes }}" />
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-12">
+            <div class="row">
+                <div class="col-sm-4 pull-right">
+                  <table class="table">
+                    <tr><th>Subtotal</th><td>{{ formatMoney(creditnotes.total, creditnotes.currency) }}</td></tr>
+                      <tr ng-repeat="i in taxRates">
+                        <th>*{{ taxTerm }} @ {{ i.rate }}%</th>
+                        <td>{{ formatMoney(i.value, creditnotes.currency) }}</td>
+                      </tr>
+                    <tr><th>Total</th><td>{{formatMoney(creditnotes.grandTotal, creditnotes.currency)}}</td></tr>
+                  </table>
+                </div>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="row">
+          <label class="col-sm-2 control-label">
+            {{ts('Comment')}}
+            <a crm-ui-help="hs({title:ts('Notes'), id:'creditnotes_comment'})"></a>
+          </label>
+          <br />
+          <br />
+        </div>
+        <div class="form-group">
+          <div class="col-sm-12">
+            <textarea name="notes" rows="5" cols="20" style="width: 100%;" ng-model="creditnotes.comment" ng-disabled="isView"></textarea>
+          </div>
+        </div>
+
+      </form>
+      <creditnote-allocation-table ng-if="creditnotes.id && (isView || isUpdate)" context="{{context}}" credit-note-id="{{creditnotes.id}}" />
+    </div>
+    <div class="panel-footer flex-between crm-submit-buttons">
+        <a class="btn btn-primary-outline cancel crm-form-submit crm-button-type-cancel" ng-href="{{ crmUrl('civicrm/contact/view', {reset: 1, cid: contactId, selectedChild: 'contribute'}) }}">
+          <span class="btn-icon"></span> {{ts('Cancel')}}</a>
+        <button ng-if="!isView" type="submit" class="btn btn-primary crm-form-submit crm-button crm-button-type-submit" ng-disabled="submitInProgress" ng-click="saveCreditnotes()">
+          <span class="btn-icon"></span> <span ng-if="!isUpdate">{{ts('Create')}}</span> <span ng-if="isUpdate">{{ts('Save')}}</span></button>
+    </div>
+  </div>
+</div>
+
+<style>
+  #creditnote__create .table>tbody>tr>td {
+    padding: 10px 10px;
+  }
+</style>

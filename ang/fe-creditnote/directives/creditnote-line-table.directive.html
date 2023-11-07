@@ -1,0 +1,29 @@
+<div class="row">
+  <label class="col-sm-2 control-label">
+    {{ts('Line Items:')}}
+  </label>
+  <br />
+  <br />
+</div>
+<div class="form-group row">
+  <div class="col-sm-12" style="overflow: scroll;">
+    <table class="table table-bordered table-striped text-center">
+      <tr>
+        <th class="text-center">Item</th>
+        <th class="text-center">Financial Type</th>
+        <th class="text-center">Quantity</th>
+        <th class="text-center">Unit Price</th>
+        <th class="text-center">Tax</th>
+        <th class="text-center">Subtotal</th>
+      </tr>
+     <tr ng-repeat="item in items track by $index">
+      <td>{{item.description}}</td>
+      <td>{{item.financial_type}}</td>
+      <td>{{item.quantity}}</td>
+      <td>{{ formatMoney(item['unit_price'], currency, true) }}</td>
+      <td>{{item.tax_rate}}%</td>
+      <td>{{ formatMoney(item['line_total'], currency, true) }}</td>
+     </tr>
+    </table>
+  </div>
+</div>

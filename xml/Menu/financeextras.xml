@@ -6,4 +6,67 @@
     <title>Record a credit card refund</title>
     <access_arguments>edit contributions</access_arguments>
   </item>
+  <item>
+    <path>civicrm/creditnote/a</path>
+    <page_callback>CRM_Financeextras_Page_Contribute_CreditNoteAngular</page_callback>
+    <access_arguments>edit contributions</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/contribution/creditnote/download-pdf</path>
+    <page_callback>CRM_Financeextras_Form_Contribute_CreditNoteDownload::download</page_callback>
+    <access_arguments>edit contributions</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/contribution/creditnote/email</path>
+    <page_callback>CRM_Financeextras_Form_Contribute_CreditNoteEmail</page_callback>
+    <access_arguments>edit contributions</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/contribution/creditnote/view</path>
+    <page_callback>CRM_Financeextras_Page_Contribute_CreditNoteAngular</page_callback>
+    <access_arguments>access CiviContribute</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/contribution/creditnote</path>
+    <page_callback>CRM_Financeextras_Page_Contribute_CreditNoteAngular</page_callback>
+    <access_arguments>edit contributions</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/contribution/creditnote/delete</path>
+    <page_callback>CRM_Financeextras_Form_Contribute_CreditNoteDelete</page_callback>
+    <access_arguments>access CiviCRM,access CiviContribute,delete in CiviContribute</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/contribution/creditnote/void</path>
+    <page_callback>CRM_Financeextras_Form_Contribute_CreditNoteVoid</page_callback>
+    <access_arguments>access CiviCRM,access CiviContribute,edit contributions</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/contribution/creditnote/allocate</path>
+    <page_callback>CRM_Financeextras_Form_Contribute_CreditNoteAllocate</page_callback>
+    <access_arguments>edit contributions</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/contribution/creditnote/refund</path>
+    <page_callback>CRM_Financeextras_Form_Contribute_CreditNoteRefund</page_callback>
+    <access_arguments>edit contributions</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/admin/financeextras/company</path>
+    <page_callback>CRM_Financeextras_Page_Company</page_callback>
+    <title>Company Listing</title>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/admin/financeextras/company/add</path>
+    <page_callback>CRM_Financeextras_Form_Company_Add</page_callback>
+    <title>Add Company</title>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/admin/financeextras/company/delete</path>
+    <page_callback>CRM_Financeextras_Form_Company_Delete</page_callback>
+    <title>Delete Company</title>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
 </menu>

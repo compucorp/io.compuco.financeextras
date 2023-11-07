@@ -2,7 +2,11 @@
 
 require_once 'financeextras.civix.php';
 // phpcs:disable
+
 use CRM_Financeextras_ExtensionUtil as E;
+use Civi\Financeextras\Event\ContributionPaymentUpdatedEvent;
+use Civi\Financeextras\Hook\AlterMailParams\AlterContributionReceipt;
+
 // phpcs:enable
 
 /**
@@ -12,15 +16,24 @@ use CRM_Financeextras_ExtensionUtil as E;
  */
 function financeextras_civicrm_config(&$config) {
   _financeextras_civix_civicrm_config($config);
+  Civi::dispatcher()->addListener('civi.api.respond', ['Civi\Financeextras\APIWrapper\SearchDisplayRun', 'respond'], -100);
+  Civi::dispatcher()->addSubscriber(new Civi\Financeextras\Event\Subscriber\CreditNoteInvoiceSubscriber());
+  Civi::dispatcher()->addListener('civi.api.respond', ['Civi\Financeextras\APIWrapper\Contribution', 'respond'], -101);
+  Civi::dispatcher()->addListener('fe.contribution.received_payment', ['\Civi\Financeextras\Event\Listener\ContributionPaymentUpdatedListener', 'handle']);
+  Civi::dispatcher()->addListener('civi.api.prepare', ['Civi\Financeextras\APIWrapper\BatchListPage', 'preApiCall']);
 }
 
 /**
- * Implements hook_civicrm_xmlMenu().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_xmlMenu
+ * Implements hook_civicrm_container().
  */
-function financeextras_civicrm_xmlMenu(&$files) {
-  _financeextras_civix_civicrm_xmlMenu($files);
+function financeextras_civicrm_container($container) {
+  $containers = [
+    new \Civi\Financeextras\Hook\Container\ServiceContainer($container),
+  ];
+
+  foreach ($containers as $container) {
+    $container->register();
+  }
 }
 
 /**
@@ -78,50 +91,6 @@ function financeextras_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
 }
 
 /**
- * Implements hook_civicrm_managed().
- *
- * Generate a list of entities to create/deactivate/delete when this module
- * is installed, disabled, uninstalled.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_managed
- */
-function financeextras_civicrm_managed(&$entities) {
-  _financeextras_civix_civicrm_managed($entities);
-}
-
-/**
- * Implements hook_civicrm_caseTypes().
- *
- * Add CiviCase types provided by this extension.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_caseTypes
- */
-function financeextras_civicrm_caseTypes(&$caseTypes) {
-  _financeextras_civix_civicrm_caseTypes($caseTypes);
-}
-
-/**
- * Implements hook_civicrm_angularModules().
- *
- * Add Angular modules provided by this extension.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_angularModules
- */
-function financeextras_civicrm_angularModules(&$angularModules) {
-  // Auto-add module files from ./ang/*.ang.php
-  _financeextras_civix_civicrm_angularModules($angularModules);
-}
-
-/**
- * Implements hook_civicrm_alterSettingsFolders().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_alterSettingsFolders
- */
-function financeextras_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
-  _financeextras_civix_civicrm_alterSettingsFolders($metaDataFolders);
-}
-
-/**
  * Implements hook_civicrm_entityTypes().
  *
  * Declare entity types provided by this module.
@@ -133,10 +102,208 @@ function financeextras_civicrm_entityTypes(&$entityTypes) {
 }
 
 /**
- * Implements hook_civicrm_themes().
+ * Implements hook_civicrm_pageRun().
+ *
+ * @link https://docs.civicrm.org/dev/en/master/hooks/hook_civicrm_pageRun/
  */
-function financeextras_civicrm_themes(&$themes) {
-  _financeextras_civix_civicrm_themes($themes);
+function financeextras_civicrm_pageRun($page) {
+  $hooks = [
+    CRM_Financeextras_Hook_PageRun_ContributionPageTab::class,
+  ];
+
+  foreach ($hooks as $hook) {
+    if ($hook::shouldHandle($page)) {
+      (new $hook())->handle($page);
+    }
+  }
+}
+
+/**
+ * Implements hook_civicrm_links().
+ */
+function financeextras_civicrm_links($op, $objectName, $objectId, &$links, &$mask, &$values) {
+  if (CRM_Financeextras_Hook_Links_Contribution::shouldHandle($op, $objectName)) {
+    $contributionHook = new CRM_Financeextras_Hook_Links_Contribution($objectId, $links);
+    $contributionHook->alterLinks();
+  }
+}
+
+/**
+ * Implements hook_civicrm_tabset().
+ *
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_tabset
+ */
+function financeextras_civicrm_tabset($tabsetName, &$tabs, $context) {
+  if ($tabsetName === 'civicrm/contact/view') {
+    $loader = Civi::service('angularjs.loader');
+    $loader->addModules(['crmApp', 'fe-creditnote']);
+  }
+}
+
+function financeextras_civicrm_post($op, $objectName, $objectId, &$objectRef) {
+  if ($objectName === 'CreditNoteAllocation' && in_array($op, ['create', 'edit'])) {
+    \CRM_Financeextras_BAO_CreditNote::updateCreditNoteStatusPostAllocation($objectId);
+  }
+
+  if ($objectName === 'Contribution' && $op === 'create') {
+    $hook = new \Civi\Financeextras\Hook\Post\ContributionCreation($objectId);
+    $hook->run();
+  }
+
+  if ($objectName === 'Contribution' && in_array($op, ['create', 'edit'])) {
+    \Civi::dispatcher()->dispatch(ContributionPaymentUpdatedEvent::NAME, new ContributionPaymentUpdatedEvent($objectId));
+    $contribution = \Civi\Api4\Contribution::get(FALSE)
+      ->addWhere('id', '=', $objectId)
+      ->execute()
+      ->first();
+    if (empty($objectRef->contact_id)) {
+      $objectRef->contact_id = $contribution['contact_id'];
+    }
+  }
+}
+
+/**
+ * Implements fieldOptions hook().
+ *
+ * @param string $entity
+ * @param string $field
+ * @param array $options
+ * @param array $params
+ */
+function financeextras_civicrm_fieldOptions($entity, $field, &$options, $params) {
+  if (in_array($entity, ['FinancialItem']) && $field == 'entity_table') {
+    $options[\CRM_Financeextras_DAO_CreditNoteLine::$_tableName] = ts('Credit Note Line');
+  }
+
+  if (in_array($entity, ['EntityFinancialTrxn']) && $field == 'entity_table') {
+    $options[\CRM_Financeextras_DAO_CreditNote::$_tableName] = ts('Credit Note');
+    $options[\CRM_Financeextras_DAO_CreditNoteLine::$_tableName] = ts('Credit Note Line');
+  }
+}
+
+/**
+ *
+ * Implements hook_civicrm_validateForm().
+ *
+ */
+function financeextras_civicrm_validateForm($formName, &$fields, &$files, &$form, &$errors) {
+  $hooks = [
+    \Civi\Financeextras\Hook\ValidateForm\MembershipCreate::class,
+    \Civi\Financeextras\Hook\ValidateForm\ContributionCreate::class,
+    \Civi\Financeextras\Hook\ValidateForm\OwnerOrganizationValidator::class,
+    \Civi\Financeextras\Hook\ValidateForm\PriceSetValidator::class,
+    \Civi\Financeextras\Hook\ValidateForm\FinancialTypeAccount::class,
+    \Civi\Financeextras\Hook\ValidateForm\LineItemEdit::class,
+  ];
+
+  foreach ($hooks as $hook) {
+    if ($hook::shouldHandle($form, $formName)) {
+      (new $hook($form, $fields, $errors, $formName))->handle();
+    }
+  }
+}
+
+/**
+ * Implements hook_civicrm_postProcess().
+ */
+function financeextras_civicrm_postProcess($formName, $form) {
+  $hooks = [
+    \Civi\Financeextras\Hook\PostProcess\ParticipantPostProcess::class,
+    \Civi\Financeextras\Hook\PostProcess\ContributionPostProcess::class,
+    \Civi\Financeextras\Hook\PostProcess\AdditionalPaymentPostProcess::class,
+    \Civi\Financeextras\Hook\PostProcess\FinancialBatchPostProcess::class,
+  ];
+
+  foreach ($hooks as $hook) {
+    if ($hook::shouldHandle($form, $formName)) {
+      (new $hook($form))->handle();
+    }
+  }
+}
+
+/**
+ * Implements hook_civicrm_buildForm().
+ */
+function financeextras_civicrm_buildForm($formName, &$form) {
+  $hooks = [
+    \Civi\Financeextras\Hook\BuildForm\ContributionView::class,
+    \Civi\Financeextras\Hook\BuildForm\MembershipCreate::class,
+    \Civi\Financeextras\Hook\BuildForm\ParticipantCreate::class,
+    \Civi\Financeextras\Hook\BuildForm\ContributionCreate::class,
+    \Civi\Financeextras\Hook\BuildForm\FinancialBatch::class,
+    \Civi\Financeextras\Hook\BuildForm\BatchTransaction::class,
+    \Civi\Financeextras\Hook\BuildForm\FinancialBatchSearch::class,
+    \Civi\Financeextras\Hook\BuildForm\FinancialAccount::class,
+  ];
+
+  foreach ($hooks as $hook) {
+    if ($hook::shouldHandle($form, $formName)) {
+      (new $hook($form))->handle();
+    }
+  }
+}
+
+/**
+ * Implements hook_civicrm_alterMailParams().
+ */
+function financeextras_civicrm_alterMailParams(&$params, $context) {
+  $hooks = [
+    AlterContributionReceipt::class,
+    \Civi\Financeextras\Hook\AlterMailParams\InvoiceTemplate::class,
+  ];
+
+  foreach ($hooks as $hook) {
+    if ($hook::shouldHandle($params, $context)) {
+      (new $hook($params, $context))->handle();
+    }
+  }
+}
+
+/**
+ * Implements hook_civicrm_alterMailContent().
+ */
+function financeextras_civicrm_alterMailContent(&$content) {
+  if (($content['workflow_name'] ?? NULL) === 'contribution_offline_receipt') {
+    $content['html'] = str_replace('$formValues.total_amount', '$contribution.total_amount', $content['html']);
+  }
+}
+
+/**
+ * Implements hook_civicrm_navigationMenu().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_navigationMenu/
+ */
+function financeextras_civicrm_navigationMenu(&$menu) {
+  $companyMenuItem = [
+    'name' => 'financeextras_company',
+    'label' => ts('Companies (For Multi-company accounting)'),
+    'url' => 'civicrm/admin/financeextras/company',
+    'permission' => 'administer CiviCRM',
+    'separator' => 2,
+  ];
+
+  _membershipextras_civix_insert_navigation_menu($menu, 'Administer/CiviContribute', $companyMenuItem);
+}
+
+/**
+ * Implements hook_civicrm_alterContent().
+ */
+function financeextras_civicrm_alterContent(&$content, $context, $tplName, &$object) {
+  if ($tplName == 'CRM/Financial/Page/BatchTransaction.tpl') {
+    $hook = new \Civi\Financeextras\Hook\AlterContent\BatchTransaction($content);
+    $hook->run();
+  }
+}
+
+/**
+ * Implements hook_civicrm_selectWhereClause().
+ */
+function financeextras_civicrm_selectWhereClause($entity, &$clauses) {
+  $ownerOrganisationToFilterIds = CRM_Utils_Request::retrieve('financeextras_owner_org_id', 'CommaSeparatedIntegers');
+  if ($entity == 'Batch' && !empty($ownerOrganisationToFilterIds)) {
+    $hook = new \Civi\Financeextras\Hook\SelectWhereClause\BatchList($clauses);
+    $hook->filterBasedOnOwnerOrganisations($ownerOrganisationToFilterIds);
+  }
 }
 
 /**
