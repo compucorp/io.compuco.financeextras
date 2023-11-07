@@ -122,9 +122,14 @@ function financeextras_civicrm_pageRun($page) {
  * Implements hook_civicrm_links().
  */
 function financeextras_civicrm_links($op, $objectName, $objectId, &$links, &$mask, &$values) {
-  if (CRM_Financeextras_Hook_Links_Contribution::shouldHandle($op, $objectName)) {
-    $contributionHook = new CRM_Financeextras_Hook_Links_Contribution($objectId, $links);
-    $contributionHook->alterLinks();
+  $hooks = [
+    \Civi\Financeextras\Hook\Links\Contribution::class,
+  ];
+
+  foreach ($hooks as $hook) {
+    if ($hook::shouldHandle($op, $objectName)) {
+      (new $hook($op, $objectId, $objectName, $links))->handle();
+    }
   }
 }
 
@@ -234,6 +239,7 @@ function financeextras_civicrm_buildForm($formName, &$form) {
     \Civi\Financeextras\Hook\BuildForm\BatchTransaction::class,
     \Civi\Financeextras\Hook\BuildForm\FinancialBatchSearch::class,
     \Civi\Financeextras\Hook\BuildForm\FinancialAccount::class,
+    \Civi\Financeextras\Hook\BuildForm\AdditionalPaymentButton::class,
   ];
 
   foreach ($hooks as $hook) {
@@ -303,37 +309,5 @@ function financeextras_civicrm_selectWhereClause($entity, &$clauses) {
   if ($entity == 'Batch' && !empty($ownerOrganisationToFilterIds)) {
     $hook = new \Civi\Financeextras\Hook\SelectWhereClause\BatchList($clauses);
     $hook->filterBasedOnOwnerOrganisations($ownerOrganisationToFilterIds);
-  }
-}
-
-/**
- * Implements hook_civicrm_links().
- */
-function financeextras_civicrm_links($op, $objectName, $objectId, &$links, &$mask, &$values) {
-  if (is_null($objectId)) {
-    return;
-  }
-
-  $hooks = [
-    new \Civi\Financeextras\Hook\Links\Contribution($op, $objectId, $objectName, $links),
-  ];
-
-  foreach ($hooks as $hook) {
-    $hook->run();
-  }
-}
-
-/**
- * Implements hook_civicrm_buildForm().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_buildForm
- */
-function financeextras_civicrm_buildForm($formName, &$form) {
-  $hooks = [
-    new CRM_Financeextras_Hook_BuildForm__AdditionalPaymentButton($form, $formName),
-  ];
-
-  foreach ($hooks as $hook) {
-    $hook->buildForm();
   }
 }

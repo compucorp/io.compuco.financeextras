@@ -1,15 +1,16 @@
 <?php
 
+use Civi\Financeextras\Hook\BuildForm\AdditionalPaymentButton;
 use Civi\Financeextras\Test\Fabricator\ContactFabricator;
 use Civi\Financeextras\Test\Fabricator\ContributionFabricator;
 use Civi\Financeextras\Test\Fabricator\PaymentProcessorFabricator;
 
 /**
- * Class CRM_Financeextras_Hook_BuildForm_AdditionalPaymentButtonTest
+ * Class AdditionalPaymentButtonTest
  *
  * @group headless
  */
-class CRM_Financeextras_Hook_BuildForm_AdditionalPaymentButtonTest extends BaseHeadlessTest {
+class AdditionalPaymentButtonTest extends BaseHeadlessTest {
 
   private $additionalPaymentForm;
 
@@ -39,8 +40,10 @@ class CRM_Financeextras_Hook_BuildForm_AdditionalPaymentButtonTest extends BaseH
     $contribution = ContributionFabricator::fabricate($contributionParams);
     $this->additionalPaymentForm->setVar('_id', $contribution['id']);
 
-    $additionalBuildFormHook = new CRM_Financeextras_Hook_BuildForm__AdditionalPaymentButton($this->additionalPaymentForm, 'CRM_Contribute_Form_AdditionalPayment');
-    $additionalBuildFormHook->buildForm();
+    if (AdditionalPaymentButton::shouldHandle($this->additionalPaymentForm, 'CRM_Contribute_Form_AdditionalPayment')) {
+      $additionalBuildFormHook = new AdditionalPaymentButton($this->additionalPaymentForm);
+      $additionalBuildFormHook->handle();
+    }
 
     $html = CRM_Core_Region::instance('form-bottom')->render('');
     $this->assertTrue((boolean) $html);
@@ -61,8 +64,10 @@ class CRM_Financeextras_Hook_BuildForm_AdditionalPaymentButtonTest extends BaseH
     $contribution = ContributionFabricator::fabricate($contributionParams);
     $this->additionalPaymentForm->setVar('_id', $contribution['id']);
 
-    $additionalBuildFormHook = new CRM_Financeextras_Hook_BuildForm__AdditionalPaymentButton($this->additionalPaymentForm, 'CRM_Contribute_Form_AdditionalPayment');
-    $additionalBuildFormHook->buildForm();
+    if (AdditionalPaymentButton::shouldHandle($this->additionalPaymentForm, 'CRM_Contribute_Form_AdditionalPayment')) {
+      $additionalBuildFormHook = new AdditionalPaymentButton($this->additionalPaymentForm);
+      $additionalBuildFormHook->handle();
+    }
 
     $html = CRM_Core_Region::instance('form-bottom')->render('');
     $this->assertFalse((boolean) $html);
