@@ -22,7 +22,7 @@ class ExchangeRateFieldManager extends AbstractManager {
    */
   public function remove(): void {
     // Prevent the linked currency_enabled option group
-    //fFrom being deleted with the field.
+    // from being deleted with the field.
     \Civi\Api4\CustomField::update(FALSE)
       ->addValue('option_group_id', NULL)
       ->addWhere('name', '=', 'sales_tax_currency')
