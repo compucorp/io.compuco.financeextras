@@ -13,6 +13,20 @@
       <collapse_adv_display>0</collapse_adv_display>
       <is_reserved>1</is_reserved>
     </CustomGroup>
+    <CustomGroup>
+      <name>financeextras_currency_exchange_rates</name>
+      <title>Currency Exchange rates</title>
+      <extends>Contribution</extends>
+      <style>Inline</style>
+      <collapse_display>1</collapse_display>
+      <is_active>1</is_active>
+      <table_name>civicrm_value_financeextras_currency_exchange_rates</table_name>
+      <is_multiple>0</is_multiple>
+      <collapse_adv_display>1</collapse_adv_display>
+      <is_reserved>1</is_reserved>
+      <is_public>0</is_public>
+      <help_pre>Stores the sales tax currency conversion data for display on invoice</help_pre>
+    </CustomGroup>
   </CustomGroups>
   <CustomFields>
     <CustomField>
@@ -32,6 +46,61 @@
       <column_name>owner_organization</column_name>
       <in_selector>0</in_selector>
       <custom_group_name>financeextras_contribution_owner</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <name>sales_tax_currency</name>
+      <label>sales_tax_currency</label>
+      <data_type>String</data_type>
+      <html_type>Select</html_type>
+      <is_required>0</is_required>
+      <is_searchable>1</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>1</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>sales_tax_currency</column_name>
+      <in_selector>0</in_selector>
+      <option_group_name>currencies_enabled</option_group_name>
+      <custom_group_name>financeextras_currency_exchange_rates</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <name>rate_1_unit_tax_currency</name>
+      <label>Rate: 1 Unit Tax Currency</label>
+      <data_type>Float</data_type>
+      <html_type>Text</html_type>
+      <is_required>0</is_required>
+      <is_searchable>1</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>65</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>rate_1_unit_tax_currency</column_name>
+      <in_selector>0</in_selector>
+      <custom_group_name>financeextras_currency_exchange_rates</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <name>rate_1_unit_contribution_currency</name>
+      <label>Rate: 1 Unit Contribution Currency</label>
+      <data_type>Float</data_type>
+      <html_type>Text</html_type>
+      <is_required>0</is_required>
+      <is_searchable>1</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>66</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <note_columns>60</note_columns>
+      <note_rows>4</note_rows>
+      <column_name>rate_1_unit_contribution_currency</column_name>
+      <in_selector>0</in_selector>
+      <custom_group_name>financeextras_currency_exchange_rates</custom_group_name>
     </CustomField>
   </CustomFields>
 </CustomData>

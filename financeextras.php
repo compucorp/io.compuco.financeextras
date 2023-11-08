@@ -217,6 +217,7 @@ function financeextras_civicrm_postProcess($formName, $form) {
     \Civi\Financeextras\Hook\PostProcess\ContributionPostProcess::class,
     \Civi\Financeextras\Hook\PostProcess\AdditionalPaymentPostProcess::class,
     \Civi\Financeextras\Hook\PostProcess\FinancialBatchPostProcess::class,
+    \Civi\Financeextras\Hook\PostProcess\UpdateContributionExchangeRate::class,
   ];
 
   foreach ($hooks as $hook) {

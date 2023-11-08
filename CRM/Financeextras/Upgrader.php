@@ -1,12 +1,13 @@
 <?php
 
+use Civi\Financeextras\Setup\Configure\SetDefaultCompany;
 use Civi\Financeextras\Setup\Manage\CreditNoteStatusManager;
+use Civi\Financeextras\Setup\Manage\ExchangeRateFieldManager;
 use Civi\Financeextras\Setup\Manage\CreditNoteActivityTypeManager;
 use Civi\Financeextras\Setup\Manage\CreditNoteAllocationTypeManager;
 use Civi\Financeextras\Setup\Manage\CreditNoteInvoiceTemplateManager;
-use Civi\Financeextras\Setup\Manage\ContributionOwnerOrganizationManager;
-use Civi\Financeextras\Setup\Configure\SetDefaultCompany;
 use Civi\Financeextras\Setup\Manage\CreditNotePaymentInstrumentManager;
+use Civi\Financeextras\Setup\Manage\ContributionOwnerOrganizationManager;
 
 /**
  * Collection of upgrade steps.
@@ -43,6 +44,7 @@ class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
   public function uninstall() {
     $steps = [
       new CreditNoteStatusManager(),
+      new ExchangeRateFieldManager(),
       new CreditNoteActivityTypeManager(),
       new CreditNoteAllocationTypeManager(),
       new CreditNoteInvoiceTemplateManager(),
@@ -61,6 +63,7 @@ class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
   public function enable() {
     $steps = [
       new CreditNoteStatusManager(),
+      new ExchangeRateFieldManager(),
       new CreditNoteActivityTypeManager(),
       new CreditNoteAllocationTypeManager(),
       new CreditNoteInvoiceTemplateManager(),
@@ -79,6 +82,7 @@ class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
   public function disable() {
     $steps = [
       new CreditNoteStatusManager(),
+      new ExchangeRateFieldManager(),
       new CreditNoteActivityTypeManager(),
       new CreditNoteAllocationTypeManager(),
       new CreditNoteInvoiceTemplateManager(),
@@ -112,18 +116,6 @@ class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
     foreach ($configurationSteps as $configurationStep) {
       $configurationStep->apply();
     }
-
-    return TRUE;
-  }
-
-  /**
-   *
-   * This upgrade creates financeextras_exchange_rate table
-   *
-   */
-  public function upgrade_1001() {
-    $this->ctx->log->info('Applying update 1001');
-    $this->executeSqlFile('sql/upgrade_1001.sql');
 
     return TRUE;
   }
