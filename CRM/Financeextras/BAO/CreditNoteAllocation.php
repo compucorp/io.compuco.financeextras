@@ -109,9 +109,11 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
       $entityTrxn->find();
 
       while ($entityTrxn->fetch()) {
-        $trxn = new \CRM_Financial_DAO_FinancialTrxn();
-        $trxn->id = $entityTrxn->financial_trxn_id;
-        $trxn->delete();
+        if (!empty($entityTrxn->financial_trxn_id)) {
+          $trxn = new \CRM_Financial_DAO_FinancialTrxn();
+          $trxn->id = $entityTrxn->financial_trxn_id;
+          $trxn->delete();
+        }
       }
       $entityTrxn->delete();
 
