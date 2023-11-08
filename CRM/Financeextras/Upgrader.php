@@ -106,6 +106,8 @@ class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
       new CreditNoteAllocationTypeManager(),
       new CreditNoteInvoiceTemplateManager(),
       new ContributionOwnerOrganizationManager(),
+      new CreditNotePaymentInstrumentManager(),
+      new AccountsReceivablePaymentMethod(),
     ];
     foreach ($manageSteps as $manageStep) {
       $manageStep->create();
