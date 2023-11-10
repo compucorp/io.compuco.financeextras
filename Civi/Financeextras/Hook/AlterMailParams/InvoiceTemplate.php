@@ -38,20 +38,22 @@ class InvoiceTemplate {
       ->addSelect(
         'financeextras_currency_exchange_rates.rate_1_unit_tax_currency',
         'financeextras_currency_exchange_rates.rate_1_unit_contribution_currency',
-        'financeextras_currency_exchange_rates.sales_tax_currency'
+        'financeextras_currency_exchange_rates.sales_tax_currency',
+        'financeextras_currency_exchange_rates.vat_text'
       )->setLimit(1)
       ->addWhere('id', '=', $this->contributionId)
       ->execute()
       ->first();
     if (empty($contribution['financeextras_currency_exchange_rates.rate_1_unit_tax_currency'])) {
-      return;
+      $showTaxConversionTable = FALSE;
     }
 
     $this->templateParams['tplParams'] = array_merge($this->templateParams['tplParams'], [
-      'showTaxConversionTable' => TRUE,
-      'rate_1_unit_tax_currency' => $contribution['financeextras_currency_exchange_rates.rate_1_unit_tax_currency'],
-      'rate_1_unit_contribution_currency' => $contribution['financeextras_currency_exchange_rates.rate_1_unit_contribution_currency'],
-      'sales_tax_currency' => $contribution['financeextras_currency_exchange_rates.sales_tax_currency'],
+      'showTaxConversionTable' => $showTaxConversionTable,
+      'rate_1_unit_tax_currency' => $contribution['financeextras_currency_exchange_rates.rate_1_unit_tax_currency'] ?? "",
+      'rate_1_unit_contribution_currency' => $contribution['financeextras_currency_exchange_rates.rate_1_unit_contribution_currency'] ?? "",
+      'sales_tax_currency' => $contribution['financeextras_currency_exchange_rates.sales_tax_currency'] ?? "",
+      'rate_vat_text' => $contribution['financeextras_currency_exchange_rates.vat_text'] ?? "",
     ]);
   }
 
