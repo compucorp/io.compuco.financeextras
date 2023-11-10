@@ -34,7 +34,7 @@ class UpdateContributionExchangeRate {
     $exchangeRate = \Civi\Api4\ExchangeRate::get(FALSE)
       ->addOrderBy('exchange_date', 'ASC')
       ->addWhere('base_currency', '=', $salesTaxCurrency)
-      ->addWhere('exchange_date', '<=', $contribution['receive_date'])
+      ->addWhere('exchange_date', '<', $contribution['receive_date'])
       ->addWhere('conversion_currency', '=', $contribution['currency'])
       ->setLimit(1)
       ->execute()
