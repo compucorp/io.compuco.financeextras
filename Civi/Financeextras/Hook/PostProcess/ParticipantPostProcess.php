@@ -74,6 +74,7 @@ class ParticipantPostProcess {
       'participant_id' => $this->form->_id,
       'source' => $this->getSource(),
       'contribution_status_id' => OptionValueUtils::getValueForOptionValue('contribution_status', 'Pending'),
+      'payment_instrument_id' => $values['payment_instrument_id'],
     ];
 
     if (!empty($values['tax_amount'])) {

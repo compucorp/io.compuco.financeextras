@@ -9,8 +9,8 @@ CRM.$(function ($) {
 
   /**
    * The event fees block for paid event is fetched via AJAX after the page has loaded.
-   * 
-   * Therefore, we need to ensure that the AJAX fetch is completed 
+   *
+   * Therefore, we need to ensure that the AJAX fetch is completed
    * before consolidating the payment fields and setting up event listeners.
    */
   function observeEventFeeIsDisplayed() {
@@ -60,16 +60,20 @@ CRM.$(function ($) {
   }
 
   function togglePaymentBlock() {
+    const accountsReceivablePaymentMethod = CRM.vars.financeextras.accounts_receivable_payment_method;
+    CRM.$("#payment_instrument_id").val(accountsReceivablePaymentMethod).change();
+
     if ($('input#record_contribution').is(':checked')) {
       $('input:radio[name=fe_ticket_type][value=paid_ticket]').click();
     }else {
       $('#payment_information').hide();
     }
-  
+
     $('input#record_contribution').on('input', () => {
       if ($('input#record_contribution').is(':checked')) {
         $('#billing-payment-block').show();
       }else {
+        CRM.$("#payment_instrument_id").val(accountsReceivablePaymentMethod).change();
         $('#billing-payment-block').hide();
       }
     })
@@ -86,7 +90,7 @@ CRM.$(function ($) {
 
     //if no free ticket is selected, uncheck record payment and hide the record payment field
     toggleBlock();
-    $('input:radio[name=fe_ticket_type][value=paid_ticket]:checked').on('change', 
+    $('input:radio[name=fe_ticket_type][value=paid_ticket]:checked').on('change',
       () => $('input#record_contribution').prop("checked", true).trigger('click')
     );
 

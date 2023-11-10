@@ -21,10 +21,17 @@ CRM.$(function ($) {
   }
 
   function togglePaymentBlock() {
+    const accountsReceivablePaymentMethod = CRM.vars.financeextras.accounts_receivable_payment_method;
+
     $('input[name=fe_record_payment_check]').prop("checked", true).trigger('change')
+    CRM.$("#payment_instrument_id").val(accountsReceivablePaymentMethod).change();
 
     $('input[name=fe_record_payment_check]').on('change', () => {
       const recordPayment = $('input[name=fe_record_payment_check]').is(':checked')
+      if (!recordPayment) {
+        CRM.$("#payment_instrument_id").val(accountsReceivablePaymentMethod).change();
+      }
+
       $('tr.record_payment-block_row').toggle(recordPayment)
     });
   }
@@ -61,7 +68,7 @@ CRM.$(function ($) {
       ))
     )
 
-    waitForElement($, 'input[name=contribution_type_toggle]', 
+    waitForElement($, 'input[name=contribution_type_toggle]',
       () => {
         $('tr.crm-membership-form-block-receive_date').before($('tr.crm-membership-form-block-financial_type_id'));
         $('tr.crm-contribution-form-block-financeextras_record_payment_amount').after(
@@ -101,10 +108,10 @@ CRM.$(function ($) {
 
   /**
    * Triggers callback when element attribute changes.
-   * 
-   * @param {object} $ 
-   * @param {string} elementPath 
-   * @param {object} callBack 
+   *
+   * @param {object} $
+   * @param {string} elementPath
+   * @param {object} callBack
    */
   function waitForElement($, elementPath, callBack) {
     (new MutationObserver(function() {
@@ -116,14 +123,14 @@ CRM.$(function ($) {
 
   /**
    * Observes change in property value for an element.
-   * 
-   * This method is used to listen for change in input fields 
+   *
+   * This method is used to listen for change in input fields
    * that doesn't emit a change event when their value changes.
-   * 
-   * @param {string} elementPath 
-   * @param {string} property 
-   * @param {function} callback 
-   * @param {number} delay 
+   *
+   * @param {string} elementPath
+   * @param {string} property
+   * @param {function} callback
+   * @param {number} delay
    */
   function observeElement(elementPath, property, callback, delay = 0) {
     const element = document.querySelector(elementPath)
