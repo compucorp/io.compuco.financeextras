@@ -6,7 +6,7 @@ use CRM_Financeextras_CustomGroup_ContributionOwnerOrganisation as ContributionO
 
 /**
  * Provides separate invoicing template and tokens for each
- * company (legal entity).
+ * company (legal entity) and adds tax conversion table data.
  */
 class InvoiceTemplate {
 
@@ -22,6 +22,8 @@ class InvoiceTemplate {
   }
 
   public function handle() {
+    $this->addTaxConversionTable();
+
     $this->contributionOwnerCompany = ContributionOwnerOrganisation::getOwnerOrganisationCompany($this->contributionId);
     if (empty($this->contributionOwnerCompany)) {
       return;
@@ -29,6 +31,30 @@ class InvoiceTemplate {
 
     $this->useContributionOwnerOrganisationInvoiceTemplate();
     $this->replaceDomainTokensWithOwnerOrganisationTokens();
+  }
+
+  private function addTaxConversionTable() {
+    $contribution = \Civi\Api4\Contribution::get(FALSE)
+      ->addSelect(
+        'financeextras_currency_exchange_rates.rate_1_unit_tax_currency',
+        'financeextras_currency_exchange_rates.rate_1_unit_contribution_currency',
+        'financeextras_currency_exchange_rates.sales_tax_currency',
+        'financeextras_currency_exchange_rates.vat_text'
+      )->setLimit(1)
+      ->addWhere('id', '=', $this->contributionId)
+      ->execute()
+      ->first();
+    if (empty($contribution['financeextras_currency_exchange_rates.rate_1_unit_tax_currency'])) {
+      $showTaxConversionTable = FALSE;
+    }
+
+    $this->templateParams['tplParams'] = array_merge($this->templateParams['tplParams'], [
+      'showTaxConversionTable' => $showTaxConversionTable,
+      'rate_1_unit_tax_currency' => $contribution['financeextras_currency_exchange_rates.rate_1_unit_tax_currency'] ?? "",
+      'rate_1_unit_contribution_currency' => $contribution['financeextras_currency_exchange_rates.rate_1_unit_contribution_currency'] ?? "",
+      'sales_tax_currency' => $contribution['financeextras_currency_exchange_rates.sales_tax_currency'] ?? "",
+      'rate_vat_text' => $contribution['financeextras_currency_exchange_rates.vat_text'] ?? "",
+    ]);
   }
 
   /**

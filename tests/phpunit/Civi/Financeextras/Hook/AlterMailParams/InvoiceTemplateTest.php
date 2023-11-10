@@ -77,6 +77,11 @@ class InvoiceTemplateTest extends BaseHeadlessTest {
     $alterInvoiceParams = new \Civi\Financeextras\Hook\AlterMailParams\InvoiceTemplate($templateParams, '');
     $alterInvoiceParams->handle();
     unset($templateParams['tplParams']['id']);
+    //Remove other keys added by the hook
+    $remove = ['showTaxConversionTable', 'rate_1_unit_tax_currency',
+      'rate_1_unit_contribution_currency', 'sales_tax_currency', 'rate_vat_text',
+    ];
+    $templateParams['tplParams'] = array_diff_key($templateParams['tplParams'], array_flip($remove));
 
     $expectedParams = [
       'domain_organization' => 'testorg1',

@@ -21,6 +21,7 @@ function financeextras_civicrm_config(&$config) {
   Civi::dispatcher()->addListener('civi.api.respond', ['Civi\Financeextras\APIWrapper\Contribution', 'respond'], -101);
   Civi::dispatcher()->addListener('fe.contribution.received_payment', ['\Civi\Financeextras\Event\Listener\ContributionPaymentUpdatedListener', 'handle']);
   Civi::dispatcher()->addListener('civi.api.prepare', ['Civi\Financeextras\APIWrapper\BatchListPage', 'preApiCall']);
+  Civi::dispatcher()->addListener('civi.token.list', 'financeextras_register_tokens');
 }
 
 /**
@@ -273,6 +274,18 @@ function financeextras_civicrm_alterMailContent(&$content) {
   if (($content['workflow_name'] ?? NULL) === 'contribution_offline_receipt') {
     $content['html'] = str_replace('$formValues.total_amount', '$contribution.total_amount', $content['html']);
   }
+
+  if (($content['workflow_name'] ?? NULL) === 'contribution_invoice_receipt') {
+    $path = E::path('/templates/CRM/Financeextras/MessageTemplate/SalesTaxConversionRateTable.tpl');
+    $content['html'] = str_replace('{contribution.tax_exchange_rate_table}', file_get_contents($path), $content['html']);
+  }
+}
+
+/**
+ * Add financeextras tokens
+ */
+function financeextras_register_tokens(\Civi\Token\Event\TokenRegisterEvent $e) {
+  $e->entity('contribution')->register('tax_exchange_rate_table', ts('Tax exchange rate table'));
 }
 
 /**
