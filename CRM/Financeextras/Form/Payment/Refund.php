@@ -310,6 +310,8 @@ class CRM_Financeextras_Form_Payment_Refund extends CRM_Core_Form {
       'trxn_id' => $this->refundStatus['refund_id'],
       'payment_instrument_id' => $this->paymentProcessor['payment_instrument_id'],
       'check_number' => $entity['financial_trxn_id.check_number'] ?? NULL,
+      'payment_processor_id' => $this->paymentProcessor['id'] ?? NULL,
+      'payment_processor_name' => $this->paymentProcessor['name'] ?? NULL,
     ];
 
     civicrm_api3('Payment', 'create', $paymentParams);
