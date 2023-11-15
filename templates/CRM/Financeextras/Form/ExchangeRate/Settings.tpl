@@ -10,7 +10,7 @@
         <div class="col-sm-2 control-label">
           {$form.$elementName.label}
           {if in_array($elementName, $help)} 
-            {help id="$elementName" file="CRM/Financeextras/Form/ExchangeRateSettings.hlp"}
+            {help id="$elementName" file="CRM/Financeextras/Form/ExchangeRate/Settings.hlp"}
           {/if}
         </div>
         <div class="col-sm-7 col-md-5">

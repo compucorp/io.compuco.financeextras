@@ -5,13 +5,13 @@ use CRM_Financeextras_ExtensionUtil as E;
 /**
  * Exchange Rate Settings form controller
  */
-class CRM_Financeextras_Form_ExchangeRateSettings extends CRM_Core_Form {
+class CRM_Financeextras_Form_ExchangeRate_Settings extends CRM_Core_Form {
 
   /**
    * @inheritdoc
    */
   public function buildQuickForm() {
-    CRM_Utils_System::setTitle(ts('Exchange Rate Settings'));
+    CRM_Utils_System::setTitle(ts('Currency Exchange Settings'));
 
     $this->add(
       'checkbox',
