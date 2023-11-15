@@ -1,6 +1,7 @@
 <?php
 
 require_once 'financeextras.civix.php';
+require_once 'Civi/Financeextras/APIWrapper/AllocatedPaymentsReport.php';
 // phpcs:disable
 use CRM_Financeextras_ExtensionUtil as E;
 // phpcs:enable
@@ -12,6 +13,12 @@ use CRM_Financeextras_ExtensionUtil as E;
  */
 function financeextras_civicrm_config(&$config) {
   _financeextras_civix_civicrm_config($config);
+
+  Civi::dispatcher()->addListener(
+    'civi.api.respond',
+    ['Civi\Financeextras\APIWrapper\AllocatedPaymentsReport', 'respond'],
+    -100
+  );
 }
 
 /**

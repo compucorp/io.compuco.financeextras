@@ -6,4 +6,9 @@
     <title>Record a credit card refund</title>
     <access_arguments>edit contributions</access_arguments>
   </item>
+  <item>
+    <path>civicrm/allocated-payments</path>
+    <page_callback>CRM_Financeextras_Page_AllocatedPaymentsAngular</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>
