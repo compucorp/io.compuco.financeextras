@@ -215,6 +215,7 @@ function financeextras_civicrm_validateForm($formName, &$fields, &$files, &$form
 function financeextras_civicrm_postProcess($formName, $form) {
   $hooks = [
     \Civi\Financeextras\Hook\PostProcess\ParticipantPostProcess::class,
+    \Civi\Financeextras\Hook\PostProcess\LocalizationPostProcess::class,
     \Civi\Financeextras\Hook\PostProcess\ContributionPostProcess::class,
     \Civi\Financeextras\Hook\PostProcess\AdditionalPaymentPostProcess::class,
     \Civi\Financeextras\Hook\PostProcess\FinancialBatchPostProcess::class,

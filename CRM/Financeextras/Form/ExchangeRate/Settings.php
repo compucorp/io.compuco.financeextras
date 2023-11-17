@@ -19,7 +19,7 @@ class CRM_Financeextras_Form_ExchangeRate_Settings extends CRM_Core_Form {
       ts('Display currency conversion for Tax on invoices')
     );
 
-    $this->addCurrency('sales_tax_currency', ts('Sales Tax Currency'), FALSE);
+    $this->addCurrency('sales_tax_currency', ts('Sales Tax Currency'));
 
     $this->addButtons([
       [
