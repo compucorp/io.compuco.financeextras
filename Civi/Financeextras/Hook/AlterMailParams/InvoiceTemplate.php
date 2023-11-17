@@ -34,6 +34,7 @@ class InvoiceTemplate {
   }
 
   private function addTaxConversionTable() {
+    $showTaxConversionTable = TRUE;
     $contribution = \Civi\Api4\Contribution::get(FALSE)
       ->addSelect(
         'financeextras_currency_exchange_rates.rate_1_unit_tax_currency',
