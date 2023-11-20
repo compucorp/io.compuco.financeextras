@@ -15,7 +15,7 @@ class LocalizationPostProcess {
   }
 
   public function updateSalexTaxCurrencyField() {
-    \Civi\Api4\CustomField::update()
+    \Civi\Api4\CustomField::update(FALSE)
       ->addValue('option_group_id.name', 'currencies_enabled')
       ->addWhere('name', '=', 'sales_tax_currency')
       ->execute();

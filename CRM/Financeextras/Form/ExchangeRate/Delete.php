@@ -41,7 +41,7 @@ class CRM_Financeextras_Form_ExchangeRate_Delete extends CRM_Core_Form {
 
   public function postProcess() {
     if (!empty($this->id)) {
-      \Civi\Api4\ExchangeRate::delete()
+      \Civi\Api4\ExchangeRate::delete(FALSE)
         ->addWhere('id', '=', $this->id)
         ->execute();
       CRM_Core_Session::setStatus(E::ts('Exchange Rate Value deleted successfully.'), ts('Item deleted'), 'success');
