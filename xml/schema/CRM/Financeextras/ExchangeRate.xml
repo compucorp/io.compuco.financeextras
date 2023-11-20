@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Financeextras</base>
+  <class>ExchangeRate</class>
+  <name>financeextras_exchange_rate</name>
+  <comment>Exchange Rate Entity</comment>
+  <log>true</log>
+
+  <paths>
+    <update>civicrm/exchange-rate/add?reset=1&amp;id=[id]</update>
+    <delete>civicrm/exchange-rate/delete?reset=1&amp;id=[id]</delete>
+  </paths>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique ExchangeRate ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>exchange_date</name>
+    <type>date</type>
+    <comment>Exchange rate date</comment>
+    <html>
+      <type>Select Date</type>
+    </html>
+  </field>
+
+  <field>
+    <name>base_currency</name>
+    <title>Base Currency</title>
+    <type>varchar</type>
+    <length>3</length>
+    <default>NULL</default>
+    <headerPattern>/cur(rency)?/i</headerPattern>
+    <dataPattern>/^[A-Z]{3}$/</dataPattern>
+    <comment>3 character string, value from config setting or input via user.</comment>
+    <pseudoconstant>
+      <table>civicrm_currency</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>full_name</labelColumn>
+      <nameColumn>name</nameColumn>
+      <abbrColumn>symbol</abbrColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+
+  <field>
+    <name>conversion_currency</name>
+    <title>Conversion Currency</title>
+    <type>varchar</type>
+    <length>3</length>
+    <default>NULL</default>
+    <headerPattern>/cur(rency)?/i</headerPattern>
+    <dataPattern>/^[A-Z]{3}$/</dataPattern>
+    <comment>3 character string, value from config setting or input via user.</comment>
+    <pseudoconstant>
+      <table>civicrm_currency</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>full_name</labelColumn>
+      <nameColumn>name</nameColumn>
+      <abbrColumn>symbol</abbrColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+
+  <field>
+    <name>base_to_conversion_rate</name>
+    <type>decimal</type>
+    <required>false</required>
+    <comment>The number of the converted currency to the base currency.</comment>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+
+  <field>
+    <name>conversion_to_base_rate</name>
+    <type>decimal</type>
+    <required>false</required>
+    <comment>The number of the Base currency to the converted currency.</comment>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+
+</table>

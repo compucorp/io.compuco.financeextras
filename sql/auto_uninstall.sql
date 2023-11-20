@@ -10,5 +10,6 @@ DROP TABLE IF EXISTS `financeextras_credit_note_allocation`;
 DROP TABLE IF EXISTS `financeextras_credit_note`;
 DROP TABLE IF EXISTS `financeextras_company`;
 DROP TABLE IF EXISTS `financeextras_batch_owner_org`;
+DROP TABLE IF EXISTS `financeextras_exchange_rate`;
 
 SET FOREIGN_KEY_CHECKS=1;

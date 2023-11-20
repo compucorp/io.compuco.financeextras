@@ -1,0 +1,6 @@
+{htxt id="base_to_conversion_rate"}
+  {ts}This field denotes the number of the converted currency to the base currency. For example: Base currency is GBP and Conversion Currency is EUR then it would be the number of EUR to the £.{/ts}
+{/htxt}
+{htxt id="conversion_to_base_rate"}
+  {ts}This field denotes the  number of the Base currency to the converted currency. For example: Base currency is GBP and Conversion Currency is EUR then it would be the number of £ to the EUR.{/ts}
+{/htxt}

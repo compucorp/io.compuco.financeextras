@@ -21,6 +21,7 @@ function financeextras_civicrm_config(&$config) {
   Civi::dispatcher()->addListener('civi.api.respond', ['Civi\Financeextras\APIWrapper\Contribution', 'respond'], -101);
   Civi::dispatcher()->addListener('fe.contribution.received_payment', ['\Civi\Financeextras\Event\Listener\ContributionPaymentUpdatedListener', 'handle']);
   Civi::dispatcher()->addListener('civi.api.prepare', ['Civi\Financeextras\APIWrapper\BatchListPage', 'preApiCall']);
+  Civi::dispatcher()->addListener('civi.token.list', 'financeextras_register_tokens');
 }
 
 /**
@@ -214,9 +215,11 @@ function financeextras_civicrm_validateForm($formName, &$fields, &$files, &$form
 function financeextras_civicrm_postProcess($formName, $form) {
   $hooks = [
     \Civi\Financeextras\Hook\PostProcess\ParticipantPostProcess::class,
+    \Civi\Financeextras\Hook\PostProcess\LocalizationPostProcess::class,
     \Civi\Financeextras\Hook\PostProcess\ContributionPostProcess::class,
     \Civi\Financeextras\Hook\PostProcess\AdditionalPaymentPostProcess::class,
     \Civi\Financeextras\Hook\PostProcess\FinancialBatchPostProcess::class,
+    \Civi\Financeextras\Hook\PostProcess\UpdateContributionExchangeRate::class,
   ];
 
   foreach ($hooks as $hook) {
@@ -272,6 +275,18 @@ function financeextras_civicrm_alterMailContent(&$content) {
   if (($content['workflow_name'] ?? NULL) === 'contribution_offline_receipt') {
     $content['html'] = str_replace('$formValues.total_amount', '$contribution.total_amount', $content['html']);
   }
+
+  if (($content['workflow_name'] ?? NULL) === 'contribution_invoice_receipt') {
+    $path = E::path('/templates/CRM/Financeextras/MessageTemplate/SalesTaxConversionRateTable.tpl');
+    $content['html'] = str_replace('{contribution.tax_exchange_rate_table}', file_get_contents($path), $content['html']);
+  }
+}
+
+/**
+ * Add financeextras tokens
+ */
+function financeextras_register_tokens(\Civi\Token\Event\TokenRegisterEvent $e) {
+  $e->entity('contribution')->register('tax_exchange_rate_table', ts('Tax exchange rate table'));
 }
 
 /**
@@ -288,7 +303,26 @@ function financeextras_civicrm_navigationMenu(&$menu) {
     'separator' => 2,
   ];
 
-  _membershipextras_civix_insert_navigation_menu($menu, 'Administer/CiviContribute', $companyMenuItem);
+  _financeextras_civix_insert_navigation_menu($menu, 'Administer/CiviContribute', $companyMenuItem);
+
+  _financeextras_civix_insert_navigation_menu($menu, 'Administer/CiviContribute', [
+    'label' => E::ts('Currency Exchange Settings'),
+    'name' => 'financeextras_exchangerate_settings',
+    'url' => 'civicrm/admin/setting/exchange-rate',
+    'permission' => 'administer CiviCRM',
+    'operator' => 'OR',
+    'separator' => 0,
+  ]);
+
+  _financeextras_civix_insert_navigation_menu($menu, 'Administer/CiviContribute', [
+    'label' => E::ts('Exchange Rates'),
+    'name' => 'financeextras_exchangerate_settings',
+    'url' => 'civicrm/exchange-rate',
+    'permission' => 'administer CiviCRM',
+    'operator' => 'OR',
+    'separator' => 0,
+  ]);
+  _financeextras_civix_navigationMenu($menu);
 }
 
 /**
