@@ -42,6 +42,9 @@ class ParticipantCreate {
     ];
     $this->form->setDefaults(array_merge($this->form->_defaultValues, $defaults));
 
+    $accountsReceivablePaymentMethodId = array_search('accounts_receivable', \CRM_Contribute_BAO_Contribution::buildOptions('payment_instrument_id', 'validate'));
+    \Civi::resources()->addVars('financeextras', ['accounts_receivable_payment_method' => $accountsReceivablePaymentMethodId]);
+
     \Civi::resources()->add([
       'scriptFile' => [E::LONG_NAME, 'js/modifyParticipantForm.js'],
       'region' => 'page-header',

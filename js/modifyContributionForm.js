@@ -19,7 +19,7 @@ const totalChanged = new CustomEvent("totalChanged", {});
       recordPaymentAmount.value = Number($('#total_amount').val()).toFixed(2);
       recordPaymentAmount.dispatchEvent(totalChanged)
     });
-  
+
     $('#price_set_id').on('change', function() {
       recordPaymentAmount.value = Number($('#line-total').data('raw-total')).toFixed(2);
       recordPaymentAmount.dispatchEvent(totalChanged)
@@ -50,7 +50,7 @@ const totalChanged = new CustomEvent("totalChanged", {});
 
       $('.record_payment-block #currency-symbol').text(currencySymbol)
     };
-  
+
     setSymbol();
     $('select[name=currency]').on('change', function() {
       setSymbol();
@@ -59,10 +59,12 @@ const totalChanged = new CustomEvent("totalChanged", {});
 
   function toggleRecordPaymentBlock() {
     const recordPaymentCheck = document.querySelector("input[name=fe_record_payment_check]");
+    const accountsReceivablePaymentMethod = CRM.vars.financeextras.accounts_receivable_payment_method;
     const toggle = (checked)  => {
       if (checked) {
         $('.record_payment-block').show();
       } else {
+        CRM.$("#payment_instrument_id").val(accountsReceivablePaymentMethod).change();
         $('.record_payment-block').hide();
       }
     }
@@ -99,5 +101,12 @@ const totalChanged = new CustomEvent("totalChanged", {});
     $('tr#email-receipt label').text('Send Email Confirmation')
     const email = $('tr#email-receipt #email-address')
     $('tr#email-receipt .description').text('Automatically email a confirmation of this transaction to ').append(email).append('?')
+    
+    if (!$('tr#email-receipt').length) {
+      $('tr.crm-contribution-form-block-is_email_receipt label').text('Send Email Confirmation')
+      let text = $('tr.crm-contribution-form-block-is_email_receipt .description').text()
+      text = text.replace('Automatically email a receipt for this payment to', 'Automatically email a confirmation of this transaction to')
+      $('tr.crm-contribution-form-block-is_email_receipt .description').text(text)
+    }
   }
 });
