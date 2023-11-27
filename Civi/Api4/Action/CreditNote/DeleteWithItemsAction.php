@@ -40,7 +40,7 @@ class DeleteWithItemsAction extends DAODeleteAction {
    *  The credit note unique identifier.
    */
   private function deleteAccountingEntries($creditNoteId): void {
-    $creditNoteLines = CreditNoteLine::get()
+    $creditNoteLines = CreditNoteLine::get(FALSE)
       ->addWhere('credit_note_id', '=', $creditNoteId)
       ->execute();
 

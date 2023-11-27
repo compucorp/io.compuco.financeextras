@@ -19,7 +19,7 @@ class OptionValueUtils {
    * @return string
    */
   public static function getValueForOptionValue($optionGroupName, $optionValueName) {
-    return OptionValue::get()
+    return OptionValue::get(FALSE)
       ->addWhere('option_group_id:name', '=', $optionGroupName)
       ->addWhere('name', '=', $optionValueName)
       ->addSelect('value')

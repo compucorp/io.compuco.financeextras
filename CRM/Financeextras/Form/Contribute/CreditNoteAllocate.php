@@ -138,7 +138,7 @@ class CRM_Financeextras_Form_Contribute_CreditNoteAllocate extends CRM_Core_Form
   }
 
   private function getContributions() {
-    $contributions = Contribution::get()
+    $contributions = Contribution::get(FALSE)
       ->addWhere('contact_id', '=', $this->creditNote['contact_id'])
       ->addWhere('contribution_status_id:name', 'IN', ['Pending', 'Partially paid'])
       ->addWhere('currency', '=', $this->creditNote['currency'])
@@ -163,7 +163,7 @@ class CRM_Financeextras_Form_Contribute_CreditNoteAllocate extends CRM_Core_Form
    *   Array of credit note fields and values.
    */
   private function getCreditNote() {
-    return CreditNote::get()
+    return CreditNote::get(FALSE)
       ->addWhere('id', '=', $this->crid)
       ->execute()
       ->first();
