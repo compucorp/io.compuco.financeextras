@@ -96,8 +96,9 @@ CRM.$(function ($) {
 
   function hidePaymentFieldsOnPaymentToggler() {
     $('li[data-selector="payment_plan"]').click( () => {
-      $('tr.record_payment-block_row').hide()
+      $('tr.record_payment-block_row').show()
       $('div.record_payment-block_check').hide();
+      $('tr.crm-contribution-form-block-financeextras_record_payment_amount').hide();
     });
 
     $('li[data-selector="contribution"]').click( () => {
