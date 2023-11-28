@@ -3,6 +3,7 @@
 namespace Civi\Financeextras\Hook\Links;
 
 use Civi\Financeextras\Hook\Links\Contribution\Refund;
+use Civi\Financeextras\Hook\Links\Contribution\CreditNote;
 
 /**
  * Contribution
@@ -45,25 +46,22 @@ class Contribution {
     $this->links = &$links;
   }
 
-  public function run(): void {
-    if (!$this->shouldRun()) {
-      return;
-    }
+  public function handle(): void {
+    $this->addLinks();
+  }
 
+  private function addLinks() {
     $links = [
       new Refund((int) $this->objectId, $this->links),
+      new CreditNote((int) $this->objectId, $this->links),
     ];
     foreach ($links as $link) {
       $link->add();
     }
   }
 
-  private function shouldRun(): bool {
-    if ($this->objectName !== 'Contribution' && $this->op !== 'contribution.selector.row') {
-      return FALSE;
-    }
-
-    return TRUE;
+  public static function shouldHandle($op, $objectName): bool {
+    return $op == 'contribution.selector.row' && $objectName == 'Contribution';
   }
 
 }

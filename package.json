@@ -1,0 +1,19 @@
+{
+  "name": "io.compuco.financeextras",
+  "version": "1.0.0",
+  "description": "This extension provides CiviCRM financial improvement.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/compucorp/io.compuco.financeextras"
+  },
+  "author": "Compuco <hello@compuco.io>",
+  "license": "GNU Affero Public License 3.0",
+  "bugs": {
+    "url": "https://github.com/compucorp/io.compuco.financeextras/issues"
+  },
+  "homepage": "https://github.com/compucorp/io.compuco.financeextras#readme",
+  "devDependencies": {
+    "eslint": "^8.40.0"
+  }
+}

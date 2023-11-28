@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Financeextras</base>
+  <class>CreditNoteAllocation</class>
+  <name>financeextras_credit_note_allocation</name>
+  <comment>Stores amounts of credit that have been allocated or “used” from a credit note.</comment>
+  <log>true</log>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique CreditNoteAllocation ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+   <field>
+    <name>credit_note_id</name>
+    <type>int unsigned</type>
+    <comment>FK to CreditNote</comment>
+    <html>
+      <type>EntityRef</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>credit_note_id</name>
+    <table>financeextras_credit_note</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>contribution_id</name>
+    <type>int unsigned</type>
+    <comment>FK to Contribution</comment>
+  </field>
+  <foreignKey>
+    <name>contribution_id</name>
+    <table>civicrm_contribution</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>type_id</name>
+    <type>int unsigned</type>
+    <comment>One of the values of the financeextras_credit_note_allocation_type option group</comment>
+    <required>false</required>
+    <default>NULL</default>
+    <pseudoconstant>
+      <optionGroupName>financeextras_credit_note_allocation_type</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <label>Type</label>
+      <type>Select</type>
+    </html>
+  </field>
+
+  <field>
+    <name>currency</name>
+    <title>Financial Currency</title>
+    <type>varchar</type>
+    <length>3</length>
+    <default>NULL</default>
+    <headerPattern>/cur(rency)?/i</headerPattern>
+    <dataPattern>/^[A-Z]{3}$/</dataPattern>
+    <comment>3 character string, value from config setting or input via user.</comment>
+    <pseudoconstant>
+      <table>civicrm_currency</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>full_name</labelColumn>
+      <nameColumn>name</nameColumn>
+      <abbrColumn>symbol</abbrColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  
+  <field>
+    <name>reference</name>
+    <title>Allocation Reference</title>
+      <type>text</type>
+    <html>
+      <label>Reference</label>
+      <type>TextArea</type>
+    </html>
+  </field>
+
+  <field>
+    <name>amount</name>
+    <type>decimal</type>
+    <required>false</required>
+    <comment>Ammount allocated</comment>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+
+  <field>
+    <name>date</name>
+    <type>date</type>
+    <comment>Allocation date</comment>
+    <html>
+      <type>Select Date</type>
+    </html>
+  </field>
+
+  <field>
+    <name>is_reversed</name>
+    <title>Reversed</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Allocation has been deleted by user</comment>
+    <required>true</required>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+
+</table>

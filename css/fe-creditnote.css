@@ -1,0 +1,46 @@
+/* Add any CSS rules for Angular module "crmFinanceextras" */
+#bootstrap-theme .creditnotes__ui-range .crm-form-date {
+  display: inline-block;
+  width: 134px;
+}
+.ui-dialog #bootstrap-theme.creditnote__container > div#creditnote__create.panel {
+  box-shadow: none;
+}
+.ui-dialog #bootstrap-theme.creditnote__container > div#creditnote__create.panel > .panel-body {
+  border: none;
+  padding: 0;
+}
+.ui-dialog #bootstrap-theme.creditnote__container > div#creditnote__create.panel .col-sm-7 {
+  width: 100%;
+}
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+}
+#creditnote__list afsearch-credit-notes ul.dropdown-menu > li.bg-disabled {
+  color: gray;
+  pointer-events: none;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+#bootstrap-theme.creditnote__container > div#creditnote__list.panel > .panel-body {
+  padding: 0px 0px 14px 0px;
+}
+#bootstrap-theme.creditnote__container > #creditnote__list afsearch-credit-notes crm-search-display-table table {
+  margin-bottom: 20px;
+}
+#creditnote__list afsearch-credit-notes crm-search-display-table ul.dropdown-menu {
+  right: 0;
+  left: auto;
+}
+#bootstrap-theme .table .table {
+  background-color: unset;
+}
+#creditnote__view #creditnote__detail>tbody> tr > td {
+  border-top: none;
+}
+#creditnote__list > div > crm-angular-js > afsearch-credit-notes > div > crm-search-display-table > div > table > tbody > tr ul.dropdown-menu li:nth-child(2) > a,
+#creditnote__list > div > crm-angular-js > afsearch-credit-notes > div > crm-search-display-table > div > table > tbody > tr ul.dropdown-menu li:nth-child(7) > a {
+  border-bottom: 1px solid #eee;
+}
+
