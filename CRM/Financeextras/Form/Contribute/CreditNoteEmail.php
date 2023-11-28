@@ -143,7 +143,7 @@ class CRM_Financeextras_Form_Contribute_CreditNoteEmail extends CRM_Core_Form {
 
     $creditNoteId = CRM_Utils_Request::retrieveValue('id', 'Positive');
 
-    $creditNote = CreditNote::get()
+    $creditNote = CreditNote::get(FALSE)
       ->addWhere('id', '=', $creditNoteId)
       ->execute()
       ->first();

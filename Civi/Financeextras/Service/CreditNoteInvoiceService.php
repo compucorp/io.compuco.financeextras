@@ -62,18 +62,18 @@ class CreditNoteInvoiceService {
    */
   private function getCreditNoteData(int $id): array {
     $invoiceAllocationType = $this->getAllocationType('invoice');
-    $creditNote = CreditNote::get()
+    $creditNote = CreditNote::get(FALSE)
       ->addWhere('id', '=', $id)
-      ->addChain('items', CreditNoteLine::get()
+      ->addChain('items', CreditNoteLine::get(FALSE)
         ->addWhere('credit_note_id', '=', '$id')
         ->addSelect('*', 'product_id.name', 'financial_type_id.name')
       )
-      ->addChain('allocations', CreditNoteAllocation::get()
+      ->addChain('allocations', CreditNoteAllocation::get(FALSE)
         ->addWhere('credit_note_id', '=', '$id')
         ->addSelect('*', 'type_id:label')
         ->addWhere('is_reversed', '=', FALSE)
       )
-      ->addChain('contact', Contact::get()
+      ->addChain('contact', Contact::get(FALSE)
         ->addWhere('id', '=', '$contact_id'), 0
       )
       ->execute()
@@ -85,7 +85,7 @@ class CreditNoteInvoiceService {
       $item['tax_rate'] = sprintf('%.2f', ($item['tax_amount'] * 100) / $item['line_total']);
     }
 
-    $contributions = empty($creditNote['allocations']) ? [] : Contribution::get()
+    $contributions = empty($creditNote['allocations']) ? [] : Contribution::get(FALSE)
       ->addWhere('id', 'IN', array_column($creditNote['allocations'], 'contribution_id'))
       ->execute()
       ->getArrayCopy();

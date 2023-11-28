@@ -22,7 +22,7 @@ function financeextras_set_currency_codes(&$options) {
  * Exposes credit note statuses to Angular.
  */
 function financeextras_set_credit_note_status(&$options) {
-  $optionValues = OptionValue::get()
+  $optionValues = OptionValue::get(FALSE)
     ->addSelect('id', 'value', 'name', 'label')
     ->addWhere('option_group_id:name', '=', 'financeextras_credit_note_status')
     ->execute();

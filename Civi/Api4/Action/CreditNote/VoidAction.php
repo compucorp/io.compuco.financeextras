@@ -77,10 +77,10 @@ class VoidAction extends AbstractAction {
    *   TRUE if credit note can be void, otherwise FALSE.
    */
   private function validateAction() {
-    $this->creditNote = CreditNote::get()
+    $this->creditNote = CreditNote::get(FALSE)
       ->addWhere('id', '=', $this->id)
       ->addWhere('status_id:name', '=', 'open')
-      ->addChain('items', CreditNoteLine::get()
+      ->addChain('items', CreditNoteLine::get(FALSE)
         ->addWhere('credit_note_id', '=', '$id')
       )
       ->execute()
@@ -90,7 +90,7 @@ class VoidAction extends AbstractAction {
       return FALSE;
     }
 
-    $creditNoteAllocations = CreditNoteAllocation::get()
+    $creditNoteAllocations = CreditNoteAllocation::get(FALSE)
       ->addWhere('credit_note_id', '=', $this->id)
       ->addWhere('is_reversed', '=', FALSE)
       ->execute()

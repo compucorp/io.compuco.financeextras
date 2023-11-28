@@ -98,7 +98,7 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
    *  The credit note unique identifier.
    */
   public static function deleteAccountingEntries($creditNoteId): void {
-    $allocations = CreditNoteAllocation::get()
+    $allocations = CreditNoteAllocation::get(FALSE)
       ->addWhere('credit_note_id', '=', $creditNoteId)
       ->execute();
 
@@ -122,7 +122,7 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
       }
     }
 
-    CreditNoteAllocation::delete()
+    CreditNoteAllocation::delete(FALSE)
       ->addWhere('credit_note_id', '=', $creditNoteId)
       ->execute();
   }

@@ -210,7 +210,7 @@ class CRM_Financeextras_Form_Contribute_CreditNoteRefund extends CRM_Contribute_
    *   Array of credit note fields and values.
    */
   private function getCreditNote() {
-    $creditNote = CreditNote::get()
+    $creditNote = CreditNote::get(FALSE)
       ->addWhere('id', '=', $this->crid)
       ->execute()
       ->first();
