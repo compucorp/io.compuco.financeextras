@@ -12,15 +12,21 @@ class SearchDisplayRun {
     $apiRequest = $event->getApiRequest();
     $result = $event->getResponse();
 
-    $isAfform = !empty($apiRequest['params']['afform']) && $apiRequest['params']['afform'] == 'afsearchCreditNotes';
+    $isAfform = !empty($apiRequest['params']['afform']);
+    $isCreditNoteAfform = $isAfform && $apiRequest['params']['afform'] == 'afsearchCreditNotes';
+    $isFinanceReportAfform = $isAfform && $apiRequest['params']['afform'] == 'afsearchAllocatedPaymentsReport';
 
     switch ($request) {
       case '4.searchdisplay.get':
         self::addCustomCreditNoteColumns($result);
         break;
 
-      case '4.searchdisplay.run' && $isAfform:
+      case '4.searchdisplay.run' && $isCreditNoteAfform:
         self::alterCreditNoteSearchDisplay($result);
+        break;
+
+      case '4.searchdisplay.run' && $isFinanceReportAfform:
+        self::alterFinanceReportDisplay($result);
         break;
     }
   }
@@ -122,6 +128,22 @@ class SearchDisplayRun {
       $allocatedTotal = $creditNote['allocated_manual_refund'] + $creditNote['allocated_online_refund'] + $creditNote['allocated_invoice'];
       if ($column['label'] == 'Allocated') {
         $column['val'] = \CRM_Utils_Money::format($allocatedTotal, $creditNote['currency']);
+      }
+    }
+  }
+
+  /**
+   * Alter finance report search display result.
+   *
+   * @param &$result
+   *    The API result object.
+   */
+  private static function alterFinanceReportDisplay(&$result) {
+    foreach ($result as &$display) {
+      foreach ($display['columns'] as &$column) {
+        if (in_array($column['label'], ['Net Amount', 'Tax Amount'])) {
+          $column['val'] = \CRM_Utils_Money::format(abs(trim($column['val']) ?: 0));
+        }
       }
     }
   }

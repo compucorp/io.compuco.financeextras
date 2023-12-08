@@ -1,0 +1,26 @@
+<div af-fieldset="">
+  <div class="row" style="margin-bottom: 1em;">
+    <div class="col-md-12">
+      <af-field name="FinancialItem_Contact_contact_id_01.id" defn="{label: 'Member Number'}" />
+    </div>
+  </div>
+  <div class="row" style="margin-bottom: 1em;">
+    <div class="col-md-12">
+      <af-field name="FinancialItem_Contact_contact_id_01.display_name" defn="{label: 'Contact Name'}" />
+    </div>
+  </div>
+  <div class="row" style="margin-bottom: 1em;">
+    <div class="col-md-12">
+      <af-field name="FinancialItem_EntityFinancialTrxn_FinancialTrxn_01.trxn_date" defn="{search_range: true, input_attrs: {time: false}}" />
+    </div>
+  </div>
+
+  <crm-search-display-table search-name="SOA_Finance_Report_Beta_v3" display-name="SOA_Finance_Report_Beta_v3_Table_1"></crm-search-display-table>
+</div>
+
+<style>
+  crm-search-display-table p.alert-info {
+    background-color: transparent;
+    border: none;
+  }
+</style>
