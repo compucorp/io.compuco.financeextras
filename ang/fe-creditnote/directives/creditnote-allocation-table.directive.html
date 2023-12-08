@@ -27,18 +27,18 @@
        <th ng-if="isUpdate"></th>
      </tr>
      <tr ng-repeat="allocation in allocations track by $index">
-      <td>{{ allocation['type_id:label'] }}</td>
-      <td>
-        <a 
+      <td class="allocation-cell">{{ allocation['type_id:label'] }}</td>
+      <td class="allocation-cell">
+        <a
           ng-href="{{crmUrl('civicrm/contact/view/contribution', {reset:1, id:allocation.contribution_id, action:'view'})}}">
             {{ (allocation['contribution_id.invoice_number']) || allocation['contribution_id']  }}
         </a>
       </td>
-      <td>{{ formatDate(allocation['date'], 'dd-M-yy') }}</td>
-      <td>{{ allocation['reference'] }}</td>
-      <td>{{ allocation['paid_from'] }}</td>
-      <td>{{ formatMoney(allocation['amount'], currency, true) }}</td>
-      <td ng-if="isUpdate && allocation['type_id:label'] == 'Invoice'">
+      <td class="allocation-cell">{{ formatDate(allocation['date'], 'dd-M-yy') }}</td>
+      <td class="allocation-cell">{{ allocation['reference'] }}</td>
+      <td class="allocation-cell">{{ allocation['paid_from'] }}</td>
+      <td class="allocation-cell">{{ formatMoney(allocation['amount'], currency, true) }}</td>
+      <td class="allocation-cell" ng-if="isUpdate && allocation['type_id:label'] == 'Invoice'">
         <div class="btn-group btn-group-sm">
           <button
             type="button"
@@ -76,3 +76,9 @@
     </div>
   </div>
 </div>
+
+<style>
+  #creditnote__view .table>tbody>tr>td.allocation-cell {
+    padding-left: 20px;
+  }
+</style>
