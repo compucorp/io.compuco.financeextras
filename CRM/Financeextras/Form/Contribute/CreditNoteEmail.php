@@ -54,7 +54,7 @@ class CRM_Financeextras_Form_Contribute_CreditNoteEmail extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   public function listTokens() {
-    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['contactId']]);
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['contactId'], 'creditNoteId' => $this->creditNoteId]);
     $tokens = $tokenProcessor->listTokens();
 
     return $tokens;

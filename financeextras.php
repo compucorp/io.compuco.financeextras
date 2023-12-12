@@ -22,6 +22,7 @@ function financeextras_civicrm_config(&$config) {
   Civi::dispatcher()->addListener('fe.contribution.received_payment', ['\Civi\Financeextras\Event\Listener\ContributionPaymentUpdatedListener', 'handle']);
   Civi::dispatcher()->addListener('civi.api.prepare', ['Civi\Financeextras\APIWrapper\BatchListPage', 'preApiCall']);
   Civi::dispatcher()->addListener('civi.token.list', 'financeextras_register_tokens');
+  Civi::dispatcher()->addSubscriber(new Civi\Financeextras\Token\CreditNote());
 }
 
 /**
