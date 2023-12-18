@@ -16,6 +16,7 @@ class ContributionCreate {
   }
 
   public function handle() {
+    $this->updateTotalAmountFromLineTotal();
     $this->validatePaymentForm();
     $this->validateConsistentIncomeAccountOwners();
   }
@@ -24,6 +25,28 @@ class ContributionCreate {
     if (!empty($this->fields['fe_record_payment_check']) && empty($this->fields['fe_record_payment_amount'])) {
       $this->errors['fe_record_payment_amount'] = ts('Payment amount is required');
     }
+  }
+
+  /**
+   * Computes credit card contribution total from line items.
+   *
+   * Credit card contribution is unaware of the line items
+   * so it cant compute total value from them, `
+   * to avoid having empty total when line item is used,
+   * we manually set the contribution total to the line item total
+   * before form submission.
+   */
+  public function updateTotalAmountFromLineTotal() {
+    if ($this->form->_mode !== 'live') {
+      return;
+    }
+
+    $data = &$this->form->controller->container();
+    if (empty($this->fields['total_amount']) && !empty($this->fields['fe_record_payment_amount'])) {
+      $data = &$this->form->controller->container();
+      $data['values']['Contribution']['total_amount'] = $this->fields['fe_record_payment_amount'];
+    }
+
   }
 
   /**

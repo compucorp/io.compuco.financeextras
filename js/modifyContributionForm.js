@@ -11,6 +11,10 @@ const totalChanged = new CustomEvent("totalChanged", {});
       toggleRecordPaymentBlock();
       placePaymentFieldsTogether();
     }
+
+    if (mode == 'live') {
+      groupLivePaymentFields();
+    }
   })();
 
   function setTotalAmount() {
@@ -108,5 +112,11 @@ const totalChanged = new CustomEvent("totalChanged", {});
       text = text.replace('Automatically email a receipt for this payment to', 'Automatically email a confirmation of this transaction to')
       $('tr.crm-contribution-form-block-is_email_receipt .description').text(text)
     }
+  }
+
+  function groupLivePaymentFields() {
+    $('tr.crm-contribution-form-block-contribution_type_id').after(
+      $('tr.crm-contribution-form-block-financeextras_record_payment_amount').hide()
+    )
   }
 });
