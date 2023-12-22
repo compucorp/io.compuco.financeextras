@@ -165,6 +165,8 @@ function financeextras_civicrm_post($op, $objectName, $objectId, &$objectRef) {
     if (empty($objectRef->contact_id)) {
       $objectRef->contact_id = $contribution['contact_id'];
     }
+
+    (new \Civi\Financeextras\Hook\Post\UpdateContributionExchangeRate($objectId))->run();
   }
 }
 
@@ -219,7 +221,6 @@ function financeextras_civicrm_postProcess($formName, $form) {
     \Civi\Financeextras\Hook\PostProcess\ContributionPostProcess::class,
     \Civi\Financeextras\Hook\PostProcess\AdditionalPaymentPostProcess::class,
     \Civi\Financeextras\Hook\PostProcess\FinancialBatchPostProcess::class,
-    \Civi\Financeextras\Hook\PostProcess\UpdateContributionExchangeRate::class,
   ];
 
   foreach ($hooks as $hook) {
