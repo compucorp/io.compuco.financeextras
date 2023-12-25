@@ -54,8 +54,8 @@ class CRM_Financeextras_Form_Contribute_CreditNoteRefund extends CRM_Contribute_
         ],
       ],
       'readonly' => TRUE,
-      'class' => 'form-control',
-    ], TRUE);
+      'class' => 'form-control disabled',
+    ], TRUE, ['disabled' => TRUE]);
 
     $this->add(
       'select',
@@ -94,7 +94,11 @@ class CRM_Financeextras_Form_Contribute_CreditNoteRefund extends CRM_Contribute_
       ts('Payment Method'),
       ['' => ts('- select -')] + CRM_Contribute_BAO_Contribution::buildOptions('payment_instrument_id', 'create'),
       TRUE,
-      ['onChange' => "return showHideByValue('payment_instrument_id', '{$checkPaymentID}','checkNumber','table-row','select',false);", 'class' => 'form-control']
+      [
+        'onChange' => "return showHideByValue('payment_instrument_id', '{$checkPaymentID}','checkNumber','table-row','select',false);",
+        'class' => 'form-control',
+        'style' => '-webkit-appearance: auto',
+      ]
     );
 
     $this->add(
