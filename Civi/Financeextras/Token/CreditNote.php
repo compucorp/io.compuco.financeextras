@@ -58,7 +58,7 @@ class CreditNote extends AbstractTokenSubscriber {
     try {
       if (is_array($creditNoteId) && count($creditNoteId) === 1) {
         $creditNoteId = $creditNoteId[0];
-        $creditNote = CRM_Financeextras_BAO_CreditNote::findById($creditNoteId);
+        $creditNote = \CRM_Financeextras_BAO_CreditNote::findById($creditNoteId);
 
         if (empty($creditNote)) {
           return $resolvedTokens;
@@ -67,8 +67,8 @@ class CreditNote extends AbstractTokenSubscriber {
         $resolvedTokens = array_merge($this->geTokens(), (array) $creditNote);
       }
     }
-    catch (Exception $e) {
-      CRM_Core_Session::setStatus('Error resolving credit note tokens');
+    catch (\Exception $e) {
+      \CRM_Core_Session::setStatus('Error resolving credit note tokens');
     }
 
     return $resolvedTokens;
@@ -87,8 +87,8 @@ class CreditNote extends AbstractTokenSubscriber {
    *   Any data that was returned by the prefetch().
    */
   public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL): void {
-    $value = CRM_Utils_Array::value($field, $prefetch);
-    $prefix = CRM_Utils_String::munge(self::TOKEN);
+    $value = \CRM_Utils_Array::value($field, $prefetch);
+    $prefix = \CRM_Utils_String::munge(self::TOKEN);
 
     if ($value) {
       $row->format('text/plain')->tokens($prefix, $field, $value);
