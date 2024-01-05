@@ -127,4 +127,14 @@ class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
     return TRUE;
   }
 
+  public function upgrade_10002() {
+    \Civi\Api4\OptionValue::update(FALSE)
+      ->addValue('filter', 1)
+      ->addWhere('option_group_id:name', '=', 'payment_instrument')
+      ->addWhere('name', 'IN', ['credit_note', 'accounts_receivable'])
+      ->execute();
+
+    return TRUE;
+  }
+
 }
