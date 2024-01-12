@@ -43,6 +43,10 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
       $allocation = self::create($data)->toArray();
 
       self::createAccountingEntries($allocation['id'], $data['credit_note_id'], $data['contribution_id'], $data['amount']);
+
+      if (!empty($allocation['contribution_id'])) {
+        \Civi::dispatcher()->dispatch(ContributionPaymentUpdatedEvent::NAME, new ContributionPaymentUpdatedEvent($allocation['contribution_id']));
+      }
     }
     catch (\Throwable $th) {
       $transaction->rollback();
