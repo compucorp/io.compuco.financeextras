@@ -16,27 +16,31 @@ class Civi_Api4_CreditNoteAllocation_AllocateActionTest extends BaseHeadlessTest
 
   use CreditNoteTrait;
 
+  const CONTRIBUTION_COMPLETED = 1;
+  const CONTRIBUTION_PENDING = 2;
+
   /**
    * Test credit note compute action returns expected fields.
+   *
+   * @dataProvider provideContributionStatus
    */
-  public function testCanAllocateCreditNoteToContribution() {
-    $amountAllocated = 100;
-    $contributionAmount = 200;
+  public function testCanAllocateCreditNoteToContribution($status, $contributionAmount, $amountAllocated, $paid) {
     $creditNote = $this->createCreditNote();
-    $contribution = $this->createContribution($creditNote['contact_id'], $contributionAmount);
+    $contribution = $this->createContribution($creditNote['contact_id'], $contributionAmount, $status);
     $allocation = $this->createAllocation($creditNote['id'], $contribution['id'], $amountAllocated, $creditNote['currency']);
 
     $this->assertNotEmpty($allocation);
-    $this->assertEquals(CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution['id'], TRUE), $contributionAmount - $amountAllocated);
+    $this->assertEquals(CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution['id'], TRUE), $paid);
   }
 
   /**
    * Tests that the expected accounting entries are created for the credit note allocation.
+   *
+   * @dataProvider provideContributionStatus
    */
-  public function testExpectedAccountingEntriesAreCreatedForCrediNoteAllocation() {
-    $amountAllocated = 100;
+  public function testExpectedAccountingEntriesAreCreatedForCrediNoteAllocation($status, $contributionAmount, $amountAllocated, $paid) {
     $creditNote = $this->createCreditNote();
-    $contribution = $this->createContribution($creditNote['contact_id'], 200);
+    $contribution = $this->createContribution($creditNote['contact_id'], $contributionAmount, $status);
     $this->createAllocation($creditNote['id'], $contribution['id'], $amountAllocated, $creditNote['currency']);
 
     $expectedAccount = FinancialAccountUtils::getFinancialTypeAccount(
@@ -70,11 +74,12 @@ class Civi_Api4_CreditNoteAllocation_AllocateActionTest extends BaseHeadlessTest
 
   /**
    * Tests that the expected entity financial transactions are created as part of the accounting entries.
+   *
+   * @dataProvider provideContributionStatus
    */
-  public function testExpectedEntityFinancialAccountingEntriesAreCreated() {
-    $amountAllocated = 100;
+  public function testExpectedEntityFinancialAccountingEntriesAreCreated($status, $contributionAmount, $amountAllocated, $paid) {
     $creditNote = $this->createCreditNote();
-    $contribution = $this->createContribution($creditNote['contact_id'], 200);
+    $contribution = $this->createContribution($creditNote['contact_id'], $contributionAmount, $status);
     $allocation = $this->createAllocation($creditNote['id'], $contribution['id'], $amountAllocated, $creditNote['currency']);
     $lineItems = LineItem::get()->addWhere('contribution_id', '=', $contribution['id'])->execute();
 
@@ -90,8 +95,11 @@ class Civi_Api4_CreditNoteAllocation_AllocateActionTest extends BaseHeadlessTest
       ->addWhere('financial_trxn_id', '=', $entityFinancialTrxn['financial_trxn_id'])
       ->execute();
 
-    $this->assertNotEmpty($lineItemEntityFinancialTrxn);
-    $this->assertEquals($lineItems->count(), $lineItemEntityFinancialTrxn->count());
+    // completed contribution has no unpaid payment to allocate to line items
+    if ($status === self::CONTRIBUTION_PENDING) {
+      $this->assertNotEmpty($lineItemEntityFinancialTrxn);
+      $this->assertEquals($lineItems->count(), $lineItemEntityFinancialTrxn->count());
+    }
 
     $allocationEntityFinancialTrxn = \Civi\Api4\EntityFinancialTrxn::get(FALSE)
       ->addWhere('entity_id', '=', $allocation['id'])
@@ -111,7 +119,7 @@ class Civi_Api4_CreditNoteAllocation_AllocateActionTest extends BaseHeadlessTest
   public function testContributionStatusIsPartiallyPaidAfterPartCreditAllocation() {
     $contributionAmount = 200;
     $creditNote = $this->createCreditNote();
-    $contribution = $this->createContribution($creditNote['contact_id'], $contributionAmount);
+    $contribution = $this->createContribution($creditNote['contact_id'], $contributionAmount, self::CONTRIBUTION_PENDING);
     $this->createAllocation($creditNote['id'], $contribution['id'], $contributionAmount / 2, $creditNote['currency']);
 
     $contribution = \Civi\Api4\Contribution::get()
@@ -131,7 +139,7 @@ class Civi_Api4_CreditNoteAllocation_AllocateActionTest extends BaseHeadlessTest
   public function testContributionStatusIsCompletedAfterFullCreditAllocation() {
     $contributionAmount = 200;
     $creditNote = $this->createCreditNote();
-    $contribution = $this->createContribution($creditNote['contact_id'], $contributionAmount);
+    $contribution = $this->createContribution($creditNote['contact_id'], $contributionAmount, self::CONTRIBUTION_PENDING);
     $this->createAllocation($creditNote['id'], $contribution['id'], $contributionAmount / 2, $creditNote['currency']);
     $this->createAllocation($creditNote['id'], $contribution['id'], $contributionAmount / 2, $creditNote['currency']);
 
@@ -142,6 +150,27 @@ class Civi_Api4_CreditNoteAllocation_AllocateActionTest extends BaseHeadlessTest
       ->first();
 
     $this->assertEquals('Completed', $contribution['contribution_status_id:name']);
+  }
+
+  /**
+   * Tests that the completed contribution status is pending refund
+   *
+   * When the amount allocated to a contribution is overpaid.
+   */
+  public function testCompletedContributionStatusIsPendingRefund() {
+    $contributionAmount = 200;
+    $creditNote = $this->createCreditNote();
+    $contribution = $this->createContribution($creditNote['contact_id'], $contributionAmount, self::CONTRIBUTION_COMPLETED);
+    $this->createAllocation($creditNote['id'], $contribution['id'], $contributionAmount / 2, $creditNote['currency']);
+    $this->createAllocation($creditNote['id'], $contribution['id'], $contributionAmount / 2, $creditNote['currency']);
+
+    $contribution = \Civi\Api4\Contribution::get()
+      ->addSelect('contribution_status_id:name')
+      ->addWhere('id', '=', $contribution['id'])
+      ->execute()
+      ->first();
+
+    $this->assertEquals('Pending refund', $contribution['contribution_status_id:name']);
   }
 
   /**
@@ -191,11 +220,11 @@ class Civi_Api4_CreditNoteAllocation_AllocateActionTest extends BaseHeadlessTest
       ->first();
   }
 
-  private function createContribution($contactId, $contributionAmount) {
+  private function createContribution($contactId, $contributionAmount, $status = 2) {
     return \Civi\Api4\Contribution::create()
       ->addValue('contact_id', $contactId)
       ->addValue('total_amount', $contributionAmount)
-      ->addValue('contribution_status_id', 2)
+      ->addValue('contribution_status_id', $status)
       ->addValue('financial_type_id', 1)
       ->execute()
       ->first();
@@ -217,6 +246,13 @@ class Civi_Api4_CreditNoteAllocation_AllocateActionTest extends BaseHeadlessTest
       ->setAmount($amount)
       ->setCurrency($currency)
       ->execute();
+  }
+
+  public function provideContributionStatus() {
+    return [
+      'Pending Contribution' => ['status' => self::CONTRIBUTION_PENDING, 'contributionAmount' => 200, 'amountAllocated' => 100, 'paid' => 100],
+      'Completed Contribtion' => ['status' => self::CONTRIBUTION_COMPLETED, 'contributionAmount' => 200, 'amountAllocated' => 100, 'paid' => 300],
+    ];
   }
 
 }
