@@ -4,12 +4,13 @@ namespace Civi\Financeextras\Service;
 
 use CRM_Utils_Array;
 use CRM_Core_Config;
+use Civi\Api4\Setting;
 use Civi\Api4\Contact;
 use Civi\Api4\CreditNote;
 use Civi\Api4\Contribution;
 use Civi\Api4\CreditNoteLine;
 use Civi\Api4\CreditNoteAllocation;
-use Civi\Api4\Setting;
+use Civi\Financeextras\Utils\FinancialAccountUtils;
 use CRM_Financeextras_BAO_CreditNote as CreditNoteBAO;
 use Civi\Financeextras\WorkflowMessage\CreditNoteInvoice;
 
@@ -82,7 +83,12 @@ class CreditNoteInvoiceService {
     $creditNote['date'] = date('M d, Y', strtotime($creditNote['date']));
 
     foreach ($creditNote['items'] as &$item) {
-      $item['tax_rate'] = sprintf('%.2f', ($item['tax_amount'] * 100) / $item['line_total']);
+      $taxAccount = FinancialAccountUtils::getFinancialTypeAccount($item['financial_type_id'], 'Sales Tax Account is');
+      $item['tax_rate'] = sprintf('%.2f', \Civi\Api4\FinancialAccount::get(FALSE)
+        ->addSelect('tax_rate')
+        ->addWhere('id', '=', $taxAccount)
+        ->execute()
+        ->first()['tax_rate'] ?? 0);
     }
 
     $contributions = empty($creditNote['allocations']) ? [] : Contribution::get(FALSE)
