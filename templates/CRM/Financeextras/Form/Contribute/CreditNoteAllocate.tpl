@@ -7,7 +7,19 @@
           <table class="table">
             <tbody>
               <tr>
-                <th><p>{ts}Remaining credit available to allocate{/ts}</p></th><td><p>{$creditNote.remaining_credit|crmMoney:$creditNote.currency}</p></td>
+                <th><p>{ts}Remaining Credit Balance to Allocate{/ts}</p></th><td><p>{$creditNote.remaining_credit|crmMoney:$creditNote.currency}</p></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="row" style="margin: 2em 0em;">
+        <div class="col-md-10">
+          <table class="table">
+            <tbody>
+              <tr>
+                <th><p>{ts}Include Completed Contributions{/ts} <span style="margin-left: 1em;">{$form.incl_completed.html}</span></p></th>
               </tr>
             </tbody>
           </table>
@@ -15,7 +27,7 @@
       </div>
 
 
-      <div class="row">
+      <div class="row" style="margin: 2em 0em;">
         <div class="col-md-10">
           <table class="table">
             <thead>
@@ -49,3 +61,28 @@
   </div>
   </div>
 </div>
+
+<script type="text/javascript">
+  {literal}
+  CRM.$(function($) {
+    const url = new URLSearchParams(window.location.search);
+    if (parseInt(url.get('completed_contribution')) == 1) {
+      $('#incl_completed_1').prop('checked', true)
+    }
+    let isChecked = $('#incl_completed_1').is(':checked');
+
+    function reloadPage(completedValue) {
+      const url = new URLSearchParams(window.location.search);
+      url.set('completed_contribution', completedValue)
+      window.location.href = window.location.origin + window.location.pathname + '?' + url.toString();
+    }
+
+    $('#incl_completed_1').change(function() {
+      isChecked = $(this).is(':checked');
+
+      // Reload the page with the appropriate completed_contribution value
+      reloadPage(isChecked ? 1 : 0);
+    });
+  });
+  {/literal}
+</script>
