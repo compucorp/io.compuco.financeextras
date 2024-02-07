@@ -48,7 +48,7 @@ class PaymentProcessor {
       $refundProcessorIDs = [];
       foreach ($processors as $processor) {
         $processor = \Civi\Payment\System::singleton()->getById($processor['id']);
-        if ($processor->supportsRefund()) {
+        if ($processor !== NULL && $processor->supportsRefund()) {
           $refundProcessorIDs[] = $processor->getID();
         }
       }
