@@ -12,6 +12,7 @@ class BatchTransaction {
 
   public function run() {
     $this->enforceSearchFiltersInBatchScreen();
+    $this->useCustomFinancialTransactionList();
   }
 
   /**
@@ -30,6 +31,17 @@ class BatchTransaction {
    */
   private function enforceSearchFiltersInBatchScreen() {
     $this->content = str_replace('buildTransactionSelectorAssign( false )', 'buildTransactionSelectorAssign( true )', $this->content);
+  }
+
+  /**
+   * Updates the template to use our custom transctionlist fetch method.
+   *
+   * This method includes creditnote transactions in the batch trnsaction list table,
+   * and also hides the financial type column ('crm-type').
+   */
+  private function useCustomFinancialTransactionList() {
+    $this->content = str_replace('CRM_Financial_Page_AJAX&fnName=getFinancialTransactionsList', 'CRM_Financeextras_Page_AJAX&fnName=getFinancialTransactionsList', $this->content);
+    $this->content = str_replace("{sClass:'crm-type'}", "{sClass:'crm-type', 'bVisible': false}", $this->content);
   }
 
 }
