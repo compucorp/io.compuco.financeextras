@@ -22,6 +22,7 @@ function financeextras_civicrm_config(&$config) {
   Civi::dispatcher()->addListener('fe.contribution.received_payment', ['\Civi\Financeextras\Event\Listener\ContributionPaymentUpdatedListener', 'handle']);
   Civi::dispatcher()->addListener('civi.api.prepare', ['Civi\Financeextras\APIWrapper\BatchListPage', 'preApiCall']);
   Civi::dispatcher()->addListener('civi.token.list', 'financeextras_register_tokens');
+  Civi::dispatcher()->addSubscriber(new Civi\Financeextras\Token\CreditNote());
 }
 
 /**
@@ -245,6 +246,7 @@ function financeextras_civicrm_buildForm($formName, &$form) {
     \Civi\Financeextras\Hook\BuildForm\FinancialBatchSearch::class,
     \Civi\Financeextras\Hook\BuildForm\FinancialAccount::class,
     \Civi\Financeextras\Hook\BuildForm\AdditionalPaymentButton::class,
+    \Civi\Financeextras\Hook\BuildForm\RefundCreditNotePaymentInformation::class,
   ];
 
   foreach ($hooks as $hook) {
