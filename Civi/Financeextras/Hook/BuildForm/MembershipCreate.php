@@ -69,7 +69,7 @@ class MembershipCreate {
    * @return bool
    */
   public static function shouldHandle($form, $formName) {
-    return $formName === "CRM_Member_Form_Membership" && ($form->getAction() & \CRM_Core_Action::ADD);
+    return $formName === "CRM_Member_Form_Membership" && $form->_mode !== 'live' && ($form->getAction() & \CRM_Core_Action::ADD);
   }
 
 }
