@@ -95,11 +95,8 @@ class Civi_Api4_CreditNoteAllocation_AllocateActionTest extends BaseHeadlessTest
       ->addWhere('financial_trxn_id', '=', $entityFinancialTrxn['financial_trxn_id'])
       ->execute();
 
-    // completed contribution has no unpaid payment to allocate to line items
-    if ($status === self::CONTRIBUTION_PENDING) {
-      $this->assertNotEmpty($lineItemEntityFinancialTrxn);
-      $this->assertEquals($lineItems->count(), $lineItemEntityFinancialTrxn->count());
-    }
+    $this->assertNotEmpty($lineItemEntityFinancialTrxn);
+    $this->assertEquals($lineItems->count(), $lineItemEntityFinancialTrxn->count());
 
     $allocationEntityFinancialTrxn = \Civi\Api4\EntityFinancialTrxn::get(FALSE)
       ->addWhere('entity_id', '=', $allocation['id'])
