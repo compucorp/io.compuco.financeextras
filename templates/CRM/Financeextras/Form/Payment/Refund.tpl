@@ -54,6 +54,11 @@
     <td class="label">{$form.reason.label}</td>
     <td>{$form.reason.html}</td>
   </tr>
+
+  <tr class="crm-payment-refund-form-block-reason">
+    <td class="label">{$form.create_credit_note.html}</td>
+    <td>{$form.create_credit_note.label} {help id="create_credit_note" file="CRM/Financeextras/Form/Payment/Refund.hlp"}</td>
+  </tr>
 </table>
 <div class="crm-submit-buttons">
   {include file="CRM/common/formButtons.tpl" location="bottom"}
