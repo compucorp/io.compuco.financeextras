@@ -13,7 +13,7 @@ use Civi\Financeextras\Setup\Manage\AccountsReceivablePaymentMethod;
 /**
  * Collection of upgrade steps.
  */
-class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
+class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
 
   /**
    * Tasks to perform when the extension is installed.
