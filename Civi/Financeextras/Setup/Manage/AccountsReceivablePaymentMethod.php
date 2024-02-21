@@ -28,6 +28,7 @@ class AccountsReceivablePaymentMethod extends AbstractManager {
         'financial_account_id' => $accountsReceivableFinancialAccountId,
         'is_reserved' => 1,
         'is_active' => 1,
+        'filter' => 1,
       ]);
     }
   }

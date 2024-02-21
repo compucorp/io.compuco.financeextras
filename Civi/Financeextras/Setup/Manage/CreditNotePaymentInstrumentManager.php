@@ -17,6 +17,7 @@ class CreditNotePaymentInstrumentManager extends AbstractManager {
       'name' => "credit_note",
       'is_active' => TRUE,
       'is_reserved' => TRUE,
+      'filter' => 1,
       'financial_account_id' => $this->getFinancialAccount(),
     ];
     \CRM_Core_BAO_OptionValue::ensureOptionValueExists($paymentInstrument);
