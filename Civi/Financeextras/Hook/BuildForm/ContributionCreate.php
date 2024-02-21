@@ -29,6 +29,10 @@ class ContributionCreate {
    */
   private function preventUserFromSettingContributionStatus() {
     try {
+      if (!$this->form->elementExists(('contribution_status_id'))) {
+        return;
+      }
+
       $statusElement = $this->form->getElement('contribution_status_id');
       if (!$this->isEdit()) {
         // By default new contribution will have a pending status
@@ -134,7 +138,7 @@ class ContributionCreate {
    */
   public static function shouldHandle($form, $formName) {
     $addOrUpdate = ($form->getAction() & CRM_Core_Action::ADD) || ($form->getAction() & CRM_Core_Action::UPDATE);
-    return $formName === "CRM_Contribute_Form_Contribution" &&  $addOrUpdate;
+    return $formName === "CRM_Contribute_Form_Contribution" && $addOrUpdate;
   }
 
 }
