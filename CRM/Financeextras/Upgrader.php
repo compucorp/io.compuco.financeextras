@@ -13,7 +13,7 @@ use Civi\Financeextras\Setup\Manage\AccountsReceivablePaymentMethod;
 /**
  * Collection of upgrade steps.
  */
-class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
+class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
 
   /**
    * Tasks to perform when the extension is installed.
@@ -123,6 +123,16 @@ class CRM_Financeextras_Upgrader extends CRM_Financeextras_Upgrader_Base {
     foreach ($configurationSteps as $configurationStep) {
       $configurationStep->apply();
     }
+
+    return TRUE;
+  }
+
+  /**
+   * This upgrade updates creditnote line table
+   */
+  public function upgrade_1001() {
+    $this->ctx->log->info('Applying update 1001');
+    $this->executeSqlFile('sql/upgrade_1001.sql');
 
     return TRUE;
   }

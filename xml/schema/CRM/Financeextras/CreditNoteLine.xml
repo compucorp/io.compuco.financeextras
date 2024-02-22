@@ -70,7 +70,7 @@
 
   <field>
     <name>quantity</name>
-    <type>decimal</type>
+    <type>decimal(20, 4)</type>
     <comment>Quantity</comment>
     <html>
       <label>Quantity</label>
