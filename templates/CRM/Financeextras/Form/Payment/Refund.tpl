@@ -64,3 +64,13 @@
   {include file="CRM/common/formButtons.tpl" location="bottom"}
 </div>
 </div>
+
+<script type="text/javascript">
+  {literal}
+    CRM.$(function($) {
+      $("a[target='crm-popup']").on('crmPopupFormSuccess', function (e) {
+        CRM.refreshParent(e);
+      });
+    });
+  {/literal}
+</script>
