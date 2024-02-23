@@ -131,11 +131,11 @@
         const dueAmount = Math.max(contribution.total_amount - contribution.paid_amount, 0)
         const duePercent = (100 * dueAmount) /contribution.total_amount
         for (let i = 0; i < lineItems.length; i++) {
-          const qty = (duePercent == 100) ? lineItems[i].qty : 1
-          let unitPrice = (duePercent == 100) ?
-            lineItems[i].unit_price :
-            (duePercent/100) * (lineItems[i].unit_price * lineItems[i].qty);
-          unitPrice = Number(unitPrice.toFixed(2))
+          let qty = lineItems[i].qty * (duePercent/100)
+          console.log(qty, lineItems[i].qty, duePercent)
+          // ensure quantity doesn't exceed 4 decimals (note this is not rounding)
+          qty = Math.floor(qty * 10000) / 10000
+          let unitPrice = Number((lineItems[i].unit_price).toFixed(2))
           $scope.creditnotes.items[i] = {
             quantity: qty,
             unit_price: unitPrice,

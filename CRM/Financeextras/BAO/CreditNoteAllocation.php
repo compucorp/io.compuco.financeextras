@@ -4,6 +4,7 @@ use Civi\Api4\CreditNoteAllocation;
 use Civi\Financeextras\Utils\OptionValueUtils;
 use Civi\Financeextras\Utils\FinancialAccountUtils;
 use Civi\Financeextras\Event\ContributionPaymentUpdatedEvent;
+use Civi\Financeextras\Utils\ContributionUtils;
 
 class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_CreditNoteAllocation {
 
@@ -184,6 +185,10 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
       'payment_processor_id' => NULL,
       'payment_instrument_id' => OptionValueUtils::getValueForOptionValue('payment_instrument', 'credit_note'),
     ], $paymentParams);
+
+    if (self::isContributionStatus($params['contribution_id'], 'Completed')) {
+      $params['line_item'] = ContributionUtils::allocatePaymentToLineItem($params['total_amount'], $params['contribution_id']);
+    }
     $transaction = \CRM_Financial_BAO_Payment::create($params);
 
     // The Payment API typically uses the "Accounts Receivable" as the "from" account
@@ -273,6 +278,24 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
         )
       ->execute()
       ->first();
+  }
+
+  /**
+   * Checks if Contribution status has the specified status.
+   *
+   * @param int $contributionId
+   *  The contribution ID
+   * @param string $status
+   *  The status to check against the contribution
+   *
+   * @return bool
+   */
+  private static function isContributionStatus($contributionId, $status) {
+    return !empty(\Civi\Api4\Contribution::get(FALSE)
+      ->addWhere('id', '=', $contributionId)
+      ->addWhere('contribution_status_id:name', '=', $status)
+      ->execute()
+      ->first());
   }
 
 }
