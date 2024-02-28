@@ -302,3 +302,19 @@ function financeextras_civicrm_selectWhereClause($entity, &$clauses) {
     $hook->filterBasedOnOwnerOrganisations($ownerOrganisationToFilterIds);
   }
 }
+
+/**
+ * Implements hook_civicrm_batchQuery().
+ */
+function financeextras_civicrm_batchQuery(&$query) {
+  $hook = new \Civi\Financeextras\Hook\BatchExport\UpdateQuery($query);
+  $hook->addCreditNoteToQuery();
+}
+
+/**
+ * Implements hook_civicrm_batchItems().
+ */
+function financeextras_civicrm_batchItems(&$results, &$items) {
+  $hook = new \Civi\Financeextras\Hook\BatchExport\UpdateItems($results, $items);
+  $hook->addCreditNoteNumberAsInvoiceNumber();
+}
