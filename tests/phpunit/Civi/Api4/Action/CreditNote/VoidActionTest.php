@@ -3,8 +3,9 @@
 use Civi\Api4\CreditNote;
 use Civi\Financeextras\Utils\OptionValueUtils;
 use Civi\Financeextras\Test\Helper\CreditNoteTrait;
-use Civi\Financeextras\Setup\Manage\CreditNoteStatusManager;
 use Civi\Financeextras\Utils\FinancialAccountUtils;
+use Civi\Financeextras\Setup\Manage\CreditNoteStatusManager;
+use Civi\Financeextras\Setup\Manage\AccountsReceivablePaymentMethod;
 
 /**
  * CreditNote.VoidAction API Test Case.
@@ -102,7 +103,7 @@ class Civi_Api4_CreditNote_VoidActionTest extends BaseHeadlessTest {
       ->addWhere('total_amount', '=', $creditNote['total_credit'])
       ->addWhere('status_id:name', '=', 'Cancelled')
       ->addWhere('payment_processor_id', 'IS NULL')
-      ->addWhere('payment_instrument_id', '=', 1)
+      ->addWhere('payment_instrument_id:name', '=', AccountsReceivablePaymentMethod::NAME)
       ->addWhere('check_number', 'IS NULL')
       ->addWhere('currency', '=', $creditNote['currency'])
       ->addWhere('to_financial_account_id', '=', $expectedToAccount)

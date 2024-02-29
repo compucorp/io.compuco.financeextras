@@ -2,6 +2,7 @@
 
 use Civi\Financeextras\Utils\OptionValueUtils;
 use Civi\Financeextras\Utils\FinancialAccountUtils;
+use Civi\Financeextras\Setup\Manage\AccountsReceivablePaymentMethod;
 use CRM_Financeextras_BAO_CreditNoteAllocation as CreditNoteAllocationBAO;
 use Civi\Financeextras\Setup\Manage\CreditNoteStatusManager as CreditNoteStatus;
 
@@ -181,7 +182,7 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
       'is_payment' => $data['is_payment'] ?? 0,
       'status_id' => $statusId,
       'payment_processor_id' => NULL,
-      'payment_instrument_id' => $data['payment_instrument_id'] ?? 1,
+      'payment_instrument_id' => $data['payment_instrument_id'] ?? self::getAccountReceivableId(),
       'card_type_id' => $data['card_type_id'] ?? NULL,
       'check_number' => $data['check_number'] ?? NULL,
       'pan_truncation' => $data['pan_truncation'] ?? NULL,
@@ -191,6 +192,16 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
       'entity_id' => $data['id'],
     ];
     return \CRM_Core_BAO_FinancialTrxn::create($trxnParams)->toArray();
+  }
+
+  /**
+   * Returns the account receivable payment method ID
+   *
+   * @return int
+   *   Account receivable ID
+   */
+  private static function getAccountReceivableId() {
+    return OptionValueUtils::getValueForOptionValue('payment_instrument', AccountsReceivablePaymentMethod::NAME);
   }
 
   /**
