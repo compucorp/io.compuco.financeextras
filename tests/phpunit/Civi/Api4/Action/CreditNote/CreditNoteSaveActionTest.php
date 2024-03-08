@@ -1,9 +1,10 @@
 <?php
 
-use Civi\Api4\CreditNoteLine;
 use Civi\Api4\CreditNote;
+use Civi\Api4\CreditNoteLine;
 use Civi\Financeextras\Test\Helper\CreditNoteTrait;
 use CRM_Financeextras_BAO_CreditNote as CreditNoteBAO;
+use Civi\Financeextras\Setup\Manage\AccountsReceivablePaymentMethod;
 
 /**
  * CreditNote.CreditNoteSaveAction API Test Case.
@@ -160,7 +161,7 @@ class Civi_Api4_CreditNote_CreditNoteSaveActionTest extends BaseHeadlessTest {
       ->addWhere('total_amount', '=', $creditNote['total_credit'] * -1)
       ->addWhere('status_id:name', '=', 'Pending')
       ->addWhere('payment_processor_id', 'IS NULL')
-      ->addWhere('payment_instrument_id', '=', 1)
+      ->addWhere('payment_instrument_id:name', '=', AccountsReceivablePaymentMethod::NAME)
       ->addWhere('check_number', 'IS NULL')
       ->addWhere('currency', '=', $creditNote['currency'])
       ->addWhere('to_financial_account_id', '=', $expectedToAccount)
