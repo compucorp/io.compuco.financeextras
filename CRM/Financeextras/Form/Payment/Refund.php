@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\CreditNoteAllocation;
+use Civi\Financeextras\Utils\FinancialAccountUtils;
 use CRM_Finananceextras_ExtensionUtil as E;
 
 /**
@@ -192,7 +194,13 @@ class CRM_Financeextras_Form_Payment_Refund extends CRM_Core_Form {
         'attributes' => ['' => '- ' . ts('select reason') . ' -'] + $reasons,
         'extra' => ['class' => 'huge crm-select2'],
         'required' => TRUE,
+      ],
 
+      'create_credit_note' => [
+        'type' => 'checkbox',
+        'label' => 'Also automatically create a credit note for this amount and apply to this invoice',
+        'extra' => ['checked' => TRUE],
+        'required' => FALSE,
       ],
     ];
   }
@@ -296,6 +304,10 @@ class CRM_Financeextras_Form_Payment_Refund extends CRM_Core_Form {
     if ($this->refundStatus['refund_status'] == "Completed") {
       $this->createFinancialTrxnRefund($vals);
     }
+
+    if ($vals['create_credit_note'] ?? FALSE) {
+      $this->createCreditNote($vals);
+    }
   }
 
   /**
@@ -323,6 +335,82 @@ class CRM_Financeextras_Form_Payment_Refund extends CRM_Core_Form {
 
     civicrm_api3('Payment', 'create', $paymentParams);
     CRM_Core_Session::setStatus(ts('Refund has been requested successfully.'), ts('Success'), 'success');
+  }
+
+  /**
+   * Creates creditnote for refund
+   *
+   * @param array $vals
+   *  Submitted refund vallues
+   */
+  public function createCreditNote($vals) {
+    $contribution = \Civi\Api4\Contribution::get()
+      ->addSelect('*', 'financeextras_contribution_owner.owner_organization')
+      ->addWhere('id', '=', $this->contributionID)
+      ->addChain('line_item', \Civi\Api4\LineItem::get()
+        ->addWhere('contribution_id', '=', '$id')
+      )
+      ->execute()
+      ->first();
+
+    $status = \Civi\Api4\OptionValue::get()
+      ->addSelect('value')
+      ->addWhere('option_group_id:name', '=', 'financeextras_credit_note_status')
+      ->addWhere('name', '=', 'open')
+      ->setLimit(1)
+      ->execute()
+      ->first()['value'];
+
+    $creditNoteData = [
+      'contact_id' => $contribution['contact_id'],
+      'owner_organization' => $contribution['financeextras_contribution_owner.owner_organization'],
+      'currency' => $contribution['currency'],
+      'date' => date("Y-m-d"),
+      'status_id' => $status,
+      'items' => [],
+    ];
+
+    $duePercent = $vals['amount'] / $contribution['total_amount'];
+    foreach ($contribution['line_item'] as $lineItem) {
+      $item = [
+        'financial_type_id' => $lineItem['financial_type_id'],
+        'description' => $lineItem['label'],
+        'quantity' => $lineItem['qty'] * $duePercent,
+        'unit_price' => $lineItem['unit_price'],
+        'line_total' => 0,
+      ];
+      $taxAccount = FinancialAccountUtils::getFinancialTypeAccount($lineItem['financial_type_id'], 'Sales Tax Account is');
+      $item['tax_rate'] = \Civi\Api4\FinancialAccount::get(FALSE)
+        ->addSelect('tax_rate')
+        ->addWhere('id', '=', $taxAccount)
+        ->execute()
+        ->first()['tax_rate'] ?? 0;
+
+      $creditNoteData['items'][] = $item;
+    }
+
+    $creditNote = \Civi\Api4\CreditNote::save(FALSE)
+      ->addRecord($creditNoteData)
+      ->execute()
+      ->first();
+
+    $allocationType = \Civi\Api4\OptionValue::get(FALSE)
+      ->addSelect('value')
+      ->addWhere('option_group_id:name', '=', 'financeextras_credit_note_allocation_type')
+      ->addWhere('name', '=', 'invoice')
+      ->execute()
+      ->first()['value'];
+
+    CreditNoteAllocation::allocate(FALSE)
+      ->setContributionId($contribution['id'])
+      ->setCreditNoteId($creditNote['id'])
+      ->setReference('CREDIT CARD REFUND')
+      ->setTypeId($allocationType)
+      ->setAmount($creditNote['total_credit'])
+      ->setCurrency($contribution['currency'])
+      ->execute();
+
+    return TRUE;
   }
 
 }

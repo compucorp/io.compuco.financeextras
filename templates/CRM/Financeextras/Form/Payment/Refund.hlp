@@ -1,0 +1,3 @@
+{htxt id="create_credit_note"}
+  {ts}By checking the box the system will automatically create a credit note equal to the amount of the refund (applied pro-rata against each of the line items on the contribution) and apply the credit to this contribution, thus reducing the amount due to you. If you do not check the box the contact will continue to owe the original amount. You can always create a credit note manually if you do not enable this option.{/ts}
+{/htxt}
