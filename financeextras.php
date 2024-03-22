@@ -79,6 +79,7 @@ function financeextras_civicrm_pageRun($page) {
 function financeextras_civicrm_links($op, $objectName, $objectId, &$links, &$mask, &$values) {
   $hooks = [
     \Civi\Financeextras\Hook\Links\Contribution::class,
+    \Civi\Financeextras\Hook\Links\ContributionRecur::class,
   ];
 
   foreach ($hooks as $hook) {
