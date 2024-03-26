@@ -78,7 +78,7 @@ class ContributionCreate {
   }
 
   private function addCreditNoteCancelAction() {
-    if (!$this->form->_id) {
+    if (!$this->form->_id || $this->contributionHasStatus(['Cancelled', 'Refunded', 'Failed', 'Chargeback'])) {
       return;
     }
 
@@ -126,6 +126,25 @@ class ContributionCreate {
       \Civi::resources()->addVars('financeextras', ['contrib_currency' => $contribution['currency']]);
       \Civi::resources()->addVars('financeextras', ['contrib_total' => $total]);
     }
+  }
+
+  /**
+   * Checks contribution has any of the given statuses.
+   *
+   * @return bool
+   *   Whether the contribution has any of the given statuses.
+   *
+   * @throws \Civi\API\Exception
+   */
+  private function contributionHasStatus($statuses) {
+    $contribution = \Civi\Api4\Contribution::get(FALSE)
+      ->addWhere('id', '=', $this->form->_id)
+      ->addWhere('contribution_status_id:name', 'IN', $statuses)
+      ->setLimit(1)
+      ->execute()
+      ->first();
+
+    return !empty($contribution);
   }
 
   /**
