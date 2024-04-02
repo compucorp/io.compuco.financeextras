@@ -377,7 +377,7 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
       'currency' => $creditNote['currency'],
       'amount' => $data['total_credit'],
       'description' => 'Fee: ' . $trxn['id'],
-      'status_id' => OptionValueUtils::getValueForOptionValue('financial_item_status', 'Completed'),
+      'status_id' => OptionValueUtils::getValueForOptionValue('financial_item_status', 'Paid'),
       'financial_account_id' => $data['to_account_id'],
       'entity_table' => 'civicrm_financial_trxn',
       'entity_id' => $trxn['id'],

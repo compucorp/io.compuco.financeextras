@@ -186,6 +186,7 @@ class Civi_Api4_CreditNote_RefundActionTest extends BaseHeadlessTest {
     $financialItem = \Civi\Api4\FinancialItem::get(FALSE)
       ->addWhere('entity_id', '=', $refundFeeFinancialTrxn['id'])
       ->addWhere('entity_table', '=', 'civicrm_financial_trxn')
+      ->addWhere('status_id', '=', 1)
       ->execute()
       ->first();
     $this->assertNotEmpty($financialItem);
