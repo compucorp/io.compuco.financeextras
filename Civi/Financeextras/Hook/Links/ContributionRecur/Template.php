@@ -35,14 +35,19 @@ class Template {
    * @throws \Civi\API\Exception
    */
   private function contributionHasPaymentProcessor(array $processors): bool {
-    $contribution = \Civi\Api4\ContributionRecur::get(FALSE)
-      ->addWhere('id', '=', $this->contributionID)
-      ->addWhere('payment_processor_id:name', 'IN', $processors)
-      ->setLimit(1)
-      ->execute()
-      ->first();
+    try {
+      $contribution = \Civi\Api4\ContributionRecur::get(FALSE)
+        ->addWhere('id', '=', $this->contributionID)
+        ->addWhere('payment_processor_id:name', 'IN', $processors)
+        ->setLimit(1)
+        ->execute()
+        ->first();
 
-    return !empty($contribution);
+      return !empty($contribution);
+    }
+    catch (\Exception $e) {
+      return FALSE;
+    }
   }
 
   /**
