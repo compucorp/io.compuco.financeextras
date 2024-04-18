@@ -3,7 +3,7 @@
   <div class="panel panel-default creditnote__allocate-form-panel">
     <div class="panel-body">
       <div class="row" style="margin: 2em 0em;">
-        <div class="col-md-10">
+        <div class="col-md-12">
           <table class="table">
             <tbody>
               <tr>
@@ -15,7 +15,7 @@
       </div>
 
       <div class="row" style="margin: 2em 0em;">
-        <div class="col-md-10">
+        <div class="col-md-12">
           <table class="table">
             <tbody>
               <tr>
@@ -28,8 +28,8 @@
 
 
       <div class="row" style="margin: 2em 0em;">
-        <div class="col-md-10">
-          <table class="table">
+        <div class="col-md-12">
+          <table class="table allocations-list">
             <thead>
               <th>Contribution ID</th>
               <th>Invoice No</th>
@@ -83,6 +83,53 @@
       // Reload the page with the appropriate completed_contribution value
       reloadPage(isChecked ? 1 : 0);
     });
+
+    const dt = $('.allocations-list').dataTable({
+      dom: '<t><"main-wrapper"<"inner-wrapper"p><"inner-wrapper"l><"info-wrap"i>>',
+      language: {
+        lengthMenu: 'Page Size _MENU_'
+      }
+    });
+
+    $('.CRM_Financeextras_Form_Contribute_CreditNoteAllocate').on('submit', function(e) {
+      var form = this;
+
+      // Encode a set of form elements from all pages as an array of names and values
+      var params = dt.$('input,select,textarea').serializeArray();
+
+      // Iterate over all form elements
+      $.each(params, function() {
+          // If element doesn't exist in DOM
+          if(!$.contains(document, form[this.name])){
+            // Create a hidden element
+            $(form).append(
+                $('<input>')
+                  .attr('type', 'hidden')
+                  .attr('name', this.name)
+                  .val(this.value)
+            );
+          }
+      });
+    });
   });
   {/literal}
 </script>
+
+<style>
+  {literal}
+    .crm-container .creditnote__allocate-form-panel .dataTables_wrapper {
+      box-shadow: unset !important;
+    }
+    #DataTables_Table_0 > thead > tr > th,
+    tbody > tr > td {
+      text-align: center !important;
+    }
+    .main-wrapper {
+      width: 100%;
+      margin-top: 24px;
+    }
+    .crm-container .dataTables_wrapper .info-wrap > .dataTables_info {
+      padding-left: 0px;
+    }
+  {/literal}
+</style>
