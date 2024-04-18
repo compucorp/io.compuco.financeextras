@@ -190,6 +190,8 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
       'fee_amount' => $data['fee_amount'] ?? NULL,
       'entity_table' => \CRM_Financeextras_DAO_CreditNote::$_tableName,
       'entity_id' => $data['id'],
+      'net_amount' => $data['net_amount'] ?? NULL,
+
     ];
     return \CRM_Core_BAO_FinancialTrxn::create($trxnParams)->toArray();
   }
@@ -305,10 +307,15 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
       throw new CRM_Core_Exception("Amount to be refunded cannot exceed the remaining credit");
     }
     $financialTrxn = self::createRefundAccountingEntries($creditNote, array_merge($allocationParam, $paymentParam));
+
+    $feeFinancialTrxnId = NULL;
+    if (!empty($paymentParam['fee_amount'])) {
+      $feeFinancialTrxnId = self::createFeeAccountingEntries($creditNote, array_merge($allocationParam, $paymentParam))['id'];
+    }
     $allocation = self::createRefundAllocation($creditNote, $allocationParam);
     CreditNoteAllocationBAO::createAllocationEntityTransactions($allocation['id'], $financialTrxn['id'], -$allocationParam['amount']);
 
-    return array_merge($allocation, ['financial_trxn_id' => $financialTrxn['id']]);
+    return array_merge($allocation, ['financial_trxn_id' => $financialTrxn['id'], 'fee_financial_trxn_id' => $feeFinancialTrxnId]);
   }
 
   private static function createRefundAllocation(array $creditNote, array $data) {
@@ -329,6 +336,7 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
     $data['from_account_id'] = FinancialAccountUtils::getFinancialTypeAccount($financialTypeId, 'Accounts Receivable Account is');
     $data['to_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($data['payment_instrument_id']);
     $data['is_payment'] = 1;
+    $data['net_amount'] = $data['total_credit'] - ($data['fee_amount'] ?? 0);
     $financialTrxn = self::createAccountingEntries($data, 'Completed');
 
     $percent = 100 * $data['amount'] / $creditNote['total_credit'];
@@ -339,6 +347,44 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
     }
 
     return $financialTrxn;
+  }
+
+  private static function createFeeAccountingEntries($creditNote, $data) {
+    $financialTypeId = $creditNote['line'][0]['financial_type_id'];
+    $data = [
+      'from_account_id' => CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($data['payment_instrument_id']),
+      'to_account_id' => FinancialAccountUtils::getFinancialTypeAccount($financialTypeId, 'Expense Account is'),
+      'date' => $data['date'],
+      'total_credit' => $data['fee_amount'],
+      'net_amount' => $data['fee_amount'],
+      'fee_amount' => 0,
+      'currency' => $data['currency'],
+      'is_payment' => 0,
+      'payment_processor_id' => NULL,
+      'payment_instrument_id' => $data['payment_instrument_id'] ?? self::getAccountReceivableId(),
+      'card_type_id' => $data['card_type_id'] ?? NULL,
+      'check_number' => $data['check_number'] ?? NULL,
+      'pan_truncation' => $data['pan_truncation'] ?? NULL,
+      'trxn_id' => $data['trxn_id'] ?? NULL,
+      'id' => $creditNote['id'],
+    ];
+
+    $trxn = self::createAccountingEntries($data, 'Completed');
+
+    $itemParams = [
+      'transaction_date' => date('Y-m-d'),
+      'contact_id' => $creditNote['contact_id'],
+      'currency' => $creditNote['currency'],
+      'amount' => $data['total_credit'],
+      'description' => 'Fee: ' . $trxn['id'],
+      'status_id' => OptionValueUtils::getValueForOptionValue('financial_item_status', 'Paid'),
+      'financial_account_id' => $data['to_account_id'],
+      'entity_table' => 'civicrm_financial_trxn',
+      'entity_id' => $trxn['id'],
+    ];
+    \CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxn);
+
+    return $trxn;
   }
 
   /**
