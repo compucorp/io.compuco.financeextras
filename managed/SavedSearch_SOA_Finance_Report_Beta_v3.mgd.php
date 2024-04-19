@@ -33,13 +33,7 @@ $mgd = [
             'FinancialItem_Contact_contact_id_01.id',
           ],
           'orderBy' => [],
-          'where' => [
-            [
-              'description',
-              'NOT REGEXP',
-              'VAT',
-            ],
-          ],
+          'where' => [],
           'groupBy' => [],
           'join' => [
             [
@@ -130,11 +124,25 @@ $mgd = [
             ],
             [
               'FinancialAccount AS FinancialItem_FinancialAccount_financial_account_id_01',
-              'LEFT',
+              'INNER',
               [
                 'financial_account_id',
                 '=',
                 'FinancialItem_FinancialAccount_financial_account_id_01.id',
+              ],
+              [
+                'OR',
+                [
+                  [
+                    'FinancialItem_FinancialAccount_financial_account_id_01.is_tax',
+                    'IS EMPTY',
+                  ],
+                  [
+                    'FinancialItem_FinancialAccount_financial_account_id_01.is_tax',
+                    '=',
+                    FALSE,
+                  ],
+                ],
               ],
             ],
             [
