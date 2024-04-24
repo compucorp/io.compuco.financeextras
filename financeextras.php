@@ -79,6 +79,7 @@ function financeextras_civicrm_pageRun($page) {
 function financeextras_civicrm_links($op, $objectName, $objectId, &$links, &$mask, &$values) {
   $hooks = [
     \Civi\Financeextras\Hook\Links\Contribution::class,
+    \Civi\Financeextras\Hook\Links\ContributionRecur::class,
   ];
 
   foreach ($hooks as $hook) {
@@ -301,4 +302,20 @@ function financeextras_civicrm_selectWhereClause($entity, &$clauses) {
     $hook = new \Civi\Financeextras\Hook\SelectWhereClause\BatchList($clauses);
     $hook->filterBasedOnOwnerOrganisations($ownerOrganisationToFilterIds);
   }
+}
+
+/**
+ * Implements hook_civicrm_batchQuery().
+ */
+function financeextras_civicrm_batchQuery(&$query) {
+  $hook = new \Civi\Financeextras\Hook\BatchExport\UpdateQuery($query);
+  $hook->addCreditNoteToQuery();
+}
+
+/**
+ * Implements hook_civicrm_batchItems().
+ */
+function financeextras_civicrm_batchItems(&$results, &$items) {
+  $hook = new \Civi\Financeextras\Hook\BatchExport\UpdateItems($results, $items);
+  $hook->addCreditNoteNumberAsInvoiceNumber();
 }

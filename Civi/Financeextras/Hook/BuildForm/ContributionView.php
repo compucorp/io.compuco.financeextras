@@ -20,7 +20,7 @@ class ContributionView {
   }
 
   private function addCreditNoteCancelAction() {
-    if (!$this->id || $this->isContributionCancelled()) {
+    if (!$this->id || $this->contributionHasStatus(['Cancelled', 'Refunded', 'Failed', 'Chargeback'])) {
       return;
     }
 
@@ -35,17 +35,17 @@ class ContributionView {
   }
 
   /**
-   * Checks contribution has been cancelled.
+   * Checks contribution has any of the given statuses.
    *
    * @return bool
-   *   Array with recurring contribution's data.
+   *   Whether the contribution has any of the given statuses.
    *
    * @throws \Civi\API\Exception
    */
-  private function isContributionCancelled() {
+  private function contributionHasStatus($statuses) {
     $contribution = \Civi\Api4\Contribution::get(FALSE)
       ->addWhere('id', '=', $this->id)
-      ->addWhere('contribution_status_id:name', '=', 'Cancelled')
+      ->addWhere('contribution_status_id:name', 'IN', $statuses)
       ->setLimit(1)
       ->execute()
       ->first();
