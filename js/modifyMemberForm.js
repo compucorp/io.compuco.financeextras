@@ -37,6 +37,15 @@ CRM.$(function ($) {
   }
 
   function toggleMembershipType() {
+    /* global membershipType */
+    if (typeof membershipType !== 'undefined' && typeof membershipType['total_amount_numeric'] !== 'undefined') {
+      if (membershipType['total_amount_numeric'] > 0) {
+        $('.fe-membership_type').show()
+      } else {
+        $('.fe-membership_type').hide()
+      }
+    }
+
     if ($('input[name=record_contribution]').is(':checked')) {
       $('input[name=fe_member_type][value=paid_member]').prop("checked", true)
     } else {
