@@ -10,6 +10,13 @@ class UpdateQuery {
   public function __construct(public string &$query) {}
 
   public function addCreditNoteToQuery() {
+
+    $export_format = \CRM_Utils_Request::retrieve('export_format', 'String');
+
+    if (!in_array($export_format, ['CSV'])) {
+      return;
+    }
+
     $this->query = "SELECT
       ft.id as financial_trxn_id,
       ft.trxn_date,
