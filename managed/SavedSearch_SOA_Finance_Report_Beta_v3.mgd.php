@@ -31,6 +31,7 @@ $mgd = [
             'LOWER(FinancialItem_EntityFinancialTrxn_FinancialTrxn_01.amount) AS LOWER_FinancialItem_EntityFinancialTrxn_FinancialTrxn_01_amount',
             'FinancialItem_Contact_contact_id_01.display_name',
             'FinancialItem_Contact_contact_id_01.id',
+            'FinancialItem_EntityFinancialTrxn_FinancialTrxn_01.id',
           ],
           'orderBy' => [],
           'where' => [],
