@@ -140,10 +140,25 @@ class SearchDisplayRun {
    */
   private static function alterFinanceReportDisplay(&$result) {
     foreach ($result as &$display) {
+      if (!is_array($display)) {
+        continue;
+      }
       foreach ($display['columns'] as &$column) {
         if (in_array($column['label'], ['Net Amount', 'Tax Amount'])) {
           $column['val'] = \CRM_Utils_Money::format(abs(trim($column['val']) ?: 0));
         }
+      }
+
+      $entityFinancialTrxn = \Civi\Api4\EntityFinancialTrxn::get(FALSE)
+        ->addWhere('entity_table', '=', 'civicrm_financial_item')
+        ->addWhere('entity_id', '=', $display['key'])
+        ->addWhere('financial_trxn_id', '=', $display['data']['FinancialItem_EntityFinancialTrxn_FinancialTrxn_01.id'])
+        ->execute()
+        ->first();
+
+      $key = $entityFinancialTrxn['id'] ?? NULL;
+      if (!empty($key)) {
+        $display['key'] = $key;
       }
     }
   }
