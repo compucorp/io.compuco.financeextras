@@ -5,6 +5,7 @@ namespace Civi\Financeextras\Token;
 use Civi\Token\Event\TokenValueEvent;
 use Civi\Token\AbstractTokenSubscriber;
 use Civi\Token\TokenRow;
+use CRM_Utils_Request;
 
 /**
  * Class CRM_Financeextras_Token_CreditNote
@@ -41,7 +42,7 @@ class CreditNote extends AbstractTokenSubscriber {
   public function checkActive(\Civi\Token\TokenProcessor $processor) {
     $creditNoteId = $processor->getContextValues('creditNoteId');
 
-    return is_array($creditNoteId) && count($creditNoteId) === 1;
+    return (is_array($creditNoteId) && count($creditNoteId) === 1) || $this->isMessageTemplatePage();
   }
 
   /**
@@ -53,17 +54,33 @@ class CreditNote extends AbstractTokenSubscriber {
    */
   public function prefetch(TokenValueEvent $e): array {
     $creditNoteId = $e->getTokenProcessor()->getContextValues('creditNoteId');
+
     $resolvedTokens = [];
+    if (empty($creditNoteId)) {
+      return $resolvedTokens;
+    }
 
     try {
       if (is_array($creditNoteId) && count($creditNoteId) === 1) {
         $creditNoteId = $creditNoteId[0];
-        $creditNote = \CRM_Financeextras_BAO_CreditNote::findById($creditNoteId);
+        $creditNote = \Civi\Api4\CreditNote::get(FALSE)
+          ->addWhere('id', '=', $creditNoteId)
+          ->addChain('organization', \Civi\Api4\Contact::get(FALSE)
+            ->addWhere('id', '=', '$owner_organization')
+          )
+          ->execute()->first();
 
         if (empty($creditNote)) {
           return $resolvedTokens;
         }
 
+        $creditNote['allocated_credit'] = ($creditNote['allocated_manual_refund'] + $creditNote['allocated_online_refund'] + $creditNote['allocated_invoice']);
+        $creditNote['owner_organization_id'] = $creditNote['owner_organization'];
+        $creditNote['owner_organization_name'] = $creditNote['organization'][0]['display_name'];
+
+        foreach (['allocated_credit', 'subtotal', 'sales_tax', 'total_credit', 'remaining_credit', 'allocated_invoice', 'allocated_manual_refund', 'allocated_online_refund'] as $key) {
+          $creditNote[$key] = \CRM_Utils_Money::format($creditNote[$key], $creditNote['currency']);
+        }
         $resolvedTokens = array_merge($this->geTokens(), (array) $creditNote);
       }
     }
@@ -109,7 +126,20 @@ class CreditNote extends AbstractTokenSubscriber {
       'subtotal' => 'Credit Note Sub Total',
       'sales_tax' => 'Credit Note Sales Tax',
       'total_credit' => 'Credit Note Total Credit',
+      'remaining_credit' => 'Credit Note Remaining Total',
+      'allocated_credit' => 'Credit Note Allocated Total',
+      'allocated_invoice' => 'Credit Note Invoice Allocations',
+      'allocated_manual_refund' => 'Credit Note Manual Refunds',
+      'allocated_online_refund' => 'Credit Note Online Refunds',
+      'owner_organization_id' => 'Credit Note Owner Organization ID',
+      'owner_organization_name' => 'Credit Note Owner Organization Name',
     ];
+  }
+
+  private function isMessageTemplatePage() {
+    $store = NULL;
+    $activePath = CRM_Utils_Request::retrieve('q', 'String', $store, FALSE, NULL, 'GET');
+    return $activePath == "civicrm/admin/messageTemplates/add";
   }
 
 }
