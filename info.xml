@@ -8,13 +8,14 @@
     <author>Compuco</author>
     <email>hello@compuco.io</email>
   </maintainer>
-  <releaseDate>2024-05-20</releaseDate>
+  <releaseDate>2024-05-23</releaseDate>
   <version>2.1.5</version>
   <develStage>stable</develStage>
   <compatibility>
     <ver>5.51</ver>
   </compatibility>
   <comments>
+    Patch 1
     Supported CiviCRM versions  :
     - CiviCRM 5.51.3
   </comments>
