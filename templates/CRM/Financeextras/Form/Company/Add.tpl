@@ -35,6 +35,14 @@
       <td class="label">{$form.next_creditnote_number.label}</td>
       <td>{$form.next_creditnote_number.html}</td>
     </tr>
+
+    <tr>
+      <td class="label">
+        {$form.receivable_payment_method.label}
+        {help id="receivable_payment_method" file="CRM/Financeextras/ReceivablePaymentMethod.hlp"}
+      </td>
+      <td>{$form.receivable_payment_method.html}</td>
+    </tr>
     </tbody>
   </table>
   <div class="crm-submit-buttons">

@@ -1,0 +1,11 @@
+{htxt id="receivable_payment_method"}
+<p>
+  {ts}Each company requires a payment method to be used as the accounts receivable account for unpaid invoices. This is created automatically for the first company. For additional companies please create this before creating the Company by:{/ts}
+</p>
+<ol style="margin-left: 5px;">
+<li>Create a contact for this legal entity / company.</li>
+<li>Create an “Asset” financial account  where the “owner” is the contact above.</li>
+<li>Create a payment method called “Accounts Receivable” with your relevant accounting codes. Set the payment method to be hidden.</li>
+<li>Select the payment method in this field.</li>
+</ol>
+{/htxt}
