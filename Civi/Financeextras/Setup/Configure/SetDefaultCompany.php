@@ -2,6 +2,8 @@
 
 namespace Civi\Financeextras\Setup\Configure;
 
+use Civi\Financeextras\Setup\Manage\AccountsReceivablePaymentMethod;
+
 /**
  * For this extension to work properly we need
  * at least one company. This adds a company
@@ -26,6 +28,7 @@ class SetDefaultCompany implements ConfigurerInterface {
         ->addValue('creditnote_template_id:name', 'Credit Note Invoice')
         ->addValue('next_creditnote_number', $this->getDefaultNextCreditNoteNumber())
         ->addValue('creditnote_prefix', $this->getDefaultCreditNotePrefix())
+        ->addValue('receivable_payment_method', $this->getDefaultAccountReceivablePaymentMethod())
         ->execute();
     }
     catch (\Exception $exception) {
@@ -111,6 +114,17 @@ class SetDefaultCompany implements ConfigurerInterface {
     } while ($result > 0);
 
     return $creditNoteNum ?? '1';
+  }
+
+  private function getDefaultAccountReceivablePaymentMethod() {
+    $paymentMethod = civicrm_api3('OptionValue', 'get', [
+      'sequential' => 1,
+      'return' => ['value'],
+      'option_group_id' => 'payment_instrument',
+      'name' => AccountsReceivablePaymentMethod::NAME,
+    ]);
+
+    return $paymentMethod['values'][0]['value'] ?? NULL;
   }
 
 }
