@@ -255,7 +255,7 @@ function financeextras_register_tokens(\Civi\Token\Event\TokenRegisterEvent $e) 
 function financeextras_civicrm_navigationMenu(&$menu) {
   $companyMenuItem = [
     'name' => 'financeextras_company',
-    'label' => ts('Companies (For Multi-company accounting)'),
+    'label' => ts('Companies'),
     'url' => 'civicrm/admin/financeextras/company',
     'permission' => 'administer CiviCRM',
     'separator' => 2,
