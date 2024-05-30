@@ -58,7 +58,7 @@ class ContributionRecur {
     }
   }
 
-  public static function shouldHandle(string $op, string $objectName): bool {
+  public static function shouldHandle(string $op, ?string $objectName): bool {
     return $op === 'contribution.selector.recurring' && $objectName === 'Contribution';
   }
 
