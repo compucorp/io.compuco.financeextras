@@ -19,6 +19,7 @@ class ContributionCreate {
     $this->updateTotalAmountFromLineTotal();
     $this->validatePaymentForm();
     $this->validateConsistentIncomeAccountOwners();
+    $this->removeInvalidSoftCreditErrors();
   }
 
   public function validatePaymentForm() {
@@ -96,6 +97,27 @@ class ContributionCreate {
   public static function shouldHandle($form, $formName) {
     $addOrUpdate = ($form->getAction() & \CRM_Core_Action::ADD) || ($form->getAction() & \CRM_Core_Action::UPDATE);
     return $formName === "CRM_Contribute_Form_Contribution" && $addOrUpdate;
+  }
+
+  /**
+   * Remove invalid errors for soft credit fields.
+   *
+   * Contribution is unaware of the line items and it cant compute total amount from them
+   * so total amount is 0 and when civi compares the soft credit amount with total amount of 0 it throws error that
+   * soft credit amount cannot be more than total amount.
+   */
+  private function removeInvalidSoftCreditErrors(): void {
+    if (empty($this->fields['total_amount']) && !empty($this->fields['fe_record_payment_amount'])) {
+      foreach ($this->fields['soft_credit_amount'] as $key => $val) {
+        if ($this->form->getElementError("soft_credit_amount[$key]") !== NULL
+          && !empty($this->fields['soft_credit_amount'][$key])
+          && \CRM_Utils_Rule::cleanMoney($this->fields['soft_credit_amount'][$key]) <= \CRM_Utils_Rule::cleanMoney($this->fields['fe_record_payment_amount'])
+        ) {
+          $this->form->setElementError("soft_credit_amount[$key]");
+        }
+      }
+    }
+
   }
 
 }
