@@ -15,7 +15,7 @@
             <th>{ts}Credit Note Template{/ts}</th>
             <th>{ts}Credit Note Prefix{/ts}</th>
             <th>{ts}Next Credit Note Number{/ts}</th>
-            <th>{ts}Accounts Receivable Payment Method{/ts}</th>
+            <th>{ts}Accounts Receivable{/ts}</th>
             <th></th>
           </tr>
           </thead>
