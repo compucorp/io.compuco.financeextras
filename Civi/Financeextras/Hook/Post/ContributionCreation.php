@@ -6,7 +6,7 @@ use CRM_Financeextras_CustomGroup_ContributionOwnerOrganisation as ContributionO
 
 class ContributionCreation {
 
-  private $contributionId;
+  private $contribution;
 
   private $ownerOrganizationId;
 
@@ -15,12 +15,11 @@ class ContributionCreation {
   private static $incomeAccountRelationId;
 
   public function __construct($contributionId) {
-    $this->contributionId = $contributionId;
-
     if (empty(self::$incomeAccountRelationId)) {
       self::$incomeAccountRelationId = key(\CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
     }
 
+    $this->contribution = $this->getContributionData((int) $contributionId);
     $this->setOwnerOrganizationId();
   }
 
@@ -48,7 +47,7 @@ class ContributionCreation {
   private function setOwnerOrganizationId() {
     $ownerOrganizationId = NULL;
 
-    $contribution = $this->getContributionData();
+    $contribution = $this->contribution;
     if (!empty($contribution['contribution_recur_id'])) {
       $ownerOrganizationId = $this->getOwnerOrganizationIdFromPaymentPlanLineItems($contribution['contribution_recur_id']);
     }
@@ -64,11 +63,11 @@ class ContributionCreation {
     $this->ownerOrganizationId = $ownerOrganizationId;
   }
 
-  private function getContributionData() {
+  private function getContributionData(int $contributionId) {
     $result = civicrm_api3('Contribution', 'get', [
       'sequential' => 1,
-      'return' => ['contribution_recur_id', 'financial_type_id'],
-      'id' => $this->contributionId,
+      'return' => ['contribution_recur_id', 'financial_type_id', 'is_pay_later'],
+      'id' => $contributionId,
     ]);
 
     if (empty($result['values'][0])) {
@@ -87,10 +86,10 @@ class ContributionCreation {
    * This method will only return result if "Membershipextras" is installed,
    * which means only "Membershipextras" payment plans are supported.
    *
-   * @param $recurContributionId
    * @return mixed|string|null
    */
-  private function getOwnerOrganizationIdFromPaymentPlanLineItems($recurContributionId) {
+  private function getOwnerOrganizationIdFromPaymentPlanLineItems() {
+    $recurContributionId = $this->contribution['contribution_recur_id'];
     if (!empty(self::$paymentPlanOwnerOrganization[$recurContributionId])) {
       return self::$paymentPlanOwnerOrganization[$recurContributionId];
     }
@@ -124,7 +123,7 @@ class ContributionCreation {
     $query = "SELECT fa.contact_id FROM civicrm_line_item li
                       INNER JOIN civicrm_entity_financial_account efa ON li.financial_type_id = efa.entity_id AND efa.entity_table = 'civicrm_financial_type'
                       INNER JOIN civicrm_financial_account fa ON efa.financial_account_id = fa.id
-                      WHERE efa.account_relationship = {$incomeAccountRelationId} AND li.contribution_id = {$this->contributionId}
+                      WHERE efa.account_relationship = {$incomeAccountRelationId} AND li.contribution_id = {$this->contribution['id']}
                       LIMIT 1";
     return \CRM_Core_DAO::singleValueQuery($query);
   }
@@ -149,12 +148,12 @@ class ContributionCreation {
   public function run() {
     if (!empty($this->ownerOrganizationId)) {
       $this->updateOwnerOrganization();
-      $this->setInvoiceNumber();
+      $this->updateContribution();
     }
     else {
       // this will terminate the Contribution transaction in CiviCRM core, which will trigger a rollback and prevent the contribution
       // from getting created.
-      throw new \CRM_Core_Exception("Unable to set the owner organisation and the invoice number for the contribution with id: {$this->contributionId}.");
+      throw new \CRM_Core_Exception("Unable to set the owner organisation and the invoice number for the contribution with id: {$this->contribution['id']}.");
     }
   }
 
@@ -164,7 +163,7 @@ class ContributionCreation {
    * @return void
    */
   private function updateOwnerOrganization() {
-    ContributionOwnerOrganisation::setOwnerOrganisation($this->contributionId, $this->ownerOrganizationId);
+    ContributionOwnerOrganisation::setOwnerOrganisation($this->contribution['id'], $this->ownerOrganizationId);
   }
 
   /**
@@ -174,13 +173,13 @@ class ContributionCreation {
    *
    * 1- Using the contribution owner organization, we get
    * its related Company record, which contains the invoice
-   * prefix and next invoice number. The value is read using
+   * prefix, next invoice number and receivable payment method. The value is read using
    * 'SELECT FOR UPDATE' to acquire a row level lock, to prevent
    * any other contribution from using the same invoice number.
    * The lock works because CiviCRM starts a transaction while
    * creating the contribution, then at some transaction it triggers this
    * hook, then later it commits the transaction. So the queries
-   * here runs as part of the contribution tran transaction.
+   * here runs as part of the contribution transaction.
    *
    * 2- Then the prefix is appended to the invoice number, this
    * will be the contribution invoice number.
@@ -188,8 +187,11 @@ class ContributionCreation {
    * 3- Then the next invoice number is incremented by one
    * while leading zeros are preserved.
    *
-   * 4- Finally the contribution invoice_number is set
+   * 4- The contribution invoice_number is set
    * to the invoice number in from step 2.
+   *
+   * 5- If the contribution is pay later than we update the payment_instrument as well
+   * for the contribution and financial trxn table.
    *
    * When the controls get back to CiviCRM core,
    * CiviCRM will commit the transaction, and thus
@@ -197,8 +199,8 @@ class ContributionCreation {
    *
    * @return void
    */
-  private function setInvoiceNumber() {
-    $companyRecord = \CRM_Core_DAO::executeQuery("SELECT invoice_prefix, next_invoice_number FROM financeextras_company WHERE contact_id = {$this->ownerOrganizationId} FOR UPDATE");
+  private function updateContribution() {
+    $companyRecord = \CRM_Core_DAO::executeQuery("SELECT invoice_prefix, next_invoice_number, receivable_payment_method FROM financeextras_company WHERE contact_id = {$this->ownerOrganizationId} FOR UPDATE");
     $companyRecord->fetch();
 
     $invoiceNumber = $companyRecord->next_invoice_number;
@@ -209,7 +211,16 @@ class ContributionCreation {
     $invoiceUpdateSQLFormula = $this->getInvoiceNumberUpdateSQLFormula($companyRecord->next_invoice_number);
     \CRM_Core_DAO::executeQuery("UPDATE financeextras_company SET next_invoice_number = {$invoiceUpdateSQLFormula}  WHERE contact_id = {$this->ownerOrganizationId}");
 
-    \CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET invoice_number = '{$invoiceNumber}' WHERE id = {$this->contributionId}");
+    \CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET invoice_number = '{$invoiceNumber}' WHERE id = {$this->contribution['id']}");
+
+    if ($this->contribution['is_pay_later'] && empty($_POST['fe_record_payment_check'])) {
+      \CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET payment_instrument_id = '{$companyRecord->receivable_payment_method}' WHERE id = {$this->contribution['id']}");
+
+      $entityFinancialTransaction = \CRM_Core_DAO::executeQuery("SELECT financial_trxn_id FROM civicrm_entity_financial_trxn WHERE entity_id = {$this->contribution['id']} AND entity_table = 'civicrm_contribution'");
+      $entityFinancialTransaction->fetch();
+
+      \CRM_Core_DAO::executeQuery("UPDATE civicrm_financial_trxn SET payment_instrument_id = '{$companyRecord->receivable_payment_method}' WHERE id = {$entityFinancialTransaction->financial_trxn_id}");
+    }
   }
 
   /**

@@ -69,6 +69,19 @@ class CRM_Financeextras_Form_Company_Add extends CRM_Core_Form {
 
     $this->add('text', 'next_creditnote_number', 'Next Credit Note Number', ['maxlength' => 11], TRUE);
 
+    $this->addEntityRef(
+      'receivable_payment_method',
+      ts('Accounts Receivable Payment Method'),
+      [
+        'entity' => 'option_value',
+        'api' => ['params' => ['option_group_id' => 'payment_instrument']],
+        'select' => ['minimumInputLength' => 0],
+        'placeholder' => ts('Select Payment Method'),
+        'multiple' => FALSE,
+      ],
+      TRUE
+    );
+
     $this->addButtons([
       [
         'type' => 'submit',
@@ -97,6 +110,7 @@ class CRM_Financeextras_Form_Company_Add extends CRM_Core_Form {
     $values['creditnote_template_id'] = $company->creditnote_template_id;
     $values['creditnote_prefix'] = $company->creditnote_prefix;
     $values['next_creditnote_number'] = $company->next_creditnote_number;
+    $values['receivable_payment_method'] = $company->receivable_payment_method;
 
     return $values;
   }
@@ -144,6 +158,7 @@ class CRM_Financeextras_Form_Company_Add extends CRM_Core_Form {
     $params['creditnote_template_id'] = $submittedValues['creditnote_template_id'];
     $params['creditnote_prefix'] = $submittedValues['creditnote_prefix'];
     $params['next_creditnote_number'] = $submittedValues['next_creditnote_number'];
+    $params['receivable_payment_method'] = $submittedValues['receivable_payment_method'];
 
     CRM_Financeextras_BAO_Company::create($params);
 

@@ -14,6 +14,7 @@ class CRM_Financeextras_Form_Company_AddTest extends BaseHeadlessTest {
       'creditnote_template_id' => '',
       'creditnote_prefix' => '',
       'next_creditnote_number' => '',
+      'receivable_payment_method' => '',
     ];
     $form = $this->submitForm($formValues);
     $actualErrors = $form->_errors;
@@ -24,6 +25,7 @@ class CRM_Financeextras_Form_Company_AddTest extends BaseHeadlessTest {
       'next_invoice_number' => 'Next Invoice Number is a required field.',
       'creditnote_template_id' => 'Credit Note Template is a required field.',
       'next_creditnote_number' => 'Next Credit Note Number is a required field.',
+      'receivable_payment_method' => 'Accounts Receivable Payment Method is a required field.',
     ];
 
     $this->assertEquals($expectedErrors, $actualErrors);
@@ -38,6 +40,7 @@ class CRM_Financeextras_Form_Company_AddTest extends BaseHeadlessTest {
       'creditnote_template_id' => 1,
       'creditnote_prefix' => 'CN_',
       'next_creditnote_number' => 'YAYAYA',
+      'receivable_payment_method' => 1,
     ];
 
     $form = $this->submitForm($formValues);
@@ -60,6 +63,7 @@ class CRM_Financeextras_Form_Company_AddTest extends BaseHeadlessTest {
       'creditnote_template_id' => 1,
       'creditnote_prefix' => 'CN_',
       'next_creditnote_number' => '00002',
+      'receivable_payment_method' => 1,
     ];
 
     $this->submitForm($formValues);
@@ -86,6 +90,7 @@ class CRM_Financeextras_Form_Company_AddTest extends BaseHeadlessTest {
       'creditnote_template_id' => 1,
       'creditnote_prefix' => 'CN_',
       'next_creditnote_number' => '000002',
+      'receivable_payment_method' => 1,
     ];
     $company = CRM_Financeextras_BAO_Company::create($params);
 

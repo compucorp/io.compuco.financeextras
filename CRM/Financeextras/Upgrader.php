@@ -137,4 +137,29 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
     return TRUE;
   }
 
+  /**
+   * This upgrade updates company table
+   */
+  public function upgrade_1002() {
+    $this->ctx->log->info('Applying update 1002');
+    $this->executeSqlFile('sql/upgrade_1002.sql');
+
+    $defaultAccountReceivableAccount = \Civi\Api4\OptionValue::get(FALSE)
+      ->setCheckPermissions(FALSE)
+      ->addSelect('value')
+      ->addWhere('option_group_id:name', '=', 'payment_instrument')
+      ->addWhere('name', '=', AccountsReceivablePaymentMethod::NAME)
+      ->execute()
+      ->first();
+
+    if (!empty($defaultAccountReceivableAccount['value'])) {
+      \Civi\Api4\Company::update(FALSE)
+        ->addValue('receivable_payment_method', $defaultAccountReceivableAccount['value'])
+        ->addWhere('id', '=', 1)
+        ->execute();
+    }
+
+    return TRUE;
+  }
+
 }
