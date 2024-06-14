@@ -213,7 +213,7 @@ class ContributionCreation {
 
     \CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET invoice_number = '{$invoiceNumber}' WHERE id = {$this->contribution['id']}");
 
-    if ($this->contribution['is_pay_later'] && empty($_POST['fe_record_payment_check'])) {
+    if ($this->isContributionNotRecordingPayment()) {
       \CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET payment_instrument_id = '{$companyRecord->receivable_payment_method}' WHERE id = {$this->contribution['id']}");
 
       $entityFinancialTransaction = \CRM_Core_DAO::executeQuery("SELECT financial_trxn_id FROM civicrm_entity_financial_trxn WHERE entity_id = {$this->contribution['id']} AND entity_table = 'civicrm_contribution'");
@@ -246,6 +246,13 @@ class ContributionCreation {
     }
 
     return $invoiceUpdateFormula;
+  }
+
+  private function isContributionNotRecordingPayment(): bool {
+    return (
+      $this->contribution['is_pay_later'] &&
+      (empty($_POST['fe_record_payment_check']) || !empty($_POST['payment_plan_schedule']))
+    );
   }
 
 }
