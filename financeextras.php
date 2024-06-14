@@ -19,6 +19,8 @@ function financeextras_civicrm_config(&$config) {
   Civi::dispatcher()->addListener('civi.api.respond', ['Civi\Financeextras\APIWrapper\SearchDisplayRun', 'respond'], -100);
   Civi::dispatcher()->addSubscriber(new Civi\Financeextras\Event\Subscriber\CreditNoteInvoiceSubscriber());
   Civi::dispatcher()->addListener('civi.api.respond', ['Civi\Financeextras\APIWrapper\Contribution', 'respond'], -101);
+  Civi::dispatcher()->addListener('civi.api.prepare', ['Civi\Financeextras\APIWrapper\Payment', 'prepare'], -102);
+  Civi::dispatcher()->addListener('civi.api.respond', ['Civi\Financeextras\APIWrapper\Payment', 'respond'], -103);
   Civi::dispatcher()->addListener('fe.contribution.received_payment', ['\Civi\Financeextras\Event\Listener\ContributionPaymentUpdatedListener', 'handle']);
   Civi::dispatcher()->addListener('civi.api.prepare', ['Civi\Financeextras\APIWrapper\BatchListPage', 'preApiCall']);
   Civi::dispatcher()->addListener('civi.token.list', 'financeextras_register_tokens');
