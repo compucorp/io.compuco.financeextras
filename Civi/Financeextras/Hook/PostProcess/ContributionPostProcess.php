@@ -33,6 +33,7 @@ class ContributionPostProcess {
           'total_amount' => $values['fe_record_payment_amount'],
           'trxn_date' => $values['receive_date'] ?? date('YmdHis'),
           'payment_instrument_id' => $values['payment_instrument_id'],
+          'is_send_contribution_notification' => FALSE,
         ];
 
         \CRM_Financial_BAO_Payment::create($params);
