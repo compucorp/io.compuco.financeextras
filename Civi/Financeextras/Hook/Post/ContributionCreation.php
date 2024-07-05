@@ -203,6 +203,17 @@ class ContributionCreation {
     $companyRecord = \CRM_Core_DAO::executeQuery("SELECT invoice_prefix, next_invoice_number, receivable_payment_method FROM financeextras_company WHERE contact_id = {$this->ownerOrganizationId} FOR UPDATE");
     $companyRecord->fetch();
 
+    $this->setInvoiceNumber($companyRecord);
+    $this->setPaymentinstrumentId($companyRecord);
+  }
+
+  /**
+   * Sets the contribution invoice number.
+   *
+   * @param \CRM_Core_DAO|object $companyRecord
+   *  The company record.
+   */
+  private function setInvoiceNumber($companyRecord) {
     $invoiceNumber = $companyRecord->next_invoice_number;
     if (!empty($companyRecord->invoice_prefix)) {
       $invoiceNumber = $companyRecord->invoice_prefix . $companyRecord->next_invoice_number;
@@ -212,14 +223,26 @@ class ContributionCreation {
     \CRM_Core_DAO::executeQuery("UPDATE financeextras_company SET next_invoice_number = {$invoiceUpdateSQLFormula}  WHERE contact_id = {$this->ownerOrganizationId}");
 
     \CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET invoice_number = '{$invoiceNumber}' WHERE id = {$this->contribution['id']}");
+  }
 
-    if ($this->isContributionNotRecordingPayment()) {
+  /**
+   * Sets the payment instrument id for the contribution.
+   *
+   * @param \CRM_Core_DAO|object $companyRecord
+   *  The company record.
+   */
+  public function setPaymentInstrumentId($companyRecord) {
+    if (!$this->isContributionNotRecordingPayment()) {
+      return;
+    }
+
+    $entityFinancialTransaction = \CRM_Core_DAO::executeQuery("SELECT financial_trxn_id FROM civicrm_entity_financial_trxn WHERE entity_id = {$this->contribution['id']} AND entity_table = 'civicrm_contribution'");
+    $entityFinancialTransaction->fetch();
+
+    $financialTrnxId = $entityFinancialTransaction->financial_trxn_id;
+    if ($this->contributionPaymentProcessorIsValid($financialTrnxId)) {
       \CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET payment_instrument_id = '{$companyRecord->receivable_payment_method}' WHERE id = {$this->contribution['id']}");
-
-      $entityFinancialTransaction = \CRM_Core_DAO::executeQuery("SELECT financial_trxn_id FROM civicrm_entity_financial_trxn WHERE entity_id = {$this->contribution['id']} AND entity_table = 'civicrm_contribution'");
-      $entityFinancialTransaction->fetch();
-
-      \CRM_Core_DAO::executeQuery("UPDATE civicrm_financial_trxn SET payment_instrument_id = '{$companyRecord->receivable_payment_method}' WHERE id = {$entityFinancialTransaction->financial_trxn_id}");
+      \CRM_Core_DAO::executeQuery("UPDATE civicrm_financial_trxn SET payment_instrument_id = '{$companyRecord->receivable_payment_method}' WHERE id = {$financialTrnxId}");
     }
   }
 
@@ -253,6 +276,30 @@ class ContributionCreation {
       $this->contribution['is_pay_later'] &&
       (empty($_POST['fe_record_payment_check']) || !empty($_POST['payment_plan_schedule']))
     );
+  }
+
+  /**
+   * Checks if the contribution payment processor type is not one of the specified types.
+   *
+   * @param int $financialTrnxId
+   *  The ID of the financial transaction.
+   * @return bool
+   *   TRUE if the payment processor type is not one of the specified types, FALSE otherwise.
+   */
+  private function contributionPaymentProcessorIsValid($financialTrnxId): bool {
+    $paymentProcessorTypes = ['OfflineDirectDebit', 'Manual_Recurring_Payment'];
+    $financialTrxn = \Civi\Api4\FinancialTrxn::get(FALSE)
+      ->addSelect('payment_processor_id:name', 'payment_processor.payment_processor_type_id:name', 'payment_instrument_id:name')
+      ->addJoin('PaymentProcessor AS payment_processor', 'LEFT')
+      ->addWhere('id', '=', $financialTrnxId)
+      ->execute()->first() ?? NULL;
+
+    if (empty($financialTrxn)) {
+      return TRUE;
+    }
+
+    return !in_array($financialTrxn['payment_processor.payment_processor_type_id:name'], $paymentProcessorTypes)
+      && $financialTrxn['payment_instrument_id:name'] != 'direct_debit';
   }
 
 }
