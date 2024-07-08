@@ -268,7 +268,7 @@ $mgd = [
               'dataType' => 'String',
               'label' => 'Tax Amount',
               'sortable' => TRUE,
-              'rewrite' => "{if '[FinancialItem_LineItem_entity_id_01_LineItem_FinancialType_financial_type_id_01_FinancialType_EntityFinancialAccount_FinancialAccount_01.account_type_code]' == \"T8\"} {if [LOWER_FinancialItem_EntityFinancialTrxn_FinancialTrxn_01_amount] >= 0} {math equation=\"x * y\" x=[LOWER_FinancialItem_EntityFinancialTrxn_FinancialTrxn_01_amount] y=0.2 format=\"%.2f\"} {else}  {math equation=\"x * y * z\" x=[LOWER_FinancialItem_EntityFinancialTrxn_FinancialTrxn_01_amount] y=0.2 z=-1 format=\"%.2f\"} {/if}  {else} 0 {/if}",
+              'rewrite' => "{if '[FinancialItem_LineItem_entity_id_01_LineItem_FinancialType_financial_type_id_01_FinancialType_EntityFinancialAccount_FinancialAccount_01.account_type_code]' == \"T8\"} {if [LOWER_FinancialItem_EntityFinancialTrxn_FinancialTrxn_01_amount] >= 0} {math equation=\"x * y\" x=[LOWER_FinancialItem_EntityFinancialTrxn_FinancialTrxn_01_amount] y=0.2} {else}  {math equation=\"x * y * z\" x=[LOWER_FinancialItem_EntityFinancialTrxn_FinancialTrxn_01_amount] y=0.2 z=-1} {/if}  {else} 0 {/if}",
             ],
             [
               'type' => 'field',
