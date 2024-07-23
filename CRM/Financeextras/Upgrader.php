@@ -101,7 +101,7 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
   }
 
   public function upgrade_1000() {
-    $this->executeSqlFile('sql/auto_install.sql');
+    $this->executeSqlFile('sql/upgrade_1000.sql');
     $this->executeCustomDataFile('xml/customFields_install.xml');
 
     $manageSteps = [
