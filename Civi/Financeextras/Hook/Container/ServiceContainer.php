@@ -33,7 +33,7 @@ class ServiceContainer {
         \Civi\Financeextras\Service\CreditNoteInvoiceService::class,
         []
       )
-    )->setAutowired(TRUE);
+    )->setAutowired(TRUE)->setPublic(TRUE);
   }
 
 }
