@@ -23,7 +23,7 @@ class CRM_Financeextras_Hook_PageRun_ContributionPageTab implements PageRunInter
    * @return bool
    */
   public static function shouldHandle($page) {
-    return $page instanceof CRM_Contribute_Page_Tab && $page->_action == CRM_Core_Action::BROWSE;
+    return $page instanceof CRM_Contribute_Page_Tab && $page->getVar('_action') == CRM_Core_Action::BROWSE;
   }
 
   /**
