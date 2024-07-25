@@ -33,7 +33,16 @@ class ServiceContainer {
         \Civi\Financeextras\Service\CreditNoteInvoiceService::class,
         []
       )
-    )->setAutowired(TRUE);
+    )->setAutowired(TRUE)->setPublic(TRUE);
+
+    $this->container->setDefinition('workflow.message.credit_note_invoice',
+      new Definition(
+        \Civi\Financeextras\WorkflowMessage\CreditNoteInvoice::class,
+        []
+      )
+    )->setAutowired(TRUE)->setPublic(TRUE);
+
+    $this->container->setAlias('Civi\Financeextras\WorkflowMessage\CreditNoteInvoice', 'workflow.message.credit_note_invoice');
   }
 
 }
