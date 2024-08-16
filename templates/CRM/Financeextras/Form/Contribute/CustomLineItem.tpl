@@ -14,6 +14,9 @@
     CRM.$(function($) {
       const submittedRows = $.parseJSON('{/literal}{$lineItemSubmitted}{literal}');
       const action = '{/literal}{$action}{literal}';
+      const nonEmtyFinancialTypes = $('table#info select[id^="item_financial_type_id_"]').filter(function() {
+        return this.value;
+      });
       isNotQuickConfig = '{/literal}{$pricesetFieldsCount}{literal}'
       const isEmptyPriceSet = !$('#price_set_id').length || $('#price_set_id').val() === ''
 
@@ -42,8 +45,11 @@
           $('#selectPriceSet').prepend( `<div id="lineItemSwitch" class="crm-hover-button">OR <a href="#">Switch back to using line items</a></div>`)
           $('#lineItemSwitch').css('display', 'block').on('click', () => $('#price_set_id').val('').change())
 
-          if ((isEmptyPriceSet) && submittedRows.length <= 0) {
-            $('#add-items').click()
+          const hasValues = nonEmtyFinancialTypes.each(function() {
+              $(this).val(this.value).trigger('change');
+          }).length > 0;
+          if (!hasValues && isEmptyPriceSet && submittedRows.length <= 0) {
+              $('#add-items').click();
           }
           toggleLineItemOrPricesetFields(isEmptyPriceSet);
 
@@ -58,7 +64,7 @@
               $('#totalAmountORPriceSet, #price_set_id').show();
             }
           });
-        }, 100);
+        }, 500);
 
         const toggleLineItemOrPricesetFields = (show) => {
           if (!show) {

@@ -21,6 +21,9 @@ const totalChanged = new CustomEvent("totalChanged", {});
     const recordPaymentAmount = document.querySelector("input[name=fe_record_payment_amount]");
     $('#total_amount').on("change", function() {
       recordPaymentAmount.value = Number($('#total_amount').val()).toFixed(2);
+      if ($('#total_amount').val() == 0 && $('#line-total').data('raw-total') > 0) {
+        return
+      }
       recordPaymentAmount.dispatchEvent(totalChanged)
     });
 
