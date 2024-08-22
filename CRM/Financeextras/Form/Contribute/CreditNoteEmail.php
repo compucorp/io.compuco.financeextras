@@ -22,7 +22,7 @@ class CRM_Financeextras_Form_Contribute_CreditNoteEmail extends CRM_Core_Form {
    *
    * @var string
    */
-  private $_context; // phpcs:ignore
+  public $_context; // phpcs:ignore
 
   /**
    * Credit Note ID.
