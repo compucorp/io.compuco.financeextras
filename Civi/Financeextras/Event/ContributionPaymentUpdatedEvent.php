@@ -2,7 +2,7 @@
 
 namespace Civi\Financeextras\Event;
 
-use \Civi\Core\Event\GenericHookEvent as Event;
+use Civi\Core\Event\GenericHookEvent as Event;
 
 /**
  * The fe.contribution.received_payment event will be dispatched

@@ -2,8 +2,13 @@
 
 ini_set('memory_limit', '2G');
 ini_set('safe_mode', 0);
+
+define('CIVICRM_CONTAINER_CACHE', 'never');
+define('CIVICRM_TEST', 1);
+putenv('CIVICRM_UF=' . ($_ENV['CIVICRM_UF'] = 'UnitTests'));
+
 // phpcs:disable
-eval(cv('php:boot --level=classloader', 'phpcode'));
+eval(cv('php:boot --level=settings', 'phpcode'));
 // phpcs:enable
 // Allow autoloading of PHPUnit helper classes in this extension.
 $loader = new \Composer\Autoload\ClassLoader();
