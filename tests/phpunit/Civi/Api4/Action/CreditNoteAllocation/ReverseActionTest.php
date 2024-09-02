@@ -82,7 +82,7 @@ class Civi_Api4_CreditNoteAllocation_ReverseActionTest extends BaseHeadlessTest 
       ->first();
 
     $lineItemEntityFinancialTrxn = \Civi\Api4\EntityFinancialTrxn::get(FALSE)
-      ->addWhere('entity_table', '=', CRM_Financial_BAO_FinancialItem::$_tableName)
+      ->addWhere('entity_table', '=', CRM_Financial_BAO_FinancialItem::getTableName())
       ->addWhere('financial_trxn_id', '=', $entityFinancialTrxn['financial_trxn_id'])
       ->execute();
 

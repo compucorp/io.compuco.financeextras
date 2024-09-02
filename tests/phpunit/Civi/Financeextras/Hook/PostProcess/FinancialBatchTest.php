@@ -90,6 +90,7 @@ class FinancialBatchTest extends BaseHeadlessTest {
     $form->_submitValues = $formValues;
     $form->_action = \CRM_Core_Action::ADD;
 
+    $form->set('BAOName', 'CRM_Financeextras_BAO_BatchOwnerOrganisation');
     $form->buildForm();
     $form->loadValues($formValues);
     $form->validate();

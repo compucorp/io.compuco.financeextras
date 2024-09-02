@@ -15,6 +15,7 @@ class RefundTest extends BaseHeadlessTest {
   public function testIsEligibleForRefund() {
     $contact = ContactFabricator::fabricate();
     $paymentProcessor = PaymentProcessorFabricator::fabricate([
+      'name'  => "Dummy",
       'payment_processor_type_id' => "Dummy",
       'financial_account_id' => "Payment Processor Account",
     ]);

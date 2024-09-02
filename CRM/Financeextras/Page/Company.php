@@ -38,11 +38,13 @@ class CRM_Financeextras_Page_Company extends CRM_Core_Page {
         'name'  => ts('Edit'),
         'url'   => 'civicrm/admin/financeextras/company/add',
         'qs'    => 'id=%%id%%&reset=1',
+        'weight' => 10,
       ],
       CRM_Core_Action::DELETE => [
         'name' => ts('Delete'),
         'url' => 'civicrm/admin/financeextras/company/delete',
         'qs' => 'id=%%id%%',
+        'weight' => 12,
       ],
     ];
   }

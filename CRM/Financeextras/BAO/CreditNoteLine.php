@@ -98,7 +98,7 @@ class CRM_Financeextras_BAO_CreditNoteLine extends CRM_Financeextras_DAO_CreditN
     $financialItem->find(TRUE);
 
     $entityTrxn = new \CRM_Financial_DAO_EntityFinancialTrxn();
-    $entityTrxn->entity_table = \CRM_Financial_BAO_FinancialItem::$_tableName;
+    $entityTrxn->entity_table = \CRM_Financial_BAO_FinancialItem::getTableName();
     $entityTrxn->entity_id = $financialItem->id;
     $entityTrxn->find(TRUE);
 

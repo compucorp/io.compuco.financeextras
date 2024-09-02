@@ -206,7 +206,7 @@ class Civi_Api4_CreditNote_CreditNoteSaveActionTest extends BaseHeadlessTest {
       // Financial item should have a entity financial transaction.
       $entityFinancialTrxn = \Civi\Api4\EntityFinancialTrxn::get(FALSE)
         ->addWhere('entity_id', '=', $financialItem['id'])
-        ->addWhere('entity_table', '=', \CRM_Financial_BAO_FinancialItem::$_tableName)
+        ->addWhere('entity_table', '=', \CRM_Financial_BAO_FinancialItem::getTableName())
         ->execute()
         ->first();
 
@@ -263,7 +263,7 @@ class Civi_Api4_CreditNote_CreditNoteSaveActionTest extends BaseHeadlessTest {
       foreach ([$financialItemForMainAmount, $financialItemForTax] as $financialItem) {
         $entityFinancialTrxn = \Civi\Api4\EntityFinancialTrxn::get(FALSE)
           ->addWhere('entity_id', '=', $financialItem['id'])
-          ->addWhere('entity_table', '=', \CRM_Financial_BAO_FinancialItem::$_tableName)
+          ->addWhere('entity_table', '=', \CRM_Financial_BAO_FinancialItem::getTableName())
           ->execute()
           ->first();
 

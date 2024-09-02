@@ -334,7 +334,7 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
     $data = array_merge($creditNote, ['total_credit' => $data['amount'] * -1], $data);
     $financialTypeId = $creditNote['line'][0]['financial_type_id'];
     $data['from_account_id'] = FinancialAccountUtils::getFinancialTypeAccount($financialTypeId, 'Accounts Receivable Account is');
-    $data['to_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($data['payment_instrument_id']);
+    $data['to_account_id'] = CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount($data['payment_instrument_id']);
     $data['is_payment'] = 1;
     $data['net_amount'] = $data['total_credit'] - ($data['fee_amount'] ?? 0);
     $financialTrxn = self::createAccountingEntries($data, 'Completed');
@@ -352,7 +352,7 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
   private static function createFeeAccountingEntries($creditNote, $data) {
     $financialTypeId = $creditNote['line'][0]['financial_type_id'];
     $data = [
-      'from_account_id' => CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($data['payment_instrument_id']),
+      'from_account_id' => CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount($data['payment_instrument_id']),
       'to_account_id' => FinancialAccountUtils::getFinancialTypeAccount($financialTypeId, 'Expense Account is'),
       'date' => $data['date'],
       'total_credit' => $data['fee_amount'],

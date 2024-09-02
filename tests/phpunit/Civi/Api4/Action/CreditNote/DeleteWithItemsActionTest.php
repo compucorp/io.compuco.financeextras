@@ -143,7 +143,7 @@ class Civi_Api4_CreditNote_DeleteWithItemsAction extends BaseHeadlessTest {
 
       $entityFinancialTrxn = \Civi\Api4\EntityFinancialTrxn::get(FALSE)
         ->addWhere('entity_id', '=', $financialItem['id'])
-        ->addWhere('entity_table', '=', \CRM_Financial_BAO_FinancialItem::$_tableName)
+        ->addWhere('entity_table', '=', \CRM_Financial_BAO_FinancialItem::getTableName())
         ->execute()
         ->first();
 

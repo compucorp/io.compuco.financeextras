@@ -15,7 +15,7 @@ class ContributionValidatorTest extends BaseHeadlessTest {
 
   private $memberDuesFinancialTypeId;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->donationFinancialTypeId = civicrm_api3('FinancialType', 'getvalue', [

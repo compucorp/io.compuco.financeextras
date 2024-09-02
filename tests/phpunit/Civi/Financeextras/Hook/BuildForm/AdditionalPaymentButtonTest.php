@@ -14,7 +14,7 @@ class AdditionalPaymentButtonTest extends BaseHeadlessTest {
 
   private $additionalPaymentForm;
 
-  public function setUp() {
+  public function setUp(): void {
     $formController = new CRM_Core_Controller();
     $this->additionalPaymentForm = new CRM_Contribute_Form_AdditionalPayment();
     $this->additionalPaymentForm->controller = $formController;
@@ -23,6 +23,7 @@ class AdditionalPaymentButtonTest extends BaseHeadlessTest {
   public function testSubmitRefundButtonLinkAddedToAdditionalPaymentForm() {
     $contact = ContactFabricator::fabricate();
     $paymentProcessor = PaymentProcessorFabricator::fabricate([
+      'name' => "Dummy",
       'payment_processor_type_id' => "Dummy",
       'financial_account_id' => "Payment Processor Account",
     ]);
