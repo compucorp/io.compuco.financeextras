@@ -194,7 +194,7 @@
             border: 1px dotted #000;
             border-style: none none dotted;
         ">
-        <img src="{$base_url}{crmResURL ext=io.compuco.financeextras file=images/cut.png}" style="height: 31px; width: auto;">
+        <img src="{$base_url}{crmResURL ext='io.compuco.financeextras' file='images/cut.png'}" style="height: 31px; width: auto;">
       </div>
 
       <div>
