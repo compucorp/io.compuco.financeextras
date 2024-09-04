@@ -94,7 +94,7 @@ class Civi_Api4_CreditNote_RefundActionTest extends BaseHeadlessTest {
       $creditNote['items'][0]['financial_type_id'],
       'Accounts Receivable Account is'
     );
-    $expectedToAccount = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount(1);
+    $expectedToAccount = CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount(1);
 
     $this->assertEquals($financialTrxn['to_financial_account_id'], $expectedToAccount);
     $this->assertEquals($financialTrxn['from_financial_account_id'], $expectedFromAccount);
@@ -153,7 +153,7 @@ class Civi_Api4_CreditNote_RefundActionTest extends BaseHeadlessTest {
       'Expense Account is'
     );
 
-    $expectedFromAccount = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount(3);
+    $expectedFromAccount = CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount(3);
 
     $refundFeeFinancialTrxn = \Civi\Api4\FinancialTrxn::get(FALSE)
       ->addWhere('id', '=', $refundAllocation['fee_financial_trxn_id'])
@@ -235,7 +235,7 @@ class Civi_Api4_CreditNote_RefundActionTest extends BaseHeadlessTest {
       'Expense Account is'
     );
 
-    $expectedFromAccount = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount(3);
+    $expectedFromAccount = CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount(3);
 
     $refundFeeFinancialTrxn = \Civi\Api4\FinancialTrxn::get(FALSE)
       ->addWhere('id', '=', $refundAllocation['fee_financial_trxn_id'])
