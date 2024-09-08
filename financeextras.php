@@ -125,6 +125,7 @@ function financeextras_civicrm_post($op, $objectName, $objectId, &$objectRef) {
 
     (new \Civi\Financeextras\Hook\Post\UpdateContributionExchangeRate($objectId))->run();
   }
+  (new \Civi\Financeextras\Hook\Post\UpdateLineItemPriceFieldValues($op, $objectName, $objectId, $objectRef))->run();
 }
 
 /**
