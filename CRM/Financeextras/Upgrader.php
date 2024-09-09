@@ -162,4 +162,31 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
     return TRUE;
   }
 
+  /**
+   * This upgrade updates line items that have empty price field values
+   */
+  public function upgrade_1003() {
+    $this->ctx->log->info('Applying update 1003');
+
+    try {
+      $priceSetId        = \CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_contribution_amount', 'id', 'name');
+      $priceSet          = current(\CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
+      $priceFieldID      = \CRM_Price_BAO_PriceSet::getOnlyPriceFieldID($priceSet);
+      $priceFieldValueID = \CRM_Price_BAO_PriceSet::getOnlyPriceFieldValueID($priceSet);
+
+      \Civi\Api4\LineItem::update(FALSE)
+        ->addValue('price_field_id', $priceFieldID)
+        ->addValue('price_field_value_id', $priceFieldValueID)
+        ->addClause('OR', ['price_field_id', 'IS NULL'], ['price_field_value_id', 'IS NULL'])
+        ->execute();
+
+      return TRUE;
+    }
+    catch (\Throwable $e) {
+      $this->ctx->log->info($e->getMessage());
+
+      return FALSE;
+    }
+  }
+
 }
