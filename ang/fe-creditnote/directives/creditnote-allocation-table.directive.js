@@ -43,13 +43,13 @@
         chain: {"allocations":["CreditNoteAllocation", "get", {"where":[["credit_note_id", "=", "$id"], ["is_reversed", "=", false]], "select":["*", "type_id:label", "contribution_id.invoice_number"]}]}
       }).then(function(result) {
         const creditnotes = result[0] ?? null;
-  
+
         $scope.isVoid = creditnotes["status_id:name"] == "void"
         $scope.currency = creditnotes.currency
         $scope.allocations = creditnotes.allocations ?? []
         $scope.total_credit = creditnotes.total_credit
-        $scope.remaining_credit = creditnotes.remaining_credit
-        $scope.allocated_credit = creditnotes.total_credit - creditnotes.remaining_credit
+        $scope.remaining_credit = creditnotes.remaining_credit ?? $scope.remaining_credit
+        $scope.allocated_credit = creditnotes.remaining_credit ? creditnotes.total_credit - creditnotes.remaining_credit : $scope.allocated_credit
       });
     }
 
