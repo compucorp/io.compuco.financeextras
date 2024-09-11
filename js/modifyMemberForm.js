@@ -45,11 +45,10 @@ CRM.$(function ($) {
         $('.fe-membership_type').hide()
       }
     }
-
-    if ($('input[name=record_contribution]').is(':checked')) {
-      $('input[name=fe_member_type][value=paid_member]').prop("checked", true)
+    if (parseFloat($('#total_amount').val()) > 0 || $('input[name=record_contribution]').is(':checked')) {
+      $('input[name=fe_member_type][value=paid_member]').prop("checked", true).trigger('change')
     } else {
-      $('input[name=fe_member_type][value=free_member]').prop("checked", true)
+      $('input[name=fe_member_type][value=free_member]').prop("checked", true).trigger('change')
     }
   }
 
