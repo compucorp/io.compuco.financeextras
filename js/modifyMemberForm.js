@@ -45,9 +45,11 @@ CRM.$(function ($) {
         $('.fe-membership_type').hide()
       }
     }
-    if (parseFloat($('#total_amount').val()) > 0 || $('input[name=record_contribution]').is(':checked')) {
+
+    if ((parseFloat($('#total_amount').val()) > 0 || $('input[name=record_contribution]').is(':checked')) && !$('input[name=fe_member_type][value=paid_member]').is(":checked")) {
       $('input[name=fe_member_type][value=paid_member]').prop("checked", true).trigger('change')
-    } else {
+    } 
+    else if ((parseFloat($('#total_amount').val()) <= 0) && $('input[name=fe_member_type][value=paid_member]').is(":checked")) {
       $('input[name=fe_member_type][value=free_member]').prop("checked", true).trigger('change')
     }
   }
@@ -63,7 +65,13 @@ CRM.$(function ($) {
 
     $('input:radio[name=fe_member_type]').on('change', () => {
       const isPaid = $('input:radio[name=fe_member_type][value=paid_member]').is(':checked');
-      $('input#record_contribution').prop("checked", !isPaid).trigger('click')
+      if ($('input#record_contribution').is(":checked") && !isPaid) {
+        $('input#record_contribution').prop("checked", !isPaid).trigger('click')
+      }
+      if (!$('input#record_contribution').is(":checked") && isPaid) {
+        $('input#record_contribution').prop("checked", !isPaid).trigger('click')
+      }
+      
     });
 
     $('tr#contri').hide();
