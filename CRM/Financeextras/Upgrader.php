@@ -171,11 +171,24 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
     try {
       $priceSetId        = \CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_contribution_amount', 'id', 'name');
       $priceSet          = current(\CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
-      $priceFieldID      = \CRM_Price_BAO_PriceSet::getOnlyPriceFieldID($priceSet);
-      $priceFieldValueID = \CRM_Price_BAO_PriceSet::getOnlyPriceFieldValueID($priceSet);
+      $priceField      = NULL;
+      foreach ($priceSet['fields'] as $field) {
+        if ($field['name'] == 'contribution_amount') {
+          $priceField = $field;
+          break;
+        }
+      }
+
+      if (empty($priceField)) {
+        return TRUE;
+      }
+      $priceFieldValueID = current($priceField['options'])['id'] ?? NULL;
+      if (empty($priceFieldValueID)) {
+        return TRUE;
+      }
 
       \Civi\Api4\LineItem::update(FALSE)
-        ->addValue('price_field_id', $priceFieldID)
+        ->addValue('price_field_id', $priceField['id'])
         ->addValue('price_field_value_id', $priceFieldValueID)
         ->addClause('OR', ['price_field_id', 'IS NULL'], ['price_field_value_id', 'IS NULL'])
         ->execute();
