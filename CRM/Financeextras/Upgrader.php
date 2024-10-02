@@ -191,6 +191,7 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
         ->addValue('price_field_id', $priceField['id'])
         ->addValue('price_field_value_id', $priceFieldValueID)
         ->addClause('OR', ['price_field_id', 'IS NULL'], ['price_field_value_id', 'IS NULL'])
+        ->addWhere('contribution_id', 'IS NOT NULL')
         ->execute();
 
       return TRUE;
