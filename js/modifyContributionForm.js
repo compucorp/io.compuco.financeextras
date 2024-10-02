@@ -5,6 +5,7 @@ const totalChanged = new CustomEvent("totalChanged", {});
     setTotalAmount();
     hideStatusField();
     const mode = CRM.vars.financeextras.mode ?? null
+    $('#selectPriceSet').hide();
 
     if (!mode) {
       setAmountCurencySymbol();

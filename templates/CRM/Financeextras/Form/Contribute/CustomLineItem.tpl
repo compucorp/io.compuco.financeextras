@@ -42,7 +42,7 @@
             .append($('#lineitem-add-block > div:last-child'))
           )
           $('#totalAmount, #totalAmountORaddLineitem').hide()
-          $('#selectPriceSet').prepend( `<div id="lineItemSwitch" class="crm-hover-button">OR <a href="#">Switch back to using line items</a></div>`)
+          $('.price-set-alt-select').prepend( `<div id="lineItemSwitch" class="crm-hover-button">OR <a href="#">Switch back to using line items</a></div>`)
           $('#lineItemSwitch').css('display', 'block').on('click', () => $('#price_set_id').val('').change())
 
           const hasValues = nonEmtyFinancialTypes.each(function() {
@@ -71,7 +71,6 @@
             $('#lineItemSwitch').show();
             $('#selectPriceSet').prepend($('#price_set_id'))
             $('#lineitem-add-block').hide();
-            $('.price-set-alt').hide();
           } else {
             $('#lineItemSwitch').hide();
             $('#lineitem-add-block').show()
