@@ -6,6 +6,7 @@ require_once 'financeextras.civix.php';
 use CRM_Financeextras_ExtensionUtil as E;
 use Civi\Financeextras\Event\ContributionPaymentUpdatedEvent;
 use Civi\Financeextras\Hook\AlterMailParams\AlterContributionReceipt;
+use Civi\Financeextras\Hook\Post\UpdateLineItemPriceFieldValues;
 
 // phpcs:enable
 
@@ -125,7 +126,10 @@ function financeextras_civicrm_post($op, $objectName, $objectId, &$objectRef) {
 
     (new \Civi\Financeextras\Hook\Post\UpdateContributionExchangeRate($objectId))->run();
   }
-  (new \Civi\Financeextras\Hook\Post\UpdateLineItemPriceFieldValues($op, $objectName, $objectId, $objectRef))->run();
+
+  if (UpdateLineItemPriceFieldValues::shouldRun($op, $objectName, $objectRef)) {
+    (new UpdateLineItemPriceFieldValues((int) $objectId))->run();
+  }
 }
 
 /**
