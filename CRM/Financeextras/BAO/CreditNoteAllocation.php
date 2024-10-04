@@ -189,6 +189,8 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
     if (self::isContributionStatus($params['contribution_id'], 'Completed')) {
       $params['line_item'] = ContributionUtils::allocatePaymentToLineItem($params['total_amount'], $params['contribution_id']);
     }
+
+    self::preventExtendingMembershipEndDate();
     $transaction = \CRM_Financial_BAO_Payment::create($params);
 
     // The Payment API typically uses the "Accounts Receivable" as the "from" account
@@ -296,6 +298,16 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
       ->addWhere('contribution_status_id:name', '=', $status)
       ->execute()
       ->first());
+  }
+
+  private static function preventExtendingMembershipEndDate() {
+    $manager = \CRM_Extension_System::singleton()->getManager();
+    if ($manager->getStatus('uk.co.compucorp.membershipextras') !== \CRM_Extension_Manager::STATUS_INSTALLED) {
+      return;
+    }
+
+    // This is to prevent the membershipextras extension from extending the membership date.
+    Civi::$statics['uk.co.compucorp.membershipextras']['paymentApiCalled'] = TRUE;
   }
 
 }
