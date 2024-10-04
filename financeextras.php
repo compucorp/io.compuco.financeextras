@@ -326,3 +326,25 @@ function financeextras_civicrm_batchItems(&$results, &$items) {
   $hook = new \Civi\Financeextras\Hook\BatchExport\UpdateItems($results, $items);
   $hook->addCreditNoteNumberAsInvoiceNumber();
 }
+
+/**
+ * Implements hook_membershipextras_preventMembershipDateExtension().
+ */
+function financeextras_membershipextras_preventMembershipDateExtension(bool &$preventMembershipDateExtension, int $paymentContributionId) {
+  $contributionId = NULL;
+  if ($paymentContributionId > 0) {
+    $contributionId = $paymentContributionId;
+  }
+  elseif (!empty(Civi::$statics[CRM_Financeextras_ExtensionUtil::LONG_NAME]['creditNoteContributionId'])) {
+    $contributionId = Civi::$statics[CRM_Financeextras_ExtensionUtil::LONG_NAME]['creditNoteContributionId'];
+  }
+
+  if (empty($contributionId)) {
+    return;
+  }
+
+  $allocation = new CRM_Financeextras_DAO_CreditNoteAllocation();
+  $allocation->contribution_id = $contributionId;
+
+  $preventMembershipDateExtension = $preventMembershipDateExtension || (bool) $allocation->find();
+}
