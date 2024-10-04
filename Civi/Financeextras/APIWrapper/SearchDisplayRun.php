@@ -145,7 +145,9 @@ class SearchDisplayRun {
       }
       foreach ($display['columns'] as &$column) {
         if (in_array($column['label'], ['Net Amount', 'Tax Amount'])) {
-          $column['val'] = \CRM_Utils_Money::format(abs(trim($column['val']) ?: 0));
+          $val = abs(trim($column['val']) ?: 0);
+          $val = floor($val * 100) / 100;
+          $column['val'] = \CRM_Utils_Money::format($val);
         }
       }
 
