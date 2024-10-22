@@ -132,7 +132,6 @@
         const duePercent = (100 * dueAmount) /contribution.total_amount
         for (let i = 0; i < lineItems.length; i++) {
           let qty = lineItems[i].qty * (duePercent/100)
-          console.log(qty, lineItems[i].qty, duePercent)
           // ensure quantity doesn't exceed 4 decimals (note this is not rounding)
           qty = Math.floor(qty * 10000) / 10000
           let unitPrice = Number((lineItems[i].unit_price).toFixed(2))
@@ -142,7 +141,7 @@
             description: lineItems[i].label,
             financial_type_id: lineItems[i].financial_type_id,
             tax_rate: 0,
-            line_total: qty * unitPrice
+            line_total: formatMoney(qty * unitPrice, $scope.creditnotes.currency)
           }
 
           handleFinancialTypeChange(i);
@@ -198,7 +197,7 @@
             financial_type_id: element.financial_type_id,
             unit_price: element.unit_price,
             quantity: element.quantity,
-            line_total: element.line_total,
+            line_total: formatMoney(element.line_total, $scope.creditnotes.currency),
             financial_type: element['financial_type_id.name']
           })
 
@@ -360,7 +359,7 @@
         return;
       }
 
-      item.line_total = item.unit_price * item.quantity || 0;
+      item.line_total = formatMoney(item.unit_price * item.quantity || 0, $scope.creditnotes.currency);
       $scope.$emit('totalChange');
     }
 
