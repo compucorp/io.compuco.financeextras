@@ -43,7 +43,7 @@ class CRM_Financeextras_BAO_CreditNoteLine extends CRM_Financeextras_DAO_CreditN
   public static function createWithAcountingEntries($items, $creditNote, $financialTrxn) {
     $result = [];
     array_walk($items, function (&$lineItem) use ($creditNote, $financialTrxn, &$result) {
-      $lineTotal = $lineItem['unit_price'] * $lineItem['quantity'];
+      $lineTotal = self::formatValue((float) ($lineItem['unit_price'] * $lineItem['quantity']));
       $lineItemParams = [
         'credit_note_id' => $creditNote['id'],
         'description' => $lineItem['description'],
@@ -161,7 +161,7 @@ class CRM_Financeextras_BAO_CreditNoteLine extends CRM_Financeextras_DAO_CreditN
       'transaction_date' => $creditNote['date'],
       'contact_id' => $creditNote['contact_id'],
       'currency' => $creditNote['currency'],
-      'amount' => ($lineItem['quantity'] * $lineItem['unit_price']),
+      'amount' => self::formatValue((float) ($lineItem['quantity'] * $lineItem['unit_price'])),
       'description' => $lineItem['description'],
       'status_id' => OptionValueUtils::getValueForOptionValue('financial_item_status', $status),
       'financial_account_id' => $financialAccount,
@@ -199,7 +199,11 @@ class CRM_Financeextras_BAO_CreditNoteLine extends CRM_Financeextras_DAO_CreditN
    *   Calculated Percentage in float
    */
   private static function calculateTaxAmount(float $percentage, float $value) {
-    return (floatval($percentage) / 100) * floatval($value);
+    return self::formatValue((float) (floatval($percentage) / 100) * floatval($value));
+  }
+
+  private static function formatValue(float $value): float {
+    return bcdiv($value, 1, 2);
   }
 
 }
