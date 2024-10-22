@@ -84,16 +84,16 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
    *   ['totalAfterTax' => <value>, 'totalBeforeTax' => <value>]
    */
   public static function computeTotalAmount(array $items) {
-    $totalBeforeTax = round(array_reduce($items, fn ($a, $b) => $a + self::getLineItemSubTotal($b), 0), 2);
-    $totalAfterTax = round(array_reduce($items,
-      fn ($a, $b) => $a + ($b['tax_amount'] ?? (($b['tax_rate'] * self::getLineItemSubTotal($b)) / 100)),
+    $totalBeforeTax = array_reduce($items, fn ($a, $b) => $a + self::getLineItemSubTotal($b), 0);
+    $totalAfterTax = array_reduce($items,
+      fn ($a, $b) => $a + ($b['tax_amount'] ?? self::formatValue((float) (($b['tax_rate'] * self::getLineItemSubTotal($b)) / 100))),
       0
-    ) + $totalBeforeTax, 2);
+    ) + $totalBeforeTax;
 
     return [
       'taxRates' => self::computeLineItemsTaxRates($items),
-      'totalAfterTax' => $totalAfterTax,
-      'totalBeforeTax' => $totalBeforeTax,
+      'totalAfterTax' => self::formatValue((float) $totalAfterTax),
+      'totalBeforeTax' => self::formatValue((float) $totalBeforeTax),
     ];
   }
 
@@ -128,7 +128,7 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
       [
         'tax_name' => $a['tax_name'] ?? '',
         'rate' => round($a['tax_rate'], 2),
-        'value' => round(($a['tax_rate'] * self::getLineItemSubTotal($a)) / 100, 2),
+        'value' => self::formatValue((float) (($a['tax_rate'] * self::getLineItemSubTotal($a)) / 100)),
       ],
       $items
     );
@@ -403,6 +403,10 @@ class CRM_Financeextras_BAO_CreditNote extends CRM_Financeextras_DAO_CreditNote 
     $cnOwnerCompany = CRM_Core_DAO::executeQuery($OwnerOrgQuery);
     $cnOwnerCompany->fetch();
     return $cnOwnerCompany->toArray();
+  }
+
+  private static function formatValue(float $value): float {
+    return bcdiv($value, 1, 2);
   }
 
 }
