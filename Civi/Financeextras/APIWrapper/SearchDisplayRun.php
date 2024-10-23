@@ -70,6 +70,10 @@ class SearchDisplayRun {
         ->execute()
         ->first();
 
+      if (empty($creditNote)) {
+        continue;
+      }
+
       $remaining = $creditNote['remaining_credit'];
       $lastIndex = count($display['columns']) - 1;
       $display['columns'][$lastIndex + 1] = $display['columns'][$lastIndex];
