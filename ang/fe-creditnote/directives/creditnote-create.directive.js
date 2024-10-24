@@ -119,9 +119,22 @@
           return
         }
 
+        let currentOwnerOrganization = $scope.creditnotes.owner_organization ? $scope.creditnotes.owner_organization
+          : String($scope.companies[0]?.contact_id);
+        let contributionOwnerOrganization = null;
+
+        $scope.companies.forEach((company) => {
+          if (company.contact_id !== null &&
+            String(contribution['financeextras_contribution_owner.owner_organization']) === String(company.contact_id)
+          ) {
+            contributionOwnerOrganization = String(company.contact_id);
+          }
+        });
+
         $scope.contactId = contribution.contact_id
         $scope.creditnotes.contact_id = contribution.contact_id
-        $scope.creditnotes.owner_organization = String(contribution['financeextras_contribution_owner.owner_organization'])
+        $scope.creditnotes.owner_organization = contributionOwnerOrganization ?
+          contributionOwnerOrganization : currentOwnerOrganization;
         $scope.creditnotes.currency = contribution.currency
         $scope.disableCurrency = true
         $scope.currencySymbol = CurrencyCodes.getSymbol(contribution.currency);
