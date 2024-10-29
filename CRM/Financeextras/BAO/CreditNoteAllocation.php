@@ -148,7 +148,7 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
    *  The amount to be allocated.
    */
   private static function createAccountingEntries($allocationId, $creditNoteId, $contributionId, $amount) {
-    $date = date("Y-m-d");
+    $date = date("Y-m-d H:i:s");
     $params = [
       'contribution_id' => $contributionId,
       'total_amount' => $amount,
