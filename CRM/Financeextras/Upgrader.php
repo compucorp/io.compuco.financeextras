@@ -142,7 +142,18 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
    */
   public function upgrade_1002() {
     $this->ctx->log->info('Applying update 1002');
-    $this->executeSqlFile('sql/upgrade_1002.sql');
+    try {
+      $columnExists = $this->checkColumnExists('financeextras_company', 'receivable_payment_method');
+      if (!$columnExists) {
+        $this->executeSqlFile('sql/upgrade_1002.sql');
+      }
+      else {
+        $this->ctx->log->info('Column financeextras_company.receivable_payment_method already exists, skipping update.');
+      }
+    }
+    catch (\Exception $e) {
+      $this->ctx->log->info('Error applying update 1002: ' . $e->getMessage());
+    }
 
     $defaultAccountReceivableAccount = \Civi\Api4\OptionValue::get(FALSE)
       ->setCheckPermissions(FALSE)
@@ -160,6 +171,21 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
     }
 
     return TRUE;
+  }
+
+  private function checkColumnExists($tableName, $columnName) {
+    $dao = CRM_Core_DAO::executeQuery("
+        SELECT COUNT(*) AS count
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = %1
+          AND COLUMN_NAME = %2
+    ", [
+      1 => [$tableName, 'String'],
+      2 => [$columnName, 'String'],
+    ]);
+    $dao->fetch();
+    return (bool) $dao->count;
   }
 
 }
