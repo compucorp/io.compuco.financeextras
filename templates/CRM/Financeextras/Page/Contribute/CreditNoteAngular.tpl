@@ -4,10 +4,10 @@
   </div>
 </div>
 <script type="text/javascript">
-  const id = JSON.parse({ $id });
-  const context = '{ $context }';
-  const contactId = JSON.parse({ $contact_id });
-  const contributionId = JSON.parse({ $contribution_id });
+  const id = JSON.parse({$id});
+  const context = '{$context}';
+  const contactId = JSON.parse({$contact_id});
+  const contributionId = JSON.parse({$contribution_id});
   {literal}
     (function(angular, $, _) {
       const app = angular.module('creditnoteTab', ['fe-creditnote']);
