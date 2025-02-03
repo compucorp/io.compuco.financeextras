@@ -90,6 +90,10 @@ class ParticipantPostProcess {
     ];
     \CRM_Event_BAO_ParticipantPayment::create($participantPaymentParams);
 
+    if ($contribution->id) {
+      $this->createFinancialItem($contribution);
+    }
+
     return $contribution->id;
   }
 
@@ -149,6 +153,17 @@ class ParticipantPostProcess {
       ];
 
       \CRM_Financial_BAO_Payment::create($params);
+    }
+  }
+
+  private function createFinancialItem(object $contribution): void {
+    $lineItem = new \CRM_Price_DAO_LineItem();
+    $lineItem->entity_table = 'civicrm_participant';
+    $lineItem->entity_id = $this->form->_id;
+    $lineItem->limit(1);
+
+    if ($lineItem->find(TRUE)) {
+      \CRM_Financial_BAO_FinancialItem::add($lineItem, $contribution);
     }
   }
 
