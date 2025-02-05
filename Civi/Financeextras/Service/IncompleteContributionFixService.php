@@ -57,7 +57,20 @@ class IncompleteContributionFixService {
 
   private function createFinancialTrxn(array $contribution): void {
     $createFinancialTrxn = TRUE;
-    $paymentProcessorId = $paymentInstrumentId = NULL;
+    try {
+      $paymentProcessorId = (int) civicrm_api3('PaymentProcessor', 'getvalue', [
+        'is_test' => 0,
+        'options' => ['limit' => 1],
+        'name'    => 'Stripe',
+        'return'  => 'id',
+      ]);
+    }
+    catch (\Throwable $e) {
+      $paymentProcessorId = 0;
+    }
+    $paymentInstrumentId = 'Credit Card';
+    $transactionIds = explode(',', $contribution['trxn_id']);
+    $lastTransactionId = $transactionIds[count($transactionIds) - 1];
 
     $financialTrxns = \Civi\Api4\FinancialTrxn::get(FALSE)
       ->addWhere('trxn_id', '=', $contribution['trxn_id'])
@@ -82,10 +95,10 @@ class IncompleteContributionFixService {
         'net_amount' => $contribution['net_amount'],
         'currency' => $contribution['currency'],
         'is_payment' => 1,
-        'trxn_id' => $contribution['trxn_id'],
+        'trxn_id' => $lastTransactionId,
         'status_id' => 'Completed',
-        'payment_instrument_id' => $paymentInstrumentId ?? 'Credit Card',
-        'payment_processor_id' => $paymentProcessorId ?? 'Stripe',
+        'payment_instrument_id' => $paymentInstrumentId,
+        'payment_processor_id' => $paymentProcessorId > 0 ? $paymentProcessorId : NULL,
         'entity_id' => $contribution['id'],
         'contribution_id' => $contribution['id'],
       ]);
@@ -110,7 +123,7 @@ class IncompleteContributionFixService {
       'qty' => 1,
       'unit_price' => $contribution['total_amount'],
       'line_total' => $contribution['total_amount'],
-      'financial_type_id' => 'Member Dues',
+      'financial_type_id' => $contribution['financial_type_id'] ?? 'Member Dues',
     ]);
 
     return $lineItem['values'] ?? [];
