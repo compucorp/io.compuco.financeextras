@@ -9,6 +9,7 @@ use Civi\Financeextras\Setup\Manage\CreditNoteInvoiceTemplateManager;
 use Civi\Financeextras\Setup\Manage\CreditNotePaymentInstrumentManager;
 use Civi\Financeextras\Setup\Manage\ContributionOwnerOrganizationManager;
 use Civi\Financeextras\Setup\Manage\AccountsReceivablePaymentMethod;
+use Civi\Financeextras\Service\IncompleteContributionFixService;
 
 /**
  * Collection of upgrade steps.
@@ -193,6 +194,24 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
         ->addClause('OR', ['price_field_id', 'IS NULL'], ['price_field_value_id', 'IS NULL'])
         ->addWhere('contribution_id', 'IS NOT NULL')
         ->execute();
+
+      return TRUE;
+    }
+    catch (\Throwable $e) {
+      $this->ctx->log->info($e->getMessage());
+
+      return FALSE;
+    }
+  }
+
+  /**
+   * Executes upgrade 1004
+   */
+  public function upgrade_1004(): bool {
+    try {
+      $contributionFix = new IncompleteContributionFixService();
+      $processedContributions = $contributionFix->execute();
+      $this->ctx->log->info(json_encode($processedContributions));
 
       return TRUE;
     }
