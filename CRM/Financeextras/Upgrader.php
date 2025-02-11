@@ -141,8 +141,10 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
    * This upgrade updates company table
    */
   public function upgrade_1002() {
-    $this->ctx->log->info('Applying update 1002');
-    $this->executeSqlFile('sql/upgrade_1002.sql');
+    if (!\CRM_Core_BAO_SchemaHandler::checkIfFieldExists('financeextras_company', 'receivable_payment_method', FALSE)) {
+      $this->ctx->log->info('Applying update 1002');
+      $this->executeSqlFile('sql/upgrade_1002.sql');
+    }
 
     $defaultAccountReceivableAccount = \Civi\Api4\OptionValue::get(FALSE)
       ->setCheckPermissions(FALSE)
