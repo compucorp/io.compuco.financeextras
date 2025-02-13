@@ -22,11 +22,6 @@ CRM.$(function ($) {
         toggleContributionBlock();
         togglePaymentBlock(defaultPaymentMethod);
         setTotalAmount();
-
-        observer.observe(document.body, {
-          childList: true,
-          subtree: true
-        });
       }
     });
 
