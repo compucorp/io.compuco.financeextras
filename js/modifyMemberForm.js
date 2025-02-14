@@ -1,4 +1,5 @@
 CRM.$(function ($) {
+  const defaultPaymentMethod = CRM.$("#payment_instrument_id") && CRM.$("#payment_instrument_id").val() ? CRM.$("#payment_instrument_id").val() : null;
 
   (function() {
     setTotalAmount();
@@ -23,16 +24,17 @@ CRM.$(function ($) {
   function togglePaymentBlock() {
     const accountsReceivablePaymentMethod = CRM.vars.financeextras.accounts_receivable_payment_method;
 
-    $('input[name=fe_record_payment_check]').prop("checked", true).trigger('change')
-    CRM.$("#payment_instrument_id").val(accountsReceivablePaymentMethod).change();
+    $('input[name=fe_record_payment_check]').prop("checked", true).trigger('change');
 
     $('input[name=fe_record_payment_check]').on('change', () => {
       const recordPayment = $('input[name=fe_record_payment_check]').is(':checked')
       if (!recordPayment) {
         CRM.$("#payment_instrument_id").val(accountsReceivablePaymentMethod).change();
+      } else {
+        CRM.$("#payment_instrument_id").val(defaultPaymentMethod).change();
       }
 
-      $('tr.record_payment-block_row').toggle(recordPayment)
+      $('tr.record_payment-block_row').toggle(recordPayment);
     });
   }
 
@@ -48,7 +50,7 @@ CRM.$(function ($) {
 
     if ((parseFloat($('#total_amount').val()) > 0 || $('input[name=record_contribution]').is(':checked')) && !$('input[name=fe_member_type][value=paid_member]').is(":checked")) {
       $('input[name=fe_member_type][value=paid_member]').prop("checked", true).trigger('change')
-    } 
+    }
     else if ((parseFloat($('#total_amount').val()) <= 0) && $('input[name=fe_member_type][value=paid_member]').is(":checked")) {
       $('input[name=fe_member_type][value=free_member]').prop("checked", true).trigger('change')
     }
@@ -71,7 +73,7 @@ CRM.$(function ($) {
       if (!$('input#record_contribution').is(":checked") && isPaid) {
         $('input#record_contribution').prop("checked", !isPaid).trigger('click')
       }
-      
+
     });
 
     $('tr#contri').hide();

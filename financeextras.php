@@ -207,6 +207,7 @@ function financeextras_civicrm_buildForm($formName, &$form) {
     \Civi\Financeextras\Hook\BuildForm\FinancialBatchSearch::class,
     \Civi\Financeextras\Hook\BuildForm\FinancialAccount::class,
     \Civi\Financeextras\Hook\BuildForm\AdditionalPaymentButton::class,
+    \Civi\Financeextras\Hook\BuildForm\PaymentCreate::class,
     \Civi\Financeextras\Hook\BuildForm\RefundCreditNotePaymentInformation::class,
   ];
 

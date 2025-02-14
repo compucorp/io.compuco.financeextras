@@ -17,16 +17,11 @@ CRM.$(function ($) {
     const observer = new window.MutationObserver(function () {
       if ($('.crm-event-eventfees-form-block-record_contribution').length && !$('tr.fe_record_contribution-block_row').length) {
         observer.disconnect();
-
+        const defaultPaymentMethod = CRM.$("#payment_instrument_id") && CRM.$("#payment_instrument_id").val() ? CRM.$("#payment_instrument_id").val() : null;
         placePaymentFieldsTogether();
         toggleContributionBlock();
-        togglePaymentBlock();
+        togglePaymentBlock(defaultPaymentMethod);
         setTotalAmount();
-
-        observer.observe(document.body, {
-          childList: true,
-          subtree: true
-        });
       }
     });
 
@@ -59,9 +54,8 @@ CRM.$(function ($) {
     $('.crm-event-eventfees-form-block-contribution_status_id').hide();
   }
 
-  function togglePaymentBlock() {
+  function togglePaymentBlock(defaultPaymentMethod) {
     const accountsReceivablePaymentMethod = CRM.vars.financeextras.accounts_receivable_payment_method;
-    CRM.$("#payment_instrument_id").val(accountsReceivablePaymentMethod).change();
 
     if ($('input#record_contribution').is(':checked')) {
       $('input:radio[name=fe_ticket_type][value=paid_ticket]').click();
@@ -71,6 +65,9 @@ CRM.$(function ($) {
 
     $('input#record_contribution').on('input', () => {
       if ($('input#record_contribution').is(':checked')) {
+        if (defaultPaymentMethod) {
+          CRM.$("#payment_instrument_id").val(defaultPaymentMethod).change();
+        }
         $('#billing-payment-block').show();
       }else {
         CRM.$("#payment_instrument_id").val(accountsReceivablePaymentMethod).change();

@@ -1,5 +1,6 @@
 CRM.$(function ($) {
-const totalChanged = new CustomEvent("totalChanged", {});
+  const totalChanged = new CustomEvent("totalChanged", {});
+  const defaultPaymentMethod = CRM.$("#payment_instrument_id") && CRM.$("#payment_instrument_id").val() ? CRM.$("#payment_instrument_id").val() : null;
 
   (function() {
     setTotalAmount();
@@ -70,6 +71,9 @@ const totalChanged = new CustomEvent("totalChanged", {});
     const accountsReceivablePaymentMethod = CRM.vars.financeextras.accounts_receivable_payment_method;
     const toggle = (checked)  => {
       if (checked) {
+        if (defaultPaymentMethod) {
+          CRM.$("#payment_instrument_id").val(defaultPaymentMethod).change();
+        }
         $('.record_payment-block').show();
       } else {
         CRM.$("#payment_instrument_id").val(accountsReceivablePaymentMethod).change();
@@ -109,7 +113,7 @@ const totalChanged = new CustomEvent("totalChanged", {});
     $('tr#email-receipt label').text('Send Email Confirmation')
     const email = $('tr#email-receipt #email-address')
     $('tr#email-receipt .description').text('Automatically email a confirmation of this transaction to ').append(email).append('?')
-    
+
     if (!$('tr#email-receipt').length) {
       $('tr.crm-contribution-form-block-is_email_receipt label').text('Send Email Confirmation')
       let text = $('tr.crm-contribution-form-block-is_email_receipt .description').text()
