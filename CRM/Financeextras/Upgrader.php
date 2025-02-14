@@ -222,4 +222,24 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
     }
   }
 
+  /**
+   * Executes upgrade 1005
+   */
+  public function upgrade_1005(): bool {
+    try {
+      $templateManager = new CreditNoteInvoiceTemplateManager();
+      $templateManager->replaceText(
+        '<img src="{$base_url}{crmResURL ext=io.compuco.financeextras file=images/cut.png}" style="height: 31px; width: auto;">',
+        '<img src="{$base_url}{crmResURL ext=\'io.compuco.financeextras\' file=\'images/cut.png\'}" style="height: 31px; width: auto;">'
+      );
+
+      return TRUE;
+    }
+    catch (\Throwable $e) {
+      $this->ctx->log->info($e->getMessage());
+
+      return FALSE;
+    }
+  }
+
 }
