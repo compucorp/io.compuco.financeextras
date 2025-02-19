@@ -26,9 +26,6 @@
 #bootstrap-theme.creditnote__container > div#creditnote__list.panel > .panel-body {
   padding: 0px 0px 14px 0px;
 }
-#bootstrap-theme.creditnote__container > #creditnote__list afsearch-credit-notes crm-search-display-table table {
-  margin-bottom: 20px;
-}
 #creditnote__list afsearch-credit-notes crm-search-display-table ul.dropdown-menu {
   right: 0;
   left: auto;

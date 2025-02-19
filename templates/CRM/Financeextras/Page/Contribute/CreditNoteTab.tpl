@@ -34,3 +34,12 @@
     </div>
   {/if}
 </div>
+
+{literal}
+<style>
+#creditnote__list .crm-search-display.crm-search-display-table {
+  box-shadow: unset;
+}
+</style>
+{/literal}
+
