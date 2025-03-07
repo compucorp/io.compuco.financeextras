@@ -58,6 +58,28 @@ class CreditNoteInvoiceTemplateManager extends AbstractManager {
     MessageTemplate::save(FALSE)->addRecord($params)->execute();
   }
 
+  public function replaceText(string $search, string $replace): void {
+    if (empty($search)) {
+      return;
+    }
+
+    $messageTemplate = MessageTemplate::get(FALSE)
+      ->addSelect('id', 'msg_html')
+      ->addWhere('workflow_name', '=', CreditNoteInvoice::WORKFLOW)
+      ->execute()
+      ->first();
+    if (empty($messageTemplate)) {
+      return;
+    }
+
+    $replaced = str_replace($search, $replace, $messageTemplate['msg_html']);
+
+    MessageTemplate::update(FALSE)
+      ->addValue('msg_html', $replaced)
+      ->addWhere('id', '=', $messageTemplate['id'])
+      ->execute();
+  }
+
   /**
    * {@inheritDoc}
    */
