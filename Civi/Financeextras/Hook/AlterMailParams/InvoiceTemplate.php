@@ -2,6 +2,7 @@
 
 namespace Civi\Financeextras\Hook\AlterMailParams;
 
+use Civi\WorkflowMessage\WorkflowMessage;
 use CRM_Financeextras_CustomGroup_ContributionOwnerOrganisation as ContributionOwnerOrganisation;
 
 /**
@@ -82,14 +83,16 @@ class InvoiceTemplate {
    * Replaces the default civicrm invoice template
    * by the one configured on the contribution owner
    * organisation.
-   * This is possible because CiviCRM calls this hook
-   * before loading the template:
-   * https://github.com/civicrm/civicrm-core/blob/5.39.1/CRM/Core/BAO/MessageTemplate.php#L418
    *
    * @return void
    */
   private function useContributionOwnerOrganisationInvoiceTemplate() {
     $this->templateParams['messageTemplateID'] = $this->contributionOwnerCompany['invoice_template_id'];
+    /** @var \Civi\WorkflowMessage\GenericWorkflowMessage $model */
+    $model = $this->templateParams['model'] ?? WorkflowMessage::create($this->templateParams['workflow'] ?? 'UNKNOWN');
+    WorkflowMessage::importAll($model, $this->templateParams);
+    $mailContent = $model->resolveContent();
+    \Civi::cache('session')->set('fe_org_message_template', base64_encode(json_encode($mailContent)));
   }
 
   /**
