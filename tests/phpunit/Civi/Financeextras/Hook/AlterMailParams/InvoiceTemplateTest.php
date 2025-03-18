@@ -28,6 +28,7 @@ class InvoiceTemplateTest extends BaseHeadlessTest {
     \CRM_Financeextras_CustomGroup_ContributionOwnerOrganisation::setOwnerOrganisation($contribution['id'], $this->company['contact_id']);
 
     $templateParams['messageTemplateID'] = NULL;
+    $templateParams['isTest'] = TRUE;
     $templateParams['tplParams']['id'] = $contribution['id'];
     $alterInvoiceParams = new \Civi\Financeextras\Hook\AlterMailParams\InvoiceTemplate($templateParams, '');
     $alterInvoiceParams->handle();
@@ -72,6 +73,7 @@ class InvoiceTemplateTest extends BaseHeadlessTest {
     ]);
     \CRM_Financeextras_CustomGroup_ContributionOwnerOrganisation::setOwnerOrganisation($contribution['id'], $this->company['contact_id']);
 
+    $templateParams['isTest'] = TRUE;
     $templateParams['tplParams'] = NULL;
     $templateParams['tplParams']['id'] = $contribution['id'];
     $alterInvoiceParams = new \Civi\Financeextras\Hook\AlterMailParams\InvoiceTemplate($templateParams, '');
@@ -117,6 +119,7 @@ class InvoiceTemplateTest extends BaseHeadlessTest {
     ]);
     \CRM_Financeextras_CustomGroup_ContributionOwnerOrganisation::setOwnerOrganisation($contribution['id'], $this->company['contact_id']);
 
+    $templateParams['isTest'] = TRUE;
     $templateParams['tplParams'] = NULL;
     $templateParams['tplParams']['id'] = $contribution['id'];
     $alterInvoiceParams = new \Civi\Financeextras\Hook\AlterMailParams\InvoiceTemplate($templateParams, '');
