@@ -238,6 +238,16 @@ function financeextras_civicrm_alterMailParams(&$params, $context) {
  * Implements hook_civicrm_alterMailContent().
  */
 function financeextras_civicrm_alterMailContent(&$content) {
+  $hooks = [
+    \Civi\Financeextras\Hook\AlterMailContent\ContributionTemplate::class,
+  ];
+
+  foreach ($hooks as $hook) {
+    if ($hook::shouldHandle($content)) {
+      (new $hook($content))->handle();
+    }
+  }
+
   if (($content['workflow_name'] ?? NULL) === 'contribution_offline_receipt') {
     $content['html'] = str_replace('$formValues.total_amount', '$contribution.total_amount', $content['html']);
   }
