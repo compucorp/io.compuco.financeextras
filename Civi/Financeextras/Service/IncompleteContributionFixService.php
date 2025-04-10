@@ -8,6 +8,15 @@ class IncompleteContributionFixService {
     $contributionStatuses = array_flip(\CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate'));
     $affectedContributions = $this->fetchAffectedContributions($contributionStatuses);
     $processedContributions = [];
+    $financialAccount = civicrm_api3('FinancialAccount', 'get', [
+      'name' => 'Payment Processor Account',
+      'is_active' => TRUE,
+      'options' => ['limit' => 1],
+    ]);
+    // we need to have payment processor financial account active to fix faulty contributions
+    if (empty($financialAccount['id'])) {
+      return [];
+    }
 
     while ($affectedContributions->fetch()) {
       $affectedContribution = $affectedContributions->toArray();
