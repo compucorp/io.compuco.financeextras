@@ -45,7 +45,8 @@ class ContributionCreate {
     $data = &$this->form->controller->container();
     if (empty($this->fields['total_amount']) && !empty($this->fields['fe_record_payment_amount'])) {
       $data = &$this->form->controller->container();
-      $data['values']['Contribution']['total_amount'] = array_sum($data['values']['Contribution']['item_line_total']) ?? $this->fields['fe_record_payment_amount'];
+      $total = array_sum($data['values']['Contribution']['item_line_total']) + array_sum($data['values']['Contribution']['item_tax_amount']);
+      $data['values']['Contribution']['total_amount'] = $total ?? $this->fields['fe_record_payment_amount'];
     }
 
   }
