@@ -213,7 +213,7 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
     try {
       $contributionFix = new IncompleteContributionFixService();
       $processedContributions = $contributionFix->execute();
-      $this->ctx->log->info(json_encode($processedContributions));
+      $this->ctx->log->info('processed contributions' . json_encode($processedContributions));
 
       return TRUE;
     }
