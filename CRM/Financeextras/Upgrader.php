@@ -9,7 +9,6 @@ use Civi\Financeextras\Setup\Manage\CreditNoteInvoiceTemplateManager;
 use Civi\Financeextras\Setup\Manage\CreditNotePaymentInstrumentManager;
 use Civi\Financeextras\Setup\Manage\ContributionOwnerOrganizationManager;
 use Civi\Financeextras\Setup\Manage\AccountsReceivablePaymentMethod;
-use Civi\Financeextras\Service\IncompleteContributionFixService;
 
 /**
  * Collection of upgrade steps.
@@ -210,18 +209,8 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
    * Executes upgrade 1004
    */
   public function upgrade_1004(): bool {
-    try {
-      $contributionFix = new IncompleteContributionFixService();
-      $processedContributions = $contributionFix->execute();
-      $this->ctx->log->info(json_encode($processedContributions));
-
-      return TRUE;
-    }
-    catch (\Throwable $e) {
-      $this->ctx->log->info($e->getMessage());
-
-      return FALSE;
-    }
+    // this function is left here as we have already upgraded some clients and cannot remove it.
+    return TRUE;
   }
 
   /**
