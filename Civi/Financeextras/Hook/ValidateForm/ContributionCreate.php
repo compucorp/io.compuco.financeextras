@@ -20,6 +20,7 @@ class ContributionCreate {
     $this->validatePaymentForm();
     $this->validateConsistentIncomeAccountOwners();
     $this->removeInvalidSoftCreditErrors();
+    $this->updateNonDeductibleAmountFromLineTotal();
   }
 
   public function validatePaymentForm() {
@@ -42,7 +43,6 @@ class ContributionCreate {
       return;
     }
 
-    $data = &$this->form->controller->container();
     if (empty($this->fields['total_amount']) && !empty($this->fields['fe_record_payment_amount'])) {
       $data = &$this->form->controller->container();
       $total = array_sum($data['values']['Contribution']['item_line_total']) + array_sum($data['values']['Contribution']['item_tax_amount']);
@@ -119,6 +119,33 @@ class ContributionCreate {
       }
     }
 
+  }
+
+  private function updateNonDeductibleAmountFromLineTotal(): void {
+    try {
+      if ($this->form->_mode !== 'live') {
+        return;
+      }
+
+      $data = &$this->form->controller->container();
+
+      if ((isset($data['values']['Contribution']['non_deductible_amount']) && (!empty($data['values']['Contribution']['non_deductible_amount']))) ||
+        isset($data['values']['Contribution']['price_set_id']) || isset($data['values']['Contribution']['priceSetId'])
+      ) {
+        return;
+      }
+
+      $financialType     = new \CRM_Financial_DAO_FinancialType();
+      $financialType->id = $data['values']['Contribution']['financial_type_id'];
+      $financialType->find(TRUE);
+
+      if (!$financialType->is_deductible && !empty($data['values']['Contribution']['item_line_total']) && !empty($data['values']['Contribution']['item_tax_amount'])) {
+        $total                                                   = array_sum($data['values']['Contribution']['item_line_total']) + array_sum($data['values']['Contribution']['item_tax_amount']);
+        $data['values']['Contribution']['non_deductible_amount'] = $total ?? $this->fields['fe_record_payment_amount'];
+      }
+    }
+    catch (\Throwable $e) {
+    }
   }
 
 }
