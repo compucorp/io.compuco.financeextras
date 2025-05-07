@@ -156,8 +156,10 @@ class ContributionCreate {
    * @return bool
    */
   public static function shouldHandle($form, $formName) {
+    $context = \CRM_Utils_Request::retrieve('context', 'String');
+    $isPledgePayment = in_array($context, ['pledge', 'pledgeDashboard']);
     $addOrUpdate = ($form->getAction() & CRM_Core_Action::ADD) || ($form->getAction() & CRM_Core_Action::UPDATE);
-    return $formName === "CRM_Contribute_Form_Contribution" && $addOrUpdate;
+    return $formName === "CRM_Contribute_Form_Contribution" && $addOrUpdate && !$isPledgePayment;
   }
 
 }
