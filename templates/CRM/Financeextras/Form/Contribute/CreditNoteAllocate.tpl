@@ -19,7 +19,7 @@
           <table class="table">
             <tbody>
               <tr>
-                <th><p>{ts}Include Completed Contributions{/ts} <span style="margin-left: 1em;">{$form.incl_completed.html}</span></p></th>
+                <th><p>{ts}show all contributions{/ts} <span style="margin-left: 1em;">{$form.incl_all.html}</span></p></th>
               </tr>
             </tbody>
           </table>
@@ -66,21 +66,21 @@
   {literal}
   CRM.$(function($) {
     const url = new URLSearchParams(window.location.search);
-    if (parseInt(url.get('completed_contribution')) == 1) {
-      $('#incl_completed_1').prop('checked', true)
+    if (parseInt(url.get('all_contribution')) == 1) {
+      $('#incl_all_1').prop('checked', true)
     }
-    let isChecked = $('#incl_completed_1').is(':checked');
+    let isChecked = $('#incl_all_1').is(':checked');
 
     function reloadPage(completedValue) {
       const url = new URLSearchParams(window.location.search);
-      url.set('completed_contribution', completedValue)
+      url.set('all_contribution', completedValue)
       window.location.href = window.location.origin + window.location.pathname + '?' + url.toString();
     }
 
-    $('#incl_completed_1').change(function() {
+    $('#incl_all_1').change(function() {
       isChecked = $(this).is(':checked');
 
-      // Reload the page with the appropriate completed_contribution value
+      // Reload the page with the appropriate all_contribution value
       reloadPage(isChecked ? 1 : 0);
     });
 

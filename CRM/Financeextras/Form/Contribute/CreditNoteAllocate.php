@@ -28,11 +28,11 @@ class CRM_Financeextras_Form_Contribute_CreditNoteAllocate extends CRM_Core_Form
   public $creditNote;
 
   /**
-   * If completed contributions should be completed
+   * If all contributions should be included
    *
    * @var bool
    */
-  public $includeCompleted;
+  public $includeAll;
 
   /**
    * {@inheritDoc}
@@ -42,7 +42,7 @@ class CRM_Financeextras_Form_Contribute_CreditNoteAllocate extends CRM_Core_Form
 
     $this->crid = CRM_Utils_Request::retrieve('crid', 'Positive', $this);
     $this->creditNote = $this->getCreditNote();
-    $this->includeCompleted = CRM_Utils_Request::retrieve('completed_contribution', 'Positive', $this, 0) === 1;
+    $this->includeAll = CRM_Utils_Request::retrieve('all_contribution', 'Positive', $this, 0) === 1;
 
     $url = CRM_Utils_System::url('civicrm/contact/view',
       ['reset' => 1, 'cid' => $this->creditNote['contact_id'], 'selectedChild' => 'contribute']
@@ -56,13 +56,13 @@ class CRM_Financeextras_Form_Contribute_CreditNoteAllocate extends CRM_Core_Form
    */
   public function buildQuickForm() {
     $currencies = array_column(CurrencyUtils::getCurrencies(), 'symbol', 'name');
-    $contributions = $this->getContributions($this->includeCompleted);
+    $contributions = $this->getContributions($this->includeAll);
 
     $this->assign('creditNote', $this->creditNote);
     $this->assign('contributions', $contributions);
     $this->assign('currencySymbol', $currencies[$this->creditNote['currency']]);
 
-    $this->addCheckBox('incl_completed', '', ['Yes' => TRUE]);
+    $this->addCheckBox('incl_all', '', ['Yes' => TRUE]);
 
     foreach ($contributions as $contribution) {
       $this->add('text', 'item_ref[' . $contribution["id"] . ']', NULL, []);
@@ -147,18 +147,18 @@ class CRM_Financeextras_Form_Contribute_CreditNoteAllocate extends CRM_Core_Form
     return TRUE;
   }
 
-  private function getContributions(bool $includeCompleted = FALSE) {
-    $statuses = ['Pending', 'Partially paid'];
+  private function getContributions(bool $includeAll = FALSE) {
+    $contributionsQuery = Contribution::get(FALSE)
+    ->addWhere('contact_id', '=', $this->creditNote['contact_id'])
+    ->addWhere('currency', '=', $this->creditNote['currency']);
 
-    if ($includeCompleted) {
-      array_push($statuses, 'Completed');
+    if ($includeAll) {
+      $contributionsQuery->addWhere('contribution_status_id:name', 'NOT IN', ['Cancelled', 'Failed']);
+    } else {
+      $contributionsQuery->addWhere('contribution_status_id:name', 'IN', ['Pending', 'Partially paid']);
     }
 
-    $contributions = Contribution::get(FALSE)
-      ->addWhere('contact_id', '=', $this->creditNote['contact_id'])
-      ->addWhere('contribution_status_id:name', 'IN', $statuses)
-      ->addWhere('currency', '=', $this->creditNote['currency'])
-      ->execute()
+    $contributions = $contributionsQuery->execute()
       ->getArrayCopy();
 
     array_walk($contributions, function(&$contribution) {
