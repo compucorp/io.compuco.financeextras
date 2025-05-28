@@ -1,6 +1,5 @@
 <?php
 
-use Civi\Api4\Contribution;
 use Civi\Api4\CreditNote;
 use Civi\Api4\CreditNoteAllocation;
 use Civi\Financeextras\Utils\CurrencyUtils;
@@ -56,18 +55,11 @@ class CRM_Financeextras_Form_Contribute_CreditNoteAllocate extends CRM_Core_Form
    */
   public function buildQuickForm() {
     $currencies = array_column(CurrencyUtils::getCurrencies(), 'symbol', 'name');
-    $contributions = $this->getContributions($this->includeAll);
 
     $this->assign('creditNote', $this->creditNote);
-    $this->assign('contributions', $contributions);
     $this->assign('currencySymbol', $currencies[$this->creditNote['currency']]);
 
     $this->addCheckBox('incl_all', '', ['Yes' => TRUE]);
-
-    foreach ($contributions as $contribution) {
-      $this->add('text', 'item_ref[' . $contribution["id"] . ']', NULL, []);
-      $this->add('number', 'item_amount[' . $contribution["id"] . ']', NULL, ['min' => 0, 'step' => 0.01]);
-    }
 
     $this->addButtons([
       [
@@ -145,31 +137,6 @@ class CRM_Financeextras_Form_Contribute_CreditNoteAllocate extends CRM_Core_Form
     }
 
     return TRUE;
-  }
-
-  private function getContributions(bool $includeAll = FALSE) {
-    $contributionsQuery = Contribution::get(FALSE)
-    ->addWhere('contact_id', '=', $this->creditNote['contact_id'])
-    ->addWhere('currency', '=', $this->creditNote['currency']);
-
-    if ($includeAll) {
-      $contributionsQuery->addWhere('contribution_status_id:name', 'NOT IN', ['Cancelled', 'Failed']);
-    } else {
-      $contributionsQuery->addWhere('contribution_status_id:name', 'IN', ['Pending', 'Partially paid']);
-    }
-
-    $contributions = $contributionsQuery->execute()
-      ->getArrayCopy();
-
-    array_walk($contributions, function(&$contribution) {
-      $contribution['due_amount'] = CRM_Utils_Money::subtractCurrencies(
-        $contribution['total_amount'],
-        $contribution['paid_amount'],
-        $this->creditNote['currency']
-      );
-    });
-
-    return $contributions;
   }
 
   /**
