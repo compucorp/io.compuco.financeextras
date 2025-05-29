@@ -60,7 +60,7 @@
   {literal} const contactID = {/literal}"{$creditNote.contact_id}"
   {literal} const loaderGif = {/literal}"{crmResURL ext="io.compuco.financeextras" file="images/loading-overlay.gif"}"
   {literal}
-  const loader = createLoadingIndicator('body', {"loadingImage": loaderGif});
+  const loader = createLoadingIndicator('div.creditnote__allocate-form-panel', {"loadingImage": loaderGif});
   let dt = null;
   function createLoadingIndicator(target, options = {}) {
     const defaults = {  
