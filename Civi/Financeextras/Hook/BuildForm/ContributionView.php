@@ -17,6 +17,7 @@ class ContributionView {
 
   public function handle() {
     $this->addCreditNoteCancelAction();
+    $this->handleButtons();
   }
 
   private function addCreditNoteCancelAction() {
@@ -63,6 +64,23 @@ class ContributionView {
    */
   public static function shouldHandle($form, $formName) {
     return $formName === "CRM_Contribute_Form_ContributionView" && ($form->getAction() & \CRM_Core_Action::VIEW);
+  }
+
+  private function handleButtons(): void {
+    if (!$this->id || !$this->contributionHasStatus(['Cancelled', 'Failed'])) {
+      return;
+    }
+
+    $buttonsToRemove = [ts('Email Invoice'), ts('Download Invoice'), ts('Download Invoice and Credit Note')];
+    $buttons = $this->form->getTemplateVars('linkButtons');
+
+    foreach ($buttons as $key => $button) {
+      if (in_array($button['title'] ?? '', $buttonsToRemove)) {
+        unset($buttons[$key]);
+      }
+    }
+
+    $this->form->assign('linkButtons', $buttons);
   }
 
 }
