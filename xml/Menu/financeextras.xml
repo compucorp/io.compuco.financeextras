@@ -93,4 +93,10 @@
     <title>Delete Exchange Rate Value</title>
     <access_arguments>administer CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/financeextras/contribution/void</path>
+    <page_callback>CRM_Financeextras_Form_Contribute_ContributionVoid</page_callback>
+    <title>Void Contribution</title>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
 </menu>
