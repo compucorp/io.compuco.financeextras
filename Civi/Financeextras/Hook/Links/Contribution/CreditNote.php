@@ -60,6 +60,32 @@ class CreditNote {
         'class' => 'no-popup',
       ];
     }
+
+    $havePayments = $this->getContributionPayments($this->contributionID);
+    if (!$this->contributionHasStatus(['Failed', 'Completed', 'Cancelled']) && \CRM_Core_Permission::check('edit contributions') &&!$havePayments) {
+      $this->links[] = [
+        'name' => 'Void Contribution',
+        'url' => 'civicrm/financeextras/contribution/void',
+        'qs' => 'reset=1&action=void&id=' . $this->contributionID,
+        'title' => 'Void Contribution',
+        'class' => 'small-popup',
+      ];
+    }
+  }
+
+  /**
+   * Retrieves a contribution payments using APIv4
+   *
+   * @return array
+   *   Array of Contribution Payments
+   */
+  public function getContributionPayments(): array {
+    return \Civi\Api4\EntityFinancialTrxn::get(FALSE)
+      ->addJoin('FinancialTrxn AS financial_trxn', 'INNER', ['financial_trxn_id', '=', 'financial_trxn.id'], ['financial_trxn.is_payment', '=', 1])
+      ->addWhere('entity_table', '=', 'civicrm_contribution')
+      ->addWhere('entity_id', '=', $this->contributionID)
+      ->execute()
+      ->getArrayCopy() ?? [];
   }
 
 }
