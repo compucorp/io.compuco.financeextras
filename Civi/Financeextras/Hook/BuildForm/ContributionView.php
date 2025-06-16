@@ -38,7 +38,8 @@ class ContributionView {
 
   private function addContributionVoidAction() {
     $havePayments = $this->getContributionPayments($this->id);
-    if (!$this->id || $this->contributionHasStatus(['Failed', 'Completed', 'Cancelled']) || $havePayments) {
+    $isAllowed = \CRM_Core_Permission::check('edit contributions');
+    if (!$this->id || $this->contributionHasStatus(['Failed', 'Completed', 'Cancelled']) || $havePayments || !$isAllowed) {
       return;
     }
 
