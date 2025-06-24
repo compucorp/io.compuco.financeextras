@@ -63,13 +63,25 @@ class CreditNote {
 
     $havePayments = $this->getContributionPayments($this->contributionID);
     if (!$this->contributionHasStatus(['Failed', 'Completed', 'Cancelled']) && \CRM_Core_Permission::check('edit contributions') &&!$havePayments) {
-      $this->links[] = [
+      $voidLink = [
         'name' => 'Void Contribution',
         'url' => 'civicrm/financeextras/contribution/void',
         'qs' => 'reset=1&action=void&id=' . $this->contributionID,
         'title' => 'Void Contribution',
         'class' => 'small-popup',
       ];
+
+      $found = FALSE;
+      foreach ($this->links as &$link) {
+        if (!$found && $link['name'] === 'Send Letter') {
+          $voidLink['weight'] = ++$link['weight'];
+          $found = TRUE;
+          break;
+        }
+      }
+      unset($link);
+
+      $this->links[] = $voidLink;
     }
   }
 
