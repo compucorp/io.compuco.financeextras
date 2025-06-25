@@ -1,9 +1,6 @@
-<div id="bootstrap-theme">
-  <div class="alert alert-warning text-center">
-    <h1><i class="fa fa-question-circle"></i></h1>
-    <h3>{ts}Are you sure you would like to void this contribution?{/ts} </h3>
-    
-    <h4>{ts}This cannot be undone.{/ts}</h4>
+<div id="bootstrap-theme" style="background-color: #fff;">
+  <div class="alert alert-warning">
+    <i aria-hidden="true" class="crm-i fa-info-circle"></i> {ts} WARNING: Are you sure you want to void this contribution?{/ts}
   </div>
   <div class="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl" location="bottom"}

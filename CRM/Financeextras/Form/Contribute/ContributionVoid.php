@@ -32,7 +32,7 @@ class CRM_Financeextras_Form_Contribute_ContributionVoid extends CRM_Core_Form {
     $this->addButtons([
       [
         'type' => 'submit',
-        'name' => E::ts('Void'),
+        'name' => E::ts('Proceed'),
       ],
       [
         'type' => 'cancel',
