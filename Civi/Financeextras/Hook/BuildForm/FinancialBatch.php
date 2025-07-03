@@ -33,6 +33,13 @@ class FinancialBatch {
     \CRM_Core_Region::instance('page-body')->add([
       'template' => "{$templatePath}/CRM/Financeextras/Hook/BuildForm/FinancialBatch.tpl",
     ]);
+
+    $js = <<<ENDJS
+(function($) {
+$(".crm-financial_type-form-block .crm-accordion-body").append($("#financeextras_owner_org_table"));
+})(CRM.$)
+ENDJS;
+    \Civi::resources()->addScript($js);
   }
 
   /**
