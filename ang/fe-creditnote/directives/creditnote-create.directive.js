@@ -59,6 +59,7 @@
     $scope.handleFinancialTypeChange = handleFinancialTypeChange;
     $scope.hs = crmUiHelp({ file: 'CRM/Financeextras/CreditNoteCtrl' });
     $scope.currencySymbol = CurrencyCodes.getSymbol(defaultCurrency);
+    $scope.isContactFieldDisabled = false;
 
     (function init () {
       initializeCreditnotes();
@@ -138,6 +139,7 @@
         $scope.creditnotes.currency = contribution.currency
         $scope.disableCurrency = true
         $scope.currencySymbol = CurrencyCodes.getSymbol(contribution.currency);
+        $scope.isContactFieldDisabled = true;
 
         const lineItems = contribution.items;
         // Ensure the due amount is not less than zero
@@ -395,6 +397,7 @@
     function setDefaultContactID () {
       if (!parseInt($scope.contributionId) && parseInt($scope.contactId)) {
         $scope.creditnotes.contact_id = $scope.contactId
+        $scope.isContactFieldDisabled = true;
       }
     }
 
