@@ -1,6 +1,6 @@
 <div id="bootstrap-theme" style="background-color: #fff;">
   <div class="alert alert-warning">
-    <i aria-hidden="true" class="crm-i fa-info-circle"></i> {ts} WARNING: Are you sure you want to void this contribution?{/ts}
+    <i aria-hidden="true" class="crm-i fa-info-circle"></i> {ts} {$popupMessage} {/ts}
   </div>
   <div class="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl" location="bottom"}
