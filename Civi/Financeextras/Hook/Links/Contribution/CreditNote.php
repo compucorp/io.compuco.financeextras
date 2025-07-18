@@ -63,8 +63,8 @@ class CreditNote {
 
     $havePayments = $this->getContributionPayments($this->contributionID);
     $isAllowed = \CRM_Core_Permission::check('edit contributions');
-    $isEmptyContribution = !$this->contributionHasStatus(['Failed', 'Cancelled', 'Completed']) && !$havePayments;
-    $isVoidable = $isEmptyContribution || $this->contributionHasStatus(['Completed']);
+    $isPendingWithoutPayments = !$this->contributionHasStatus(['Failed', 'Cancelled', 'Completed']) && !$havePayments;
+    $isVoidable = $isPendingWithoutPayments || $this->contributionHasStatus(['Completed']);
     if ($isVoidable && $isAllowed) {
       $voidLink = [
         'name' => 'Void Contribution',
