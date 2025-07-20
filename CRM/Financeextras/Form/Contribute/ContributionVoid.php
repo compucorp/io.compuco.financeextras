@@ -23,6 +23,20 @@ class CRM_Financeextras_Form_Contribute_ContributionVoid extends CRM_Core_Form {
     CRM_Utils_System::setTitle('Void Contribution');
 
     $this->id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+
+    $contributionResult = \Civi\Api4\Contribution::get(TRUE)
+      ->addSelect('contribution_status_id:name')
+      ->addWhere('id', '=', $this->id)
+      ->execute()
+      ->first();
+
+    $contributionStatus = $contributionResult !== NULL ? $contributionResult['contribution_status_id:name'] : "";
+    $popupMessage = "Are you sure you want to void this contribution? Invoices cannot be downloaded for void contributions.";
+    if ($contributionStatus == "Completed") {
+      $popupMessage = "Are you sure you want to void this contribution? Invoices cannot be downloaded for void contributions. To credit this invoice, please create a credit note and apply the credit to this contribution instead.";
+    }
+
+    $this->assign("popupMessage", $popupMessage);
   }
 
   /**
