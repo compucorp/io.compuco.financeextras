@@ -266,42 +266,6 @@ function financeextras_register_tokens(\Civi\Token\Event\TokenRegisterEvent $e) 
 }
 
 /**
- * Implements hook_civicrm_navigationMenu().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_navigationMenu/
- */
-function financeextras_civicrm_navigationMenu(&$menu) {
-  $companyMenuItem = [
-    'name' => 'financeextras_company',
-    'label' => ts('Companies'),
-    'url' => 'civicrm/admin/financeextras/company',
-    'permission' => 'administer CiviCRM',
-    'separator' => 2,
-  ];
-
-  _financeextras_civix_insert_navigation_menu($menu, 'Administer/CiviContribute', $companyMenuItem);
-
-  _financeextras_civix_insert_navigation_menu($menu, 'Administer/CiviContribute', [
-    'label' => E::ts('Currency Exchange Settings'),
-    'name' => 'financeextras_exchangerate_settings',
-    'url' => 'civicrm/admin/setting/exchange-rate',
-    'permission' => 'administer CiviCRM',
-    'operator' => 'OR',
-    'separator' => 0,
-  ]);
-
-  _financeextras_civix_insert_navigation_menu($menu, 'Administer/CiviContribute', [
-    'label' => E::ts('Exchange Rates'),
-    'name' => 'financeextras_exchangerate_settings',
-    'url' => 'civicrm/exchange-rate',
-    'permission' => 'administer CiviCRM',
-    'operator' => 'OR',
-    'separator' => 0,
-  ]);
-  _financeextras_civix_navigationMenu($menu);
-}
-
-/**
  * Implements hook_civicrm_alterContent().
  */
 function financeextras_civicrm_alterContent(&$content, $context, $tplName, &$object) {
