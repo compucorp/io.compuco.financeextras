@@ -1,3 +1,5 @@
+{crmStyle ext="io.compuco.financeextras" file="css/loader.css"}
+
 <div id="bootstrap-theme">
 
   <div class="panel panel-default creditnote__allocate-form-panel">
@@ -19,7 +21,7 @@
           <table class="table">
             <tbody>
               <tr>
-                <th><p>{ts}Include Completed Contributions{/ts} <span style="margin-left: 1em;">{$form.incl_completed.html}</span></p></th>
+                <th><p>{ts}Show All Contributions{/ts} <span style="margin-left: 1em;">{$form.incl_all.html}</span></p></th>
               </tr>
             </tbody>
           </table>
@@ -39,16 +41,6 @@
               <th>Ref.</th>
             </thead>
             <tbody>
-            {foreach from=$contributions item=contribution}
-              <tr>
-                <td>{$contribution.id}</td>
-                <td>{$contribution.invoice_number}</td>
-                <td>{$contribution.total_amount|crmMoney:$creditNote.currency}</td>
-                <td>{$contribution.due_amount|crmMoney:$creditNote.currency}</td>
-                <td>{$currencySymbol} {$form.item_amount[$contribution.id].html}</td>
-                <td>{$form.item_ref[$contribution.id].html}</td>
-              </tr>
-            {/foreach}
             </tbody>
           </table>
         </div>
@@ -63,32 +55,123 @@
 </div>
 
 <script type="text/javascript">
+  {literal} const currency= {/literal}"{$creditNote.currency}"
+  {literal} const currencySymbol= {/literal}"{$currencySymbol}"
+  {literal} const contactID = {/literal}"{$creditNote.contact_id}"
+  {literal} const loaderGif = {/literal}"{crmResURL ext="io.compuco.financeextras" file="images/loading-overlay.gif"}"
   {literal}
-  CRM.$(function($) {
-    const url = new URLSearchParams(window.location.search);
-    if (parseInt(url.get('completed_contribution')) == 1) {
-      $('#incl_completed_1').prop('checked', true)
+  const loader = createLoadingIndicator('div.creditnote__allocate-form-panel', {"loadingImage": loaderGif});
+  let dt = null;
+  function createLoadingIndicator(target, options = {}) {
+    const defaults = {  
+      loadingImage: false,
+      showOnInit: true,
+      loadingClass: "loader",
+      wrapperClass: "loading-indicator-wrapper"
+    };
+
+    const config = { ...defaults, ...options };
+    const $target = CRM.$(target);
+
+    const $wrapper = CRM.$('<div>', { class: config.wrapperClass });
+    const $helper = CRM.$('<span>', { class: 'loading-indicator-helper' });
+    $indicator = config.loadingImage ? CRM.$('<img src="' + config.loadingImage + '" />') : CRM.$('<div class="' + config.loadingClass + '"></div>');
+
+    $wrapper.append($helper).append($indicator);
+    $target.append($wrapper);
+
+    if (config.showOnInit) {
+      $wrapper.removeClass('loader-hidden').addClass('loader-visible');
+    } else {
+      $wrapper.removeClass('loader-visible').addClass('loader-hidden');
     }
-    let isChecked = $('#incl_completed_1').is(':checked');
 
-    function reloadPage(completedValue) {
-      const url = new URLSearchParams(window.location.search);
-      url.set('completed_contribution', completedValue)
-      window.location.href = window.location.origin + window.location.pathname + '?' + url.toString();
+    return {
+      show: () => {
+        $wrapper.removeClass('loader-hidden').addClass('loader-visible');
+      },
+      hide: () => {
+        $wrapper.removeClass('loader-visible').addClass('loader-hidden');
+      },
+      element: $wrapper
+    };
+  }
+  function fetchContributions(includeAll = false) {
+    loader.show();
+    const statusFilter = includeAll
+    ? ["contribution_status_id:name", "NOT IN", ["Cancelled", "Failed"]]
+    : ["contribution_status_id:name", "IN", ["Pending", "Partially paid"]];
+
+    CRM.api4('Contribution', 'get', {
+      where: [
+        ["contact_id", "=", contactID],
+        ["currency", "=", currency],
+        statusFilter
+      ]
+    }).then(function(contributions) {
+      renderContributions(contributions)
+      loader.hide();
+    }, function(failure) {
+      loader.hide();
+    });
+  }
+
+  function renderContributions(contributions) {
+    const $table = CRM.$('.allocations-list');
+    const $tbody = $table.find('tbody');
+    $tbody.empty();
+
+    if (CRM.$.fn.DataTable.isDataTable($table)) {
+      $table.DataTable().clear().destroy();
     }
+    contributions.forEach(contribution => {
+      const dueAmount = parseFloat(contribution.total_amount) - parseFloat(contribution.paid_amount || 0);
 
-    $('#incl_completed_1').change(function() {
-      isChecked = $(this).is(':checked');
+      const $row = CRM.$('<tr>');
+      $row.append(`<td>${contribution.id}</td>`);
+      $row.append(`<td>${contribution.invoice_number || ''}</td>`);
+      $row.append(`<td>${currencySymbol} ${Number(contribution.total_amount).toFixed(2)}</td>`);
+      $row.append(`<td>${currencySymbol} ${Number(dueAmount).toFixed(2)}</td>`);
 
-      // Reload the page with the appropriate completed_contribution value
-      reloadPage(isChecked ? 1 : 0);
+      const $amountInput = CRM.$('<input>', {
+        type: 'number',
+        name: `item_amount[${contribution.id}]`,
+        class: 'crm-form-text crm-form-number',
+        value: ''
+      });
+      const $refInput = CRM.$('<input>', {
+        type: 'text',
+        name: `item_ref[${contribution.id}]`,
+        class: 'crm-form-text',
+        value: ''
+      });
+
+      $row.append(CRM.$('<td>').append(currencySymbol + ' ').append($amountInput));
+      $row.append(CRM.$('<td>').append($refInput));
+
+      $tbody.append($row);
     });
 
-    const dt = $('.allocations-list').dataTable({
+    dt = CRM.$('.allocations-list').DataTable({
       dom: '<t><"main-wrapper"<"inner-wrapper"p><"inner-wrapper"l><"info-wrap"i>>',
       language: {
         lengthMenu: 'Page Size _MENU_'
-      }
+      },
+      paging: true,
+      pageLength: 10, // Set a default page length
+      destroy: true // Ensure reinitialization doesn't break things
+    });
+  }
+
+  CRM.$(function($) {
+    let isChecked = $('#incl_all_1').is(':checked');
+    fetchContributions(isChecked)
+
+    $('#incl_all_1').change(function() {
+      isChecked = $(this).is(':checked');
+
+      // Reload the page with the appropriate all_contribution value
+      fetchContributions(isChecked)
     });
 
     $('.CRM_Financeextras_Form_Contribute_CreditNoteAllocate').on('submit', function(e) {

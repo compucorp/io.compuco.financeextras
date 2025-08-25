@@ -60,6 +60,47 @@ class CreditNote {
         'class' => 'no-popup',
       ];
     }
+
+    $havePayments = $this->getContributionPayments($this->contributionID);
+    $isAllowed = \CRM_Core_Permission::check('edit contributions');
+    $isPendingWithoutPayments = !$this->contributionHasStatus(['Failed', 'Cancelled', 'Completed']) && !$havePayments;
+    $isVoidable = $isPendingWithoutPayments || $this->contributionHasStatus(['Completed']);
+    if ($isVoidable && $isAllowed) {
+      $voidLink = [
+        'name' => 'Void Contribution',
+        'url' => 'civicrm/financeextras/contribution/void',
+        'qs' => 'reset=1&action=void&id=' . $this->contributionID,
+        'title' => 'Void Contribution',
+        'class' => 'small-popup',
+      ];
+
+      $found = FALSE;
+      foreach ($this->links as &$link) {
+        if (!$found && $link['name'] === 'Send Letter') {
+          $voidLink['weight'] = ++$link['weight'];
+          $found = TRUE;
+          break;
+        }
+      }
+      unset($link);
+
+      $this->links[] = $voidLink;
+    }
+  }
+
+  /**
+   * Retrieves a contribution payments using APIv4
+   *
+   * @return array
+   *   Array of Contribution Payments
+   */
+  public function getContributionPayments(): array {
+    return \Civi\Api4\EntityFinancialTrxn::get(FALSE)
+      ->addJoin('FinancialTrxn AS financial_trxn', 'INNER', ['financial_trxn_id', '=', 'financial_trxn.id'], ['financial_trxn.is_payment', '=', 1])
+      ->addWhere('entity_table', '=', 'civicrm_contribution')
+      ->addWhere('entity_id', '=', $this->contributionID)
+      ->execute()
+      ->getArrayCopy() ?? [];
   }
 
 }
