@@ -8,8 +8,8 @@
     <author>Compuco</author>
     <email>hello@compuco.io</email>
   </maintainer>
-  <releaseDate>2025-07-10</releaseDate>
-  <version>2.4.4</version>
+  <releaseDate>2025-08-25</releaseDate>
+  <version>2.4.5</version>
   <develStage>stable</develStage>
   <compatibility>
     <ver>5.51</ver>
