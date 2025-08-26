@@ -233,4 +233,14 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
     }
   }
 
+  /**
+   * This upgrade adds new fields to company table
+   */
+  public function upgrade_1006(): bool {
+    $this->ctx->log->info('Applying update 1006');
+    $this->executeSqlFile('sql/upgrade_1006.sql');
+
+    return TRUE;
+  }
+
 }
