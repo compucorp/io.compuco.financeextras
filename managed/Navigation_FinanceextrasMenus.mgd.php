@@ -26,26 +26,6 @@ return [
     ],
   ],
   [
-    'name' => 'Navigation_financeextras_exchangerate_settings',
-    'entity' => 'Navigation',
-    'cleanup' => 'unused',
-    'update' => 'unmodified',
-    'params' => [
-      'version' => 4,
-      'values' => [
-        'name' => 'financeextras_exchangerate_settings',
-        'label' => 'Currency Exchange Settings',
-        'url' => 'civicrm/admin/setting/exchange-rate',
-        'permission' => 'administer CiviCRM',
-        'permission_operator' => 'OR',
-        'parent_id.name' => 'CiviContribute',
-        'has_separator' => 0,
-        'weight' => 101,
-        'is_active' => 1,
-      ],
-    ],
-  ],
-  [
     'name' => 'Navigation_financeextras_exchangerate_list',
     'entity' => 'Navigation',
     'cleanup' => 'unused',
