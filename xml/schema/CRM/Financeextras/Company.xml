@@ -123,4 +123,47 @@
       <label>Accounts Receivable Payment Method</label>
     </html>
   </field>
+
+  <field>
+    <name>company_number</name>
+    <title>Company Number</title>
+    <type>varchar</type>
+    <length>255</length>
+    <html>
+      <label>Company Number</label>
+      <type>Text</type>
+    </html>
+  </field>
+
+  <field>
+    <name>sales_tax_registration_number</name>
+    <title>Sales Tax Registration Number</title>
+    <type>varchar</type>
+    <length>255</length>
+    <html>
+      <label>Sales Tax Registration Number</label>
+      <type>Text</type>
+    </html>
+  </field>
+
+  <field>
+    <name>display_currency_conversion_for_tax_on_invoices</name>
+    <title>Display Currency Conversion For Tax On Invoices</title>
+    <type>tinyint</type>
+    <html>
+      <type>CheckBox</type>
+      <label>Display Currency Conversion For Tax On Invoices</label>
+    </html>
+  </field>
+
+  <field>
+    <name>sales_tax_currency</name>
+    <title>Sales Tax Currency</title>
+    <type>varchar</type>
+    <length>100</length>
+    <html>
+      <label>Sales Tax Currency</label>
+      <type>Text</type>
+    </html>
+  </field>
 </table>

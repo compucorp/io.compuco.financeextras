@@ -1,5 +1,6 @@
 <?php
 
+use Civi\Api4\Company;
 use Civi\Financeextras\Setup\Configure\SetDefaultCompany;
 use Civi\Financeextras\Setup\Manage\CreditNoteStatusManager;
 use Civi\Financeextras\Setup\Manage\ExchangeRateFieldManager;
@@ -241,6 +242,31 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
     $this->executeSqlFile('sql/upgrade_1006.sql');
 
     return TRUE;
+  }
+
+  /**
+   * Executes upgrade 1007
+   */
+  public function upgrade_1007(): bool {
+    try {
+      $settings = Civi::settings()->get('fe_exchange_rate_settings');
+      $company = Company::get(FALSE)->setOrderBy(['id' => 'ASC'])->setLimit(1)->execute()->first();
+
+      if (isset($settings, $company, $company['id']) && (!empty($settings['display_on_invoice']) || !empty($settings['sales_tax_currency']))) {
+        Company::update(FALSE)
+          ->addValue('display_currency_conversion_for_tax_on_invoices', $settings['display_on_invoice'] ?? 0)
+          ->addValue('sales_tax_currency', $settings['sales_tax_currency'] ?? NULL)
+          ->addWhere('id', '=', $company['id'])
+          ->execute();
+      }
+
+      return TRUE;
+    }
+    catch (\Throwable $e) {
+      $this->ctx->log->info($e->getMessage());
+
+      return FALSE;
+    }
   }
 
 }
