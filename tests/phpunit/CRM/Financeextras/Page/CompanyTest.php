@@ -16,7 +16,7 @@ class CRM_Financeextras_Page_CompanyTest extends BaseHeadlessTest {
       'next_invoice_number' => '000001',
       'creditnote_prefix' => 'CN',
       'next_creditnote_number' => '000002',
-      'receivable_payment_method' => 1,
+      'company_number' => '000002',
     ];
     CRM_Financeextras_BAO_Company::create($params1);
 
@@ -27,7 +27,7 @@ class CRM_Financeextras_Page_CompanyTest extends BaseHeadlessTest {
       'next_invoice_number' => '000005',
       'creditnote_prefix' => 'XH',
       'next_creditnote_number' => '000006',
-      'receivable_payment_method' => 2,
+      'company_number' => '000003',
     ];
     CRM_Financeextras_BAO_Company::create($params2);
 
@@ -43,10 +43,12 @@ class CRM_Financeextras_Page_CompanyTest extends BaseHeadlessTest {
     $secondRowAfterDefaultRecord = next($rowsToShowInPage);
     $this->assertEquals('Default Organization', $secondRowAfterDefaultRecord['company_name']);
     $this->assertEquals($params1['next_invoice_number'], $secondRowAfterDefaultRecord['next_invoice_number']);
+    $this->assertEquals($params1['company_number'], $secondRowAfterDefaultRecord['company_number']);
 
     $thirdRow = next($rowsToShowInPage);
     $this->assertEquals('Default Organization', $thirdRow['company_name']);
     $this->assertEquals($params2['next_invoice_number'], $thirdRow['next_invoice_number']);
+    $this->assertEquals($params2['company_number'], $thirdRow['company_number']);
   }
 
   private function disableReturningPageResult($page) {
