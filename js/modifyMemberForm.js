@@ -1,5 +1,7 @@
 CRM.$(function ($) {
   const defaultPaymentMethod = CRM.$("#payment_instrument_id") && CRM.$("#payment_instrument_id").val() ? CRM.$("#payment_instrument_id").val() : null;
+  const isDirectDebitDefaultPaymentMethod = CRM.vars.financeextras.is_direct_debit_default_payment_method;
+  const accountsReceivablePaymentMethod = CRM.vars.financeextras.accounts_receivable_payment_method;
 
   (function() {
     setTotalAmount();
@@ -22,8 +24,6 @@ CRM.$(function ($) {
   }
 
   function togglePaymentBlock() {
-    const accountsReceivablePaymentMethod = CRM.vars.financeextras.accounts_receivable_payment_method;
-
     $('input[name=fe_record_payment_check]').prop("checked", true).trigger('change');
 
     $('input[name=fe_record_payment_check]').on('change', () => {
@@ -43,8 +43,14 @@ CRM.$(function ($) {
     if (typeof membershipType !== 'undefined' && typeof membershipType['total_amount_numeric'] !== 'undefined') {
       if (membershipType['total_amount_numeric'] > 0) {
         $('.fe-membership_type').show()
+        if (isDirectDebitDefaultPaymentMethod && CRM.$("#payment_instrument_id").val() !== defaultPaymentMethod) {
+          CRM.$("#payment_instrument_id").val(defaultPaymentMethod).change();
+        }
       } else {
         $('.fe-membership_type').hide()
+        if (isDirectDebitDefaultPaymentMethod) {
+          CRM.$("#payment_instrument_id").val(accountsReceivablePaymentMethod).change();
+        }
       }
     }
 
@@ -67,11 +73,21 @@ CRM.$(function ($) {
 
     $('input:radio[name=fe_member_type]').on('change', () => {
       const isPaid = $('input:radio[name=fe_member_type][value=paid_member]').is(':checked');
-      if ($('input#record_contribution').is(":checked") && !isPaid) {
-        $('input#record_contribution').prop("checked", !isPaid).trigger('click')
+      if (!isPaid) {
+        if ($('input#record_contribution').is(":checked")) {
+          $('input#record_contribution').prop("checked", !isPaid).trigger('click')
+        }
+        if (isDirectDebitDefaultPaymentMethod) {
+          CRM.$("#payment_instrument_id").val(accountsReceivablePaymentMethod).change();
+        }
       }
-      if (!$('input#record_contribution').is(":checked") && isPaid) {
-        $('input#record_contribution').prop("checked", !isPaid).trigger('click')
+      else {
+        if (!$('input#record_contribution').is(":checked")) {
+          $('input#record_contribution').prop("checked", !isPaid).trigger('click')
+        }
+        if (isDirectDebitDefaultPaymentMethod && CRM.$("#payment_instrument_id").val() !== defaultPaymentMethod) {
+          CRM.$("#payment_instrument_id").val(defaultPaymentMethod).change();
+        }
       }
 
     });
