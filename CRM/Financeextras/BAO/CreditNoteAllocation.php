@@ -43,7 +43,7 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
     try {
       $allocation = self::create($data)->toArray();
 
-      self::createAccountingEntries($allocation['id'], $data['credit_note_id'], $data['contribution_id'], $data['amount']);
+      self::createAccountingEntries($allocation, $data['credit_note_id'], $data['contribution_id'], $data['amount']);
 
       if (!empty($allocation['contribution_id'])) {
         \Civi::dispatcher()->dispatch(ContributionPaymentUpdatedEvent::NAME, new ContributionPaymentUpdatedEvent($allocation['contribution_id']));
@@ -72,6 +72,8 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
     if (empty($allocation)) {
       throw new \CRM_Core_Exception("Credit Note allocation not found");
     }
+
+    $reference = $allocation['reference'] ?? NULL;
     self::create([
       'id' => $allocation['id'],
       'is_reversed' => TRUE,
@@ -84,10 +86,15 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
       'contribution_id' => $allocation['contribution_id'],
       'total_amount' => $amount,
       'trxn_date' => $allocation['date'],
+      'trxn_id' => $reference,
     ];
     $transaction = self::createPayment($account, $params);
+    self::createAllocationEntityTransactions((int) $allocation['id'], (int) $transaction->id, (int) $amount);
 
-    self::createAllocationEntityTransactions($allocation['id'], $transaction->id, $amount);
+    // Create allocation transaction with positive amount for reversal
+    $allocationAmount = $allocation['amount'];
+    $allocationTransaction = self::createAllocationTransaction($account, (int) $allocation['contribution_id'], (float) $allocationAmount, $allocation['date'], $reference);
+    self::createAllocationEntityTransactions((int) $allocation['id'], (int) $allocationTransaction->id, (float) $allocationAmount);
 
     if (!empty($allocation['contribution_id'])) {
       \Civi::dispatcher()->dispatch(ContributionPaymentUpdatedEvent::NAME, new ContributionPaymentUpdatedEvent($allocation['contribution_id']));
@@ -135,8 +142,8 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
   /**
    * Creates the neccessary accounting entries using Payment API.
    *
-   * @param int $allocationId
-   *  The credit note allocation ID
+   * @param array $allocation
+   *  The credit note allocation
    *
    * @param int $creditNoteId
    *  The credit note credit is to be allocated from.
@@ -147,12 +154,15 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
    * @param float $amount
    *  The amount to be allocated.
    */
-  private static function createAccountingEntries($allocationId, $creditNoteId, $contributionId, $amount) {
+  private static function createAccountingEntries($allocation, $creditNoteId, $contributionId, $amount) {
     $date = date("Y-m-d H:i:s");
+    $reference = $allocation['reference'] ?? NULL;
+
     $params = [
       'contribution_id' => $contributionId,
       'total_amount' => $amount,
       'trxn_date' => $date,
+      'trxn_id' => $reference,
     ];
 
     $creditNoteLine = \Civi\Api4\CreditNoteLine::get(FALSE)
@@ -164,9 +174,15 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
       $creditNoteLine['financial_type_id'],
       'Accounts Receivable Account is'
     );
-    $transaction = self::createPayment($account, $params);
 
-    self::createAllocationEntityTransactions($allocationId, $transaction->id, $amount);
+    // Create the original payment transaction
+    $transaction = self::createPayment($account, $params);
+    self::createAllocationEntityTransactions((int) $allocation['id'], $transaction->id, $amount);
+
+    // Create allocation transaction with negative amount for allocation
+    $allocationAmount = -$amount;
+    $allocationTransaction = self::createAllocationTransaction($account, (int) $contributionId, (float) $allocationAmount, $date, $reference);
+    self::createAllocationEntityTransactions((int) $allocation['id'], (int) $allocationTransaction->id, (float) $allocationAmount);
   }
 
   /**
@@ -203,6 +219,43 @@ class CRM_Financeextras_BAO_CreditNoteAllocation extends CRM_Financeextras_DAO_C
       'from_financial_account_id' => $account,
       'to_financial_account_id' => $account,
     ]);
+
+    return $transaction;
+  }
+
+  /**
+   * Creates a non-payment financial transaction.
+   *
+   * @param int $account
+   *   Financial account ID
+   * @param int $contributionId
+   *   Contribution ID
+   * @param float $amount
+   *   Transaction amount
+   * @param string $date
+   *   Transaction date
+   * @param string|null $reference
+   *   Allocation reference
+   *
+   * @return \CRM_Financial_DAO_FinancialTrxn
+   */
+  private static function createAllocationTransaction(int $account, int $contributionId, float $amount, string $date, ?string $reference = NULL): CRM_Financial_DAO_FinancialTrxn {
+    $params = [
+      'from_financial_account_id' => $account,
+      'to_financial_account_id' => $account,
+      'total_amount' => $amount,
+      'net_amount' => $amount,
+      'currency' => \CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'currency'),
+      'trxn_date' => $date,
+      'status_id' => \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+      'payment_instrument_id' => OptionValueUtils::getValueForOptionValue('payment_instrument', 'credit_note'),
+      'is_payment' => 1,
+      'trxn_id' => $reference,
+    ];
+
+    $transaction = new \CRM_Financial_DAO_FinancialTrxn();
+    $transaction->copyValues($params);
+    $transaction->save();
 
     return $transaction;
   }
