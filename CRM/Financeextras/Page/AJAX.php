@@ -40,7 +40,7 @@ class CRM_Financeextras_Page_AJAX {
     $returnvalues = [
       'civicrm_financial_trxn.payment_instrument_id as payment_method',
     // @custom-code start: contactID from contribution or credit note
-      'COALESCE(civicrm_contribution.contact_id, financeextras_credit_note.contact_id) as contact_id',
+      'COALESCE(civicrm_contribution.contact_id, financeextras_credit_note.contact_id, allocation_credit_note.contact_id) as contact_id',
     // @custom-code end
       'civicrm_contribution.id as contributionID',
       'contact_a.sort_name',
@@ -50,7 +50,7 @@ class CRM_Financeextras_Page_AJAX {
       'contact_a.contact_sub_type',
       'civicrm_financial_trxn.trxn_date as transaction_date',
     // @custom-code start: date from contribution or credit note
-      'COALESCE(civicrm_contribution.receive_date, financeextras_credit_note.date) as receive_date',
+      'COALESCE(civicrm_contribution.receive_date, financeextras_credit_note.date, allocation.date) as receive_date',
     // @custom-code end
       'civicrm_financial_type.name',
       'civicrm_financial_trxn.currency as currency',
@@ -58,7 +58,7 @@ class CRM_Financeextras_Page_AJAX {
       'civicrm_financial_trxn.check_number as check_number',
       'civicrm_financial_trxn.card_type_id',
       'civicrm_financial_trxn.pan_truncation',
-      'financeextras_credit_note.id as creditnote_id',
+      'COALESCE(financeextras_credit_note.id, allocation_credit_note.id) as creditnote_id',
       'civicrm_entity_financial_trxn.entity_table as entity_table',
     ];
 
@@ -274,15 +274,18 @@ class CRM_Financeextras_Page_AJAX {
     INNER JOIN civicrm_entity_financial_trxn ON civicrm_entity_financial_trxn.financial_trxn_id = civicrm_financial_trxn.id
     LEFT JOIN civicrm_contribution ON (civicrm_contribution.id = civicrm_entity_financial_trxn.entity_id
       AND civicrm_entity_financial_trxn.entity_table='civicrm_contribution')
-    -- @custom-code start: Join the credit note table
-    LEFT JOIN financeextras_credit_note ON (financeextras_credit_note.id = civicrm_entity_financial_trxn.entity_id 
+    -- @custom-code start: Join the credit note and credit note allocation table
+    LEFT JOIN financeextras_credit_note ON (financeextras_credit_note.id = civicrm_entity_financial_trxn.entity_id
       AND civicrm_entity_financial_trxn.entity_table='financeextras_credit_note')
-    -- @custom-code end 
+      LEFT JOIN financeextras_credit_note_allocation allocation ON (allocation.id = civicrm_entity_financial_trxn.entity_id
+      AND civicrm_entity_financial_trxn.entity_table='financeextras_credit_note_allocation')
+      LEFT JOIN financeextras_credit_note allocation_credit_note ON (allocation.credit_note_id = allocation_credit_note.id)
+    -- @custom-code end
     LEFT JOIN civicrm_entity_batch ON civicrm_entity_batch.entity_table = 'civicrm_financial_trxn'
     AND civicrm_entity_batch.entity_id = civicrm_financial_trxn.id
     LEFT JOIN civicrm_financial_type ON civicrm_financial_type.id = civicrm_contribution.financial_type_id
     -- @custom-code start:  Join contact from either contribution or credit note contact ID column
-    LEFT JOIN civicrm_contact contact_a ON contact_a.id = COALESCE(civicrm_contribution.contact_id, financeextras_credit_note.contact_id)
+    LEFT JOIN civicrm_contact contact_a ON contact_a.id = COALESCE(civicrm_contribution.contact_id, financeextras_credit_note.contact_id, allocation_credit_note.contact_id)
     -- @custom-code end
     LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id = civicrm_contribution.id
     ";
@@ -401,13 +404,13 @@ class CRM_Financeextras_Page_AJAX {
     if (!empty($query->_where[0])) {
       $where = implode(' AND ', $query->_where[0]) . " AND civicrm_entity_batch.batch_id IS NULL ";
       // @custom-code start: Incorporate credit note transactions when the default search option is used (i.e., non-test contribution transactions).
-      $where = str_replace("civicrm_contribution.is_test = 0", "(civicrm_contribution.is_test = 0 OR civicrm_entity_financial_trxn.entity_table = 'financeextras_credit_note')", $where);
+      $where = str_replace("civicrm_contribution.is_test = 0", "(civicrm_contribution.is_test = 0 OR civicrm_entity_financial_trxn.entity_table = 'financeextras_credit_note' OR civicrm_entity_financial_trxn.entity_table = 'financeextras_credit_note_allocation')", $where);
       // @custom-code end
       $where = str_replace('civicrm_contribution.payment_instrument_id', 'civicrm_financial_trxn.payment_instrument_id', $where);
     }
     else {
       // @custom-code start:  Consider credit notes when calculating batch transaction summaries.
-      $where = "civicrm_entity_financial_trxn.entity_table IN ('financeextras_credit_note', 'civicrm_contribution')";
+      $where = "civicrm_entity_financial_trxn.entity_table IN ('financeextras_credit_note', 'civicrm_contribution', 'financeextras_credit_note_allocation')";
       // @custom-code end
       if (!$notPresent) {
         $where .= " AND civicrm_entity_batch.batch_id = {$entityID} ";
@@ -449,7 +452,7 @@ class CRM_Financeextras_Page_AJAX {
    *   The updated links.
    */
   public static function updateTransactionLinks($row, array $links) {
-    if (!empty($links['view'])  && $row->entity_table == 'financeextras_credit_note') {
+    if (!empty($links['view'])  && in_array($row->entity_table, ['financeextras_credit_note', 'financeextras_credit_note_allocation'])) {
       $links['view']['url'] = 'civicrm/contribution/creditnote/view';
       $links['view']['qs'] = 'reset=1&id=%%creditnoteid%%&cid=%%cid%%&action=view';
       $links['view']['fe'] = TRUE;
