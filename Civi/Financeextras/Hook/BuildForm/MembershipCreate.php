@@ -6,6 +6,8 @@ use CRM_Financeextras_ExtensionUtil as E;
 
 class MembershipCreate {
 
+  const DIRECT_DEBIT_PAYMENT_METHOD_NAME = 'direct_debit';
+
   /**
    * @param \CRM_Member_Form_Membership $form
    */
@@ -34,6 +36,10 @@ class MembershipCreate {
 
       $accountsReceivablePaymentMethodId = array_search('accounts_receivable', \CRM_Contribute_BAO_Contribution::buildOptions('payment_instrument_id', 'validate'));
       \Civi::resources()->addVars('financeextras', ['accounts_receivable_payment_method' => $accountsReceivablePaymentMethodId]);
+
+      $defaultPaymentMethod = \CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1', 'name');
+      $defaultPaymentMethodName = array_values($defaultPaymentMethod)[0] ?? '';
+      \Civi::resources()->addVars('financeextras', ['is_direct_debit_default_payment_method' => $defaultPaymentMethodName === self::DIRECT_DEBIT_PAYMENT_METHOD_NAME]);
 
       \Civi::resources()->add([
         'scriptFile' => [E::LONG_NAME, 'js/modifyMemberForm.js'],
