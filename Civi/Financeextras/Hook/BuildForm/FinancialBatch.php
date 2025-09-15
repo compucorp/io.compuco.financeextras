@@ -33,6 +33,8 @@ class FinancialBatch {
     \CRM_Core_Region::instance('page-body')->add([
       'template' => "{$templatePath}/CRM/Financeextras/Hook/BuildForm/FinancialBatch.tpl",
     ]);
+
+    \Civi::resources()->addScriptFile('io.compuco.financeextras', 'js/financialbatch.js');
   }
 
   /**

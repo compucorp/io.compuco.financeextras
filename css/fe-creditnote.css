@@ -41,3 +41,14 @@
   border-bottom: 1px solid #eee;
 }
 
+.cn-disabled-dropdown {
+  background-color: #f3f6f7 !important;
+  cursor: not-allowed;
+  border-color: #ccc;
+}
+
+.cn-disabled-dropdown .select2-chosen {
+  color: #c2cfd8 !important;
+}
+
+

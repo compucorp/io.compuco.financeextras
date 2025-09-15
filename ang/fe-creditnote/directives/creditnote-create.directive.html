@@ -25,7 +25,8 @@
               }"
               required
               ng-minlength="1"
-              ng-disabled="isView || isUpdate"
+              ng-disabled="isView || isUpdate || isContactFieldDisabled"
+              ng-class="{'cn-disabled-dropdown': isView || isUpdate || isContactFieldDisabled}"
             />
             <span class="crm-inline-error" ng-show="creditnotesForm.contact.$dirty && creditnotesForm.contact.$invalid && creditnotesForm.contact.$error.required">Contact is required</span>
           </div>
