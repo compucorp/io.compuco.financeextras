@@ -17,7 +17,7 @@ class InvoiceTemplate {
   private $contributionId;
 
   private $contributionOwnerCompany;
-  
+
   private static $processedInvoices = 0;
   private static $contributionCache = [];
   private static $contributionCacheOrder = [];
@@ -34,7 +34,7 @@ class InvoiceTemplate {
 
   public function handle() {
     self::$processedInvoices++;
-    
+
     try {
       $this->addTaxConversionTable();
 
@@ -45,14 +45,14 @@ class InvoiceTemplate {
         // Cache using LRU
         $this->addToLRUCache(self::$ownerCompanyCache, self::$ownerCompanyCacheOrder, $this->contributionId, $this->contributionOwnerCompany);
       }
-      
+
       if (empty($this->contributionOwnerCompany)) {
         return;
       }
 
       $this->useContributionOwnerOrganisationInvoiceTemplate();
       $this->replaceDomainTokensWithOwnerOrganisationTokens();
-      
+
       // Adaptive memory management: Batch-complete trigger after each invoice
       // Uses conservative approach with memory-threshold backup
       GCManager::maybeCollectGarbage('invoice_processing');
@@ -65,7 +65,7 @@ class InvoiceTemplate {
 
   private function addTaxConversionTable() {
     $showTaxConversionTable = TRUE;
-    
+
     // Check LRU cache first
     $contribution = $this->getContributionFromCache($this->contributionId);
     if (!$contribution) {
@@ -79,7 +79,7 @@ class InvoiceTemplate {
         ->addWhere('id', '=', $this->contributionId)
         ->execute()
         ->first();
-      
+
       // Cache the result using LRU
       $this->addToLRUCache(self::$contributionCache, self::$contributionCacheOrder, $this->contributionId, $contribution);
     }
@@ -174,7 +174,7 @@ class InvoiceTemplate {
    */
   private function getOwnerOrganisationLocation() {
     $ownerOrganisationId = $this->contributionOwnerCompany['contact_id'];
-    
+
     // Check LRU cache first
     $locationDefaults = $this->getLocationFromCache($ownerOrganisationId);
     if (!$locationDefaults) {
@@ -199,7 +199,7 @@ class InvoiceTemplate {
 
     return $locationDefaults;
   }
-  
+
   /**
    * Gets contribution data from LRU cache.
    */
@@ -210,7 +210,7 @@ class InvoiceTemplate {
     }
     return FALSE;
   }
-  
+
   /**
    * Gets owner company data from LRU cache.
    */
@@ -221,7 +221,7 @@ class InvoiceTemplate {
     }
     return FALSE;
   }
-  
+
   /**
    * Gets location data from LRU cache.
    */
@@ -232,7 +232,7 @@ class InvoiceTemplate {
     }
     return FALSE;
   }
-  
+
   /**
    * Updates LRU order by moving item to end (most recently used).
    */
@@ -244,7 +244,7 @@ class InvoiceTemplate {
     }
     $orderArray[] = $key;
   }
-  
+
   /**
    * Adds item to LRU cache, evicting least recently used if at capacity.
    */
@@ -255,13 +255,13 @@ class InvoiceTemplate {
       $this->updateLRUOrder($orderArray, $key);
       return;
     }
-    
+
     // If at capacity, remove least recently used item
     if (count($cache) >= self::$maxCacheSize) {
       $lruKey = array_shift($orderArray);
       unset($cache[$lruKey]);
     }
-    
+
     // Add new item
     $cache[$key] = $value;
     $orderArray[] = $key;
