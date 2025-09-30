@@ -4,6 +4,7 @@ namespace Civi\Financeextras\Hook\AlterMailParams;
 
 use Civi\WorkflowMessage\WorkflowMessage;
 use CRM_Financeextras_CustomGroup_ContributionOwnerOrganisation as ContributionOwnerOrganisation;
+use Civi\Financeextras\Common\GCManager;
 
 /**
  * Provides separate invoicing template and tokens for each
@@ -16,6 +17,15 @@ class InvoiceTemplate {
   private $contributionId;
 
   private $contributionOwnerCompany;
+  
+  private static $processedInvoices = 0;
+  private static $contributionCache = [];
+  private static $contributionCacheOrder = [];
+  private static $ownerCompanyCache = [];
+  private static $ownerCompanyCacheOrder = [];
+  private static $locationCache = [];
+  private static $locationCacheOrder = [];
+  private static $maxCacheSize = 100;
 
   public function __construct(&$templateParams, $context) {
     $this->templateParams = &$templateParams;
@@ -23,29 +33,56 @@ class InvoiceTemplate {
   }
 
   public function handle() {
-    $this->addTaxConversionTable();
+    self::$processedInvoices++;
+    
+    try {
+      $this->addTaxConversionTable();
 
-    $this->contributionOwnerCompany = ContributionOwnerOrganisation::getOwnerOrganisationCompany($this->contributionId);
-    if (empty($this->contributionOwnerCompany)) {
-      return;
+      // Get owner company from cache or fetch
+      $this->contributionOwnerCompany = $this->getOwnerCompanyFromCache($this->contributionId);
+      if (!$this->contributionOwnerCompany) {
+        $this->contributionOwnerCompany = ContributionOwnerOrganisation::getOwnerOrganisationCompany($this->contributionId);
+        // Cache using LRU
+        $this->addToLRUCache(self::$ownerCompanyCache, self::$ownerCompanyCacheOrder, $this->contributionId, $this->contributionOwnerCompany);
+      }
+      
+      if (empty($this->contributionOwnerCompany)) {
+        return;
+      }
+
+      $this->useContributionOwnerOrganisationInvoiceTemplate();
+      $this->replaceDomainTokensWithOwnerOrganisationTokens();
+      
+      // Adaptive memory management: Batch-complete trigger after each invoice
+      // Uses conservative approach with memory-threshold backup
+      GCManager::maybeCollectGarbage('invoice_processing');
+    } catch (Exception $e) {
+      // Log error and continue processing other invoices
+      \Civi::log()->error('InvoiceTemplate processing failed for contribution ' . $this->contributionId . ': ' . $e->getMessage());
+      throw $e;
     }
-
-    $this->useContributionOwnerOrganisationInvoiceTemplate();
-    $this->replaceDomainTokensWithOwnerOrganisationTokens();
   }
 
   private function addTaxConversionTable() {
     $showTaxConversionTable = TRUE;
-    $contribution = \Civi\Api4\Contribution::get(FALSE)
-      ->addSelect(
-        'financeextras_currency_exchange_rates.rate_1_unit_tax_currency',
-        'financeextras_currency_exchange_rates.rate_1_unit_contribution_currency',
-        'financeextras_currency_exchange_rates.sales_tax_currency',
-        'financeextras_currency_exchange_rates.vat_text'
-      )->setLimit(1)
-      ->addWhere('id', '=', $this->contributionId)
-      ->execute()
-      ->first();
+    
+    // Check LRU cache first
+    $contribution = $this->getContributionFromCache($this->contributionId);
+    if (!$contribution) {
+      $contribution = \Civi\Api4\Contribution::get(FALSE)
+        ->addSelect(
+          'financeextras_currency_exchange_rates.rate_1_unit_tax_currency',
+          'financeextras_currency_exchange_rates.rate_1_unit_contribution_currency',
+          'financeextras_currency_exchange_rates.sales_tax_currency',
+          'financeextras_currency_exchange_rates.vat_text'
+        )->setLimit(1)
+        ->addWhere('id', '=', $this->contributionId)
+        ->execute()
+        ->first();
+      
+      // Cache the result using LRU
+      $this->addToLRUCache(self::$contributionCache, self::$contributionCacheOrder, $this->contributionId, $contribution);
+    }
     if (empty($contribution['financeextras_currency_exchange_rates.rate_1_unit_tax_currency'])) {
       $showTaxConversionTable = FALSE;
     }
@@ -137,7 +174,14 @@ class InvoiceTemplate {
    */
   private function getOwnerOrganisationLocation() {
     $ownerOrganisationId = $this->contributionOwnerCompany['contact_id'];
-    $locationDefaults = \CRM_Core_BAO_Location::getValues(['contact_id' => $ownerOrganisationId]);
+    
+    // Check LRU cache first
+    $locationDefaults = $this->getLocationFromCache($ownerOrganisationId);
+    if (!$locationDefaults) {
+      $locationDefaults = \CRM_Core_BAO_Location::getValues(['contact_id' => $ownerOrganisationId]);
+      // Cache using LRU
+      $this->addToLRUCache(self::$locationCache, self::$locationCacheOrder, $ownerOrganisationId, $locationDefaults);
+    }
 
     if (!empty($locationDefaults['address'][1]['state_province_id'])) {
       $locationDefaults['address'][1]['state_province_abbreviation'] = \CRM_Core_PseudoConstant::stateProvinceAbbreviation($locationDefaults['address'][1]['state_province_id']);
@@ -154,6 +198,73 @@ class InvoiceTemplate {
     }
 
     return $locationDefaults;
+  }
+  
+  /**
+   * Gets contribution data from LRU cache.
+   */
+  private function getContributionFromCache($contributionId) {
+    if (isset(self::$contributionCache[$contributionId])) {
+      $this->updateLRUOrder(self::$contributionCacheOrder, $contributionId);
+      return self::$contributionCache[$contributionId];
+    }
+    return FALSE;
+  }
+  
+  /**
+   * Gets owner company data from LRU cache.
+   */
+  private function getOwnerCompanyFromCache($contributionId) {
+    if (isset(self::$ownerCompanyCache[$contributionId])) {
+      $this->updateLRUOrder(self::$ownerCompanyCacheOrder, $contributionId);
+      return self::$ownerCompanyCache[$contributionId];
+    }
+    return FALSE;
+  }
+  
+  /**
+   * Gets location data from LRU cache.
+   */
+  private function getLocationFromCache($contactId) {
+    if (isset(self::$locationCache[$contactId])) {
+      $this->updateLRUOrder(self::$locationCacheOrder, $contactId);
+      return self::$locationCache[$contactId];
+    }
+    return FALSE;
+  }
+  
+  /**
+   * Updates LRU order by moving item to end (most recently used).
+   */
+  private function updateLRUOrder(&$orderArray, $key) {
+    $index = array_search($key, $orderArray);
+    if ($index !== FALSE) {
+      unset($orderArray[$index]);
+      $orderArray = array_values($orderArray); // Re-index array
+    }
+    $orderArray[] = $key;
+  }
+  
+  /**
+   * Adds item to LRU cache, evicting least recently used if at capacity.
+   */
+  private function addToLRUCache(&$cache, &$orderArray, $key, $value) {
+    // If already exists, update value and move to end
+    if (isset($cache[$key])) {
+      $cache[$key] = $value;
+      $this->updateLRUOrder($orderArray, $key);
+      return;
+    }
+    
+    // If at capacity, remove least recently used item
+    if (count($cache) >= self::$maxCacheSize) {
+      $lruKey = array_shift($orderArray);
+      unset($cache[$lruKey]);
+    }
+    
+    // Add new item
+    $cache[$key] = $value;
+    $orderArray[] = $key;
   }
 
 }
