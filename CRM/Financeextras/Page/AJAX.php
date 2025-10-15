@@ -350,8 +350,8 @@ class CRM_Financeextras_Page_AJAX {
         if ($field == 'receive_date_relative') {
           $relativeDate = explode('.', $params[$field]);
           $date = CRM_Utils_Date::relativeToAbsolute($relativeDate[0], $relativeDate[1]);
-          $values['receive_date_low'] = $date['from'];
-          $values['receive_date_high'] = $date['to'];
+          $values['receive_date_low'] = !empty($date['from']) ? substr($date['from'], 0, 8) . '000000' : $date['from'];
+          $values['receive_date_high'] = !empty($date['to']) ? substr($date['to'], 0, 8) . '235959' : $date['to'];
         }
 
         // Add left joins as they're needed to consider
@@ -401,12 +401,11 @@ class CRM_Financeextras_Page_AJAX {
       $from .= " " . implode(" ", $customJoins);
     }
 
-    if (!empty($query->_where[0])) {
-      $where = implode(' AND ', $query->_where[0]) . " AND civicrm_entity_batch.batch_id IS NULL ";
+    if (!empty($query->_where[0]) && is_array($query->_where[0])) {
       // @custom-code start: Incorporate credit note transactions when the default search option is used (i.e., non-test contribution transactions).
-      $where = str_replace("civicrm_contribution.is_test = 0", "(civicrm_contribution.is_test = 0 OR civicrm_entity_financial_trxn.entity_table = 'financeextras_credit_note' OR civicrm_entity_financial_trxn.entity_table = 'financeextras_credit_note_allocation')", $where);
+      $queryWhere = self::adjustFilters($query->_where[0]);
       // @custom-code end
-      $where = str_replace('civicrm_contribution.payment_instrument_id', 'civicrm_financial_trxn.payment_instrument_id', $where);
+      $where = implode(' AND ', $queryWhere) . " AND civicrm_entity_batch.batch_id IS NULL ";
     }
     else {
       // @custom-code start:  Consider credit notes when calculating batch transaction summaries.
@@ -460,6 +459,26 @@ class CRM_Financeextras_Page_AJAX {
     }
 
     return $links;
+  }
+
+  private static function adjustFilters(array $where): array {
+    foreach ($where as $k => $condition) {
+      $where[$k] = str_replace(
+        [
+          'civicrm_contribution.receive_date',
+          'civicrm_contribution.is_test = 0',
+          'civicrm_contribution.payment_instrument_id',
+        ],
+        [
+          'COALESCE(allocation.date, financeextras_credit_note.date, civicrm_contribution.receive_date)',
+          "(civicrm_contribution.is_test = 0 OR civicrm_entity_financial_trxn.entity_table = 'financeextras_credit_note' OR civicrm_entity_financial_trxn.entity_table = 'financeextras_credit_note_allocation')",
+          'civicrm_financial_trxn.payment_instrument_id',
+        ],
+        $condition
+      );
+    }
+
+    return $where;
   }
 
 }
