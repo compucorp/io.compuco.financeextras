@@ -229,9 +229,13 @@ function financeextras_civicrm_alterMailParams(&$params, $context) {
 
   foreach ($hooks as $hook) {
     if ($hook::shouldHandle($params, $context)) {
-      (new $hook($params, $context))->handle();
+      $hookInstance = new $hook($params, $context);
+      $hookInstance->handle();
     }
   }
+
+  // Adaptive memory management for mail processing operations
+  \Civi\Financeextras\Common\GCManager::maybeCollectGarbage('mail_processing');
 }
 
 /**
