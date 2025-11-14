@@ -49,7 +49,7 @@
         $scope.allocations = creditnotes.allocations ?? []
         $scope.total_credit = creditnotes.total_credit
         $scope.remaining_credit = creditnotes.remaining_credit ?? $scope.remaining_credit
-        $scope.allocated_credit = creditnotes.remaining_credit ? creditnotes.total_credit - creditnotes.remaining_credit : $scope.allocated_credit
+        $scope.allocated_credit = creditnotes.remaining_credit ? creditnotes.total_credit - creditnotes.remaining_credit : $scope.total_credit
       });
     }
 

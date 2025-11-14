@@ -63,7 +63,7 @@
   const loader = createLoadingIndicator('div.creditnote__allocate-form-panel', {"loadingImage": loaderGif});
   let dt = null;
   function createLoadingIndicator(target, options = {}) {
-    const defaults = {  
+    const defaults = {
       loadingImage: false,
       showOnInit: true,
       loadingClass: "loader",
@@ -137,7 +137,9 @@
         type: 'number',
         name: `item_amount[${contribution.id}]`,
         class: 'crm-form-text crm-form-number',
-        value: ''
+        value: '',
+        step: '0.01',
+        min: 0
       });
       const $refInput = CRM.$('<input>', {
         type: 'text',
