@@ -1,0 +1,38 @@
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_HOST: "%"
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      # Port 3307 to avoid conflict with Stripe extension (which uses 3306)
+      # This allows both test environments to run simultaneously
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    tmpfs:
+      - /var/lib/mysql:rw,noexec,nosuid,size=1024m
+
+  civicrm:
+    image: compucorp/civicrm-buildkit:1.3.1-php8.0
+    platform: linux/amd64
+    working_dir: /extension
+    volumes:
+      - civicrm-site:/build
+      - .:/extension
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      CIVICRM_EXTENSIONS_DIR: /site/web/sites/all/modules/civicrm/tools/extensions
+      CIVICRM_SETTINGS_DIR: /site/web/sites/default
+    command: tail -f /dev/null
+    stdin_open: true
+    tty: true
+
+volumes:
+  civicrm-site:
