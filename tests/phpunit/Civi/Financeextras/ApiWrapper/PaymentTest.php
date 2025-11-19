@@ -28,7 +28,7 @@ class PaymentTest extends BaseHeadlessTest {
     self::$contribution = ContributionFabricator::fabricate($contributionParams);
   }
 
-  public function setUp() {
+  public function setUp(): void {
   }
 
   public function testMakingPartialPaymentUpdatesContributionToPartiallyPaid(): void {

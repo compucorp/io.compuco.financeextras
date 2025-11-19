@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<table>
+  <base>CRM/Financeextras</base>
+  <class>PaymentAttempt</class>
+  <name>financeextras_payment_attempt</name>
+  <comment>Tracks payment attempts across all processors (Stripe, GoCardless, ITAS, etc.)</comment>
+  <log>true</log>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>contribution_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to Contribution</comment>
+    <html>
+      <type>EntityRef</type>
+      <label>Contribution</label>
+    </html>
+  </field>
+  <foreignKey>
+    <name>contribution_id</name>
+    <table>civicrm_contribution</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <index>
+    <name>index_contribution_id</name>
+    <fieldName>contribution_id</fieldName>
+    <unique>true</unique>
+  </index>
+
+  <field>
+    <name>contact_id</name>
+    <type>int unsigned</type>
+    <required>false</required>
+    <comment>FK to Contact (donor)</comment>
+    <html>
+      <type>EntityRef</type>
+      <label>Contact</label>
+    </html>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>payment_processor_id</name>
+    <type>int unsigned</type>
+    <required>false</required>
+    <comment>FK to Payment Processor</comment>
+    <html>
+      <type>Select</type>
+      <label>Payment Processor</label>
+    </html>
+  </field>
+  <foreignKey>
+    <name>payment_processor_id</name>
+    <table>civicrm_payment_processor</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+
+  <!-- GENERIC PROCESSOR FIELDS -->
+  <field>
+    <name>processor_type</name>
+    <type>varchar</type>
+    <length>50</length>
+    <required>true</required>
+    <comment>Processor type: 'stripe', 'gocardless', 'itas', etc.</comment>
+    <html>
+      <type>Text</type>
+      <label>Processor Type</label>
+    </html>
+  </field>
+  <index>
+    <name>index_processor_type</name>
+    <fieldName>processor_type</fieldName>
+  </index>
+
+  <field>
+    <name>processor_session_id</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Processor session ID (cs_... for Stripe, mandate_... for GoCardless)</comment>
+    <html>
+      <type>Text</type>
+      <label>Processor Session ID</label>
+    </html>
+  </field>
+  <index>
+    <name>index_processor_session</name>
+    <fieldName>processor_session_id</fieldName>
+    <fieldName>processor_type</fieldName>
+  </index>
+
+  <field>
+    <name>processor_payment_id</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Processor payment ID (pi_... for Stripe, payment_... for GoCardless)</comment>
+    <html>
+      <type>Text</type>
+      <label>Processor Payment ID</label>
+    </html>
+  </field>
+  <index>
+    <name>index_processor_payment</name>
+    <fieldName>processor_payment_id</fieldName>
+    <fieldName>processor_type</fieldName>
+  </index>
+
+  <field>
+    <name>status</name>
+    <type>varchar</type>
+    <length>25</length>
+    <required>true</required>
+    <default>'pending'</default>
+    <comment>Attempt status: pending, completed, failed, cancelled</comment>
+    <pseudoconstant>
+      <callback>CRM_Financeextras_BAO_PaymentAttempt::getStatuses</callback>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+      <label>Status</label>
+    </html>
+  </field>
+
+  <field>
+    <name>created_date</name>
+    <type>timestamp</type>
+    <required>true</required>
+    <default>CURRENT_TIMESTAMP</default>
+    <comment>When attempt was created</comment>
+    <html>
+      <type>Select Date</type>
+      <label>Created Date</label>
+    </html>
+  </field>
+
+  <field>
+    <name>updated_date</name>
+    <type>timestamp</type>
+    <required>true</required>
+    <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <comment>Last updated</comment>
+    <html>
+      <type>Select Date</type>
+      <label>Updated Date</label>
+    </html>
+  </field>
+</table>

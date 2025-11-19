@@ -13,7 +13,8 @@ abstract class BaseHeadlessTest extends PHPUnit\Framework\TestCase implements
       ->apply();
   }
 
-  public function setUp() {
+  public function setUp(): void {
+    parent::setUp();
     $ownerOrgId = $this->createCompany(1)['contact_id'];
     $this->updateFinancialAccountOwner('Donation', $ownerOrgId);
     $this->updateFinancialAccountOwner('Member Dues', $ownerOrgId);

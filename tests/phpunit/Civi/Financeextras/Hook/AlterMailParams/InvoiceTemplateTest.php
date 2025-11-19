@@ -11,7 +11,7 @@ class InvoiceTemplateTest extends BaseHeadlessTest {
 
   private $company;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->company = $this->createCompany(1);
