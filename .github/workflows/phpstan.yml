@@ -1,0 +1,99 @@
+name: PHPStan
+
+on: pull_request
+
+env:
+  GITHUB_BASE_REF: ${{ github.base_ref }}
+
+jobs:
+  run-phpstan:
+
+    runs-on: ubuntu-latest
+    container: compucorp/civicrm-buildkit:1.3.1-php8.0
+
+    env:
+      CIVICRM_EXTENSIONS_DIR: site/web/sites/all/modules/civicrm/tools/extensions
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+        - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Config mysql database as per CiviCRM requirement
+        run: echo "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));" | mysql -u root --password=root --host=mysql
+
+      - name: Composer version downgrade 2.2.5
+        run: composer self-update 2.2.5
+
+      - name: Install missing extension
+        run: sudo apt update && apt install -y php-bcmath
+
+      - name: Config amp
+        run : amp config:set --mysql_dsn=mysql://root:root@mysql:3306
+
+      - name: Build Drupal site
+        run: civibuild create drupal-clean --civi-ver 6.4.1 --cms-ver 7.100 --web-root $GITHUB_WORKSPACE/site
+
+      - uses: actions/checkout@v2
+        with:
+          path: ${{ env.CIVICRM_EXTENSIONS_DIR }}/io.compuco.financeextras
+          fetch-depth: 0
+
+      - name: Enable Finance Extras extension
+        working-directory: ${{ env.CIVICRM_EXTENSIONS_DIR }}
+        run: cv en financeextras
+
+      - name: Install extension dependencies
+        working-directory: ${{ env.CIVICRM_EXTENSIONS_DIR }}/io.compuco.financeextras
+        run: composer install
+
+      - name: Fetch target branch
+        working-directory: ${{ env.CIVICRM_EXTENSIONS_DIR }}/io.compuco.financeextras
+        run: git fetch -n origin ${GITHUB_BASE_REF}
+
+      - name: Download PHPStan
+        run: |
+          curl -sL https://github.com/phpstan/phpstan/releases/download/1.12.10/phpstan.phar -o /tmp/phpstan.phar
+          chmod +x /tmp/phpstan.phar
+
+      - name: Run PHPStan
+        working-directory: ${{ env.CIVICRM_EXTENSIONS_DIR }}/io.compuco.financeextras
+        run: |
+          # Create phpstan.neon with CI-specific paths
+          cat > phpstan-ci.neon <<EOF
+          includes:
+            - phpstan-baseline.neon
+            - vendor/phpstan/phpstan-phpunit/extension.neon
+
+          parameters:
+            level: 9
+            paths:
+              - Civi
+              - CRM
+              - tests
+            excludePaths:
+              analyse:
+                - CRM/Financeextras/DAO/*
+                - financeextras.civix.php
+                - '*.mgd.php'
+                - tests/bootstrap.php
+                - Civi/Financeextras/Event/Subscriber/CreditNoteInvoiceSubscriber.php
+                - tests/phpunit/Civi/Financeextras/Utils/LineItemUtilsTest.php
+                - tests/phpunit/Civi/Financeextras/Utils/PaymentUrlBuilderTest.php
+            scanFiles:
+              - financeextras.civix.php
+              - $GITHUB_WORKSPACE/site/web/sites/all/modules/civicrm/Civi.php
+              - tests/phpunit/BaseHeadlessTest.php
+            scanDirectories:
+              - CRM/Financeextras/DAO
+              - $GITHUB_WORKSPACE/site/web/sites/all/modules/civicrm/Civi
+              - $GITHUB_WORKSPACE/site/web/sites/all/modules/civicrm/CRM
+              - $GITHUB_WORKSPACE/site/web/sites/all/modules/civicrm/api
+              - tests
+          EOF
+          php /tmp/phpstan.phar analyse -c phpstan-ci.neon --memory-limit=1G --error-format=github
