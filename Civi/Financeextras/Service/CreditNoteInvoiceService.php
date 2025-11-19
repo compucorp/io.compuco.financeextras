@@ -46,7 +46,7 @@ class CreditNoteInvoiceService {
     $this->template->setDomainLogo($creditNote['company']['logo_url']);
     $this->template->setDomainLocation($this->getContactLocation($creditNote['company']['contact_id']));
 
-    $rendered = $this->template->renderTemplate(['messageTemplateID' => $creditNote['company']['creditnote_template_id']]);
+    $rendered = $this->template->renderTemplate(['messageTemplateID' => (int) $creditNote['company']['creditnote_template_id']]);
     $rendered['format'] = $rendered['format'] ?? $this->defaultInvoiceFormat();
 
     return $rendered;
