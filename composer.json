@@ -1,0 +1,15 @@
+{
+    "name": "compucorp/financeextras-extension",
+    "description": "Finance Extras Extension",
+    "authors": [
+        {
+            "name": "Compucorp",
+            "email": "hello@compuco.io"
+        }
+    ],
+    "require-dev": {
+        "phpstan/phpstan": "^1.12",
+        "phpstan/phpstan-phpunit": "^1.4",
+        "phpunit/phpunit": "^9.5"
+    }
+}
