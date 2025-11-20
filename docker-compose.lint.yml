@@ -1,6 +1,6 @@
 services:
   php-lint:
-    image: php:8.0-cli
+    image: php:8.1-cli
     volumes:
       - .:/extension
     working_dir: /extension
