@@ -132,7 +132,7 @@ CREATE TABLE `financeextras_credit_note_line` (
   `credit_note_id` int unsigned COMMENT 'FK to CreditNote',
   `financial_type_id` int unsigned COMMENT 'FK to CiviCRM Financial Type',
   `description` text NULL COMMENT 'line item description',
-  `quantity` decimal(20,2) COMMENT 'Quantity',
+  `quantity` decimal(20, 4) COMMENT 'Quantity',
   `unit_price` decimal(20,2) COMMENT 'Unit Price',
   `tax_amount` decimal(20,2) COMMENT 'Tax amount for the line item',
   `line_total` decimal(20,2) COMMENT 'Line Total',
