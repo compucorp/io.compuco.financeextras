@@ -13,7 +13,7 @@ class ContributionCreationTest extends BaseHeadlessTest {
 
   private $secondCompany;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     // Both "Donation" And "Member Dues" are financial types that are shipped with the test

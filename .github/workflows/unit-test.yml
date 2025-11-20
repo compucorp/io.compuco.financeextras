@@ -10,46 +10,40 @@ jobs:
 
     env:
       CIVICRM_EXTENSIONS_DIR: site/web/sites/all/modules/civicrm/tools/extensions
+      CIVICRM_SETTINGS_DIR: site/web/sites/default
 
     services:
       mysql:
-        image: mariadb:10.3.10
+        image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: root
         ports:
-          - 3306
+        - 3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-
       - name: Config mysql database as per CiviCRM requirement
         run: echo "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));" | mysql -u root --password=root --host=mysql
+
+      - name: Composer version downgrade 2.2.5
+        run: composer self-update 2.2.5
+
+      - name: Install missing extension
+        run: sudo apt update && apt install -y php-bcmath
 
       - name: Config amp
         run : amp config:set --mysql_dsn=mysql://root:root@mysql:3306
 
-      - name: Composer version downgrade 2.2.5
-        run : composer self-update 2.2.5
-
       - name: Build Drupal site
-        run: civibuild create drupal-clean --civi-ver 5.75.0 --cms-ver 7.94 --web-root $GITHUB_WORKSPACE/site
-
-      - uses: compucorp/apply-patch@1.0.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          repo: compucorp/civicrm-core
-          version: 5.75.0
-          path: site/web/sites/all/modules/civicrm
+        run: civibuild create drupal-clean --civi-ver 6.4.1 --cms-ver 7.100 --web-root $GITHUB_WORKSPACE/site
 
       - uses: actions/checkout@v2
         with:
           path: ${{ env.CIVICRM_EXTENSIONS_DIR }}/io.compuco.financeextras
 
-      - name: Installing Finance Extras
+      - name: Enable Finance Extras extension
         working-directory: ${{ env.CIVICRM_EXTENSIONS_DIR }}
         run: cv en financeextras
-      
 
       - name: Setup Test DB
         run: echo "CREATE DATABASE civicrm_test;" | mysql -u root --password=root --host=mysql
@@ -71,4 +65,4 @@ jobs:
 
       - name: Run phpunit tests
         working-directory: ${{ env.CIVICRM_EXTENSIONS_DIR }}/io.compuco.financeextras
-        run: phpunit5
+        run: phpunit9

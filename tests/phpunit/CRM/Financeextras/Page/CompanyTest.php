@@ -5,7 +5,7 @@
  */
 class CRM_Financeextras_Page_CompanyTest extends BaseHeadlessTest {
 
-  public function setUp() {
+  public function setUp(): void {
   }
 
   public function testCompanyRecordsAppearInPage() {

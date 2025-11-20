@@ -50,16 +50,16 @@ class CreditNoteInvoiceServiceTest extends BaseHeadlessTest {
     $subtotal = \CRM_Utils_Money::format($creditNote->subtotal, $creditNote->currency);
     $totalCredit = \CRM_Utils_Money::format($creditNote->total_credit, $creditNote->currency);
     $this->assertArrayHasKey("html", $invoice);
-    $this->assertRegExp('/' . $contact->display_name . '/', $invoice['html']);
-    $this->assertRegExp('/' . $ownerOrg->organization_name . '/', $invoice['html']);
-    $this->assertRegExp('/Supplementary Address 1/', $invoice['html']);
-    $this->assertRegExp('/Supplementary Address 2/', $invoice['html']);
-    $this->assertRegExp('/' . str_replace(' ', '', $subtotal) . '/', $invoice['html']);
-    $this->assertRegExp('/' . str_replace(' ', '', $totalCredit) . '/', $invoice['html']);
-    $this->assertRegExp('/' . $lineItem1['description'] . '/', $invoice['html']);
-    $this->assertRegExp('/' . $lineItem2['description'] . '/', $invoice['html']);
-    $this->assertRegExp('/' . $lineItem1['quantity'] . '/', $invoice['html']);
-    $this->assertRegExp('/' . $lineItem2['quantity'] . '/', $invoice['html']);
+    $this->assertMatchesRegularExpression('/' . $contact->display_name . '/', $invoice['html']);
+    $this->assertMatchesRegularExpression('/' . $ownerOrg->organization_name . '/', $invoice['html']);
+    $this->assertMatchesRegularExpression('/Supplementary Address 1/', $invoice['html']);
+    $this->assertMatchesRegularExpression('/Supplementary Address 2/', $invoice['html']);
+    $this->assertMatchesRegularExpression('/' . str_replace(' ', '', $subtotal) . '/', $invoice['html']);
+    $this->assertMatchesRegularExpression('/' . str_replace(' ', '', $totalCredit) . '/', $invoice['html']);
+    $this->assertMatchesRegularExpression('/' . $lineItem1['description'] . '/', $invoice['html']);
+    $this->assertMatchesRegularExpression('/' . $lineItem2['description'] . '/', $invoice['html']);
+    $this->assertMatchesRegularExpression('/' . $lineItem1['quantity'] . '/', $invoice['html']);
+    $this->assertMatchesRegularExpression('/' . $lineItem2['quantity'] . '/', $invoice['html']);
   }
 
   private function createAddressForContact($contactId) {

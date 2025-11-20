@@ -1,5 +1,12 @@
 node_modules/
+vendor/
 coverage/
 bin/*
 !bin/install-php-linter
 *.css.map
+.phpunit.result.cache
+composer.lock
+io.compuco.financeextras.iml
+phpstan_output.log
+test_output.log
+lint_output.log

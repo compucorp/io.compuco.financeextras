@@ -1,0 +1,7 @@
+services:
+  php-lint:
+    image: php:8.1-cli
+    volumes:
+      - .:/extension
+    working_dir: /extension
+    command: tail -f /dev/null  # Keep container running

@@ -15,7 +15,7 @@ class OwnerOrganizationValidatorTest extends BaseHeadlessTest {
 
   private $memberDuesFinancialTypeId;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->testPriceSetId = civicrm_api3('PriceSet', 'create', [

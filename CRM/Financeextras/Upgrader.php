@@ -233,4 +233,20 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
     }
   }
 
+  /**
+   * Adds PaymentAttempt table for tracking payment attempts across processors
+   */
+  public function upgrade_1006(): bool {
+    $this->ctx->log->info('Applying update 1006 - Adding PaymentAttempt table');
+
+    try {
+      $this->executeSqlFile('sql/upgrade_1006.sql');
+      return TRUE;
+    }
+    catch (\Throwable $e) {
+      $this->ctx->log->error('Failed to apply upgrade 1006: ' . $e->getMessage());
+      return FALSE;
+    }
+  }
+
 }

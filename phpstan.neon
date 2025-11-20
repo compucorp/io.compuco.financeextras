@@ -1,0 +1,35 @@
+includes:
+    - phpstan-baseline.neon
+    - vendor/phpstan/phpstan-phpunit/extension.neon
+
+parameters:
+    level: 9
+    paths:
+        - Civi
+        - CRM
+        - tests
+    excludePaths:
+        analyse:
+            # Auto-generated files - don't analyze but allow scanning for type info
+            - CRM/Financeextras/DAO/*
+            - financeextras.civix.php
+            - '*.mgd.php'
+            - tests/bootstrap.php
+            # Legacy files with unknown interfaces (pre-existing issues)
+            - Civi/Financeextras/Event/Subscriber/CreditNoteInvoiceSubscriber.php
+            - tests/phpunit/Civi/Financeextras/Utils/LineItemUtilsTest.php
+            - tests/phpunit/Civi/Financeextras/Utils/PaymentUrlBuilderTest.php
+    scanFiles:
+        - financeextras.civix.php
+        - /build/site/web/sites/all/modules/civicrm/Civi.php
+        # Test base classes needed for type information
+        - tests/phpunit/BaseHeadlessTest.php
+    scanDirectories:
+        # Scan DAO files for type information (but don't analyze them)
+        - CRM/Financeextras/DAO
+        # Scan CiviCRM core for type information
+        - /build/site/web/sites/all/modules/civicrm/Civi
+        - /build/site/web/sites/all/modules/civicrm/CRM
+        - /build/site/web/sites/all/modules/civicrm/api
+        # Scan test infrastructure for type information
+        - tests

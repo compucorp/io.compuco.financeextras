@@ -17,7 +17,7 @@ class FinancialTypeAccountTest extends BaseHeadlessTest {
 
   private $accountsReceivableFinancialAccountId;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->form = new \CRM_Financial_Form_FinancialTypeAccount();
