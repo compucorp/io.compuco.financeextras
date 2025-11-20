@@ -335,7 +335,7 @@ class CRM_Financeextras_Page_AJAX {
       if (isset($params[$field])) {
         $values[$field] = $params[$field];
         if ($field == 'sort_name') {
-          $from .= " LEFT JOIN civicrm_contact contact_b ON contact_b.id = civicrm_contribution.contact_id
+          $from .= " LEFT JOIN civicrm_contact contact_b ON contact_b.id = COALESCE(civicrm_contribution.contact_id, financeextras_credit_note.contact_id, allocation_credit_note.contact_id)
           LEFT JOIN civicrm_email ON contact_b.id = civicrm_email.contact_id";
         }
         if ($field == 'contribution_in_honor_of') {
