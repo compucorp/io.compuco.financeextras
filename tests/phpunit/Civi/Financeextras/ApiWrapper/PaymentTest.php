@@ -28,7 +28,7 @@ class PaymentTest extends BaseHeadlessTest {
     self::$contribution = ContributionFabricator::fabricate($contributionParams);
   }
 
-  public function setUp() {
+  public function setUp(): void {
   }
 
   public function testMakingPartialPaymentUpdatesContributionToPartiallyPaid(): void {
@@ -52,6 +52,22 @@ class PaymentTest extends BaseHeadlessTest {
       'trxn_id' => self::$contribution['trxn_id'],
       'is_send_contribution_notification' => FALSE,
     ]);
+    $contribution = civicrm_api3('Contribution', 'getSingle', ['id' => self::$contribution['id']]);
+
+    $this->assertEquals('Completed', $contribution['contribution_status']);
+  }
+
+  public function testZeroAmountContributionIsCreatedAsCompleted(): void {
+    $contact = ContactFabricator::fabricate();
+    self::$contribution = ContributionFabricator::fabricate([
+      'financial_type_id' => 'Donation',
+      'receive_date' => date('Y-m-d'),
+      'total_amount' => 0.00,
+      'contact_id' => $contact['id'],
+      'payment_instrument_id' => 'Credit Card',
+      'currency' => 'GBP',
+    ]);
+
     $contribution = civicrm_api3('Contribution', 'getSingle', ['id' => self::$contribution['id']]);
 
     $this->assertEquals('Completed', $contribution['contribution_status']);
