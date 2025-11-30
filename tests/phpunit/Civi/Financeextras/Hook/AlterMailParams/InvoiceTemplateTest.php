@@ -128,4 +128,92 @@ class InvoiceTemplateTest extends BaseHeadlessTest {
     $this->assertEquals($fakeOrganisationImageURL, $templateParams['tplParams']['domain_logo']);
   }
 
+  /**
+   * Test LRU cache functionality for contribution data.
+   */
+  public function testContributionLRUCache() {
+    $templateParams = ['tplParams' => ['id' => 123]];
+    $invoice = new InvoiceTemplate($templateParams, 'test');
+    $reflection = new \ReflectionClass($invoice);
+
+    // Get private methods
+    $addToLRUCacheMethod = $reflection->getMethod('addToLRUCache');
+    $addToLRUCacheMethod->setAccessible(TRUE);
+    $getContributionFromCacheMethod = $reflection->getMethod('getContributionFromCache');
+    $getContributionFromCacheMethod->setAccessible(TRUE);
+
+    // Test cache miss
+    $result = $getContributionFromCacheMethod->invoke($invoice, 999);
+    $this->assertFalse($result);
+
+    // Add to cache and test hit
+    $cache = [];
+    $order = [];
+    $testData = ['id' => 123, 'rate_1_unit_tax_currency' => '1.2'];
+
+    $addToLRUCacheMethod->invoke($invoice, $cache, $order, 123, $testData);
+
+    // Set static cache properties
+    $contributionCacheProperty = $reflection->getProperty('contributionCache');
+    $contributionCacheProperty->setAccessible(TRUE);
+    $contributionCacheProperty->setValue(NULL, $cache);
+
+    $contributionOrderProperty = $reflection->getProperty('contributionCacheOrder');
+    $contributionOrderProperty->setAccessible(TRUE);
+    $contributionOrderProperty->setValue(NULL, $order);
+
+    $result = $getContributionFromCacheMethod->invoke($invoice, 123);
+    $this->assertEquals($testData, $result);
+  }
+
+  /**
+   * Test LRU cache eviction when at capacity.
+   */
+  public function testLRUCacheEviction() {
+    $templateParams = ['tplParams' => ['id' => 1]];
+    $invoice = new InvoiceTemplate($templateParams, 'test');
+    $reflection = new \ReflectionClass($invoice);
+
+    $addToLRUCacheMethod = $reflection->getMethod('addToLRUCache');
+    $addToLRUCacheMethod->setAccessible(TRUE);
+    $maxCacheSizeProperty = $reflection->getProperty('maxCacheSize');
+    $maxCacheSizeProperty->setAccessible(TRUE);
+
+    // Set small cache size for testing
+    $maxCacheSizeProperty->setValue(NULL, 2);
+
+    $cache = [];
+    $order = [];
+
+    // Fill cache to capacity
+    $addToLRUCacheMethod->invoke($invoice, $cache, $order, 1, 'data1');
+    $addToLRUCacheMethod->invoke($invoice, $cache, $order, 2, 'data2');
+
+    $this->assertCount(2, $cache);
+    $this->assertTrue(isset($cache[1]));
+
+    // Add one more - should evict LRU
+    $addToLRUCacheMethod->invoke($invoice, $cache, $order, 3, 'data3');
+
+    $this->assertCount(2, $cache);
+    $this->assertFalse(isset($cache[1])); // First item evicted
+    $this->assertTrue(isset($cache[3])); // New item present
+  }
+
+  /**
+   * Test owner company cache functionality.
+   */
+  public function testOwnerCompanyCache() {
+    $templateParams = ['tplParams' => ['id' => 456]];
+    $invoice = new InvoiceTemplate($templateParams, 'test');
+    $reflection = new \ReflectionClass($invoice);
+
+    $getOwnerCompanyFromCacheMethod = $reflection->getMethod('getOwnerCompanyFromCache');
+    $getOwnerCompanyFromCacheMethod->setAccessible(TRUE);
+
+    // Test cache miss
+    $result = $getOwnerCompanyFromCacheMethod->invoke($invoice, 456);
+    $this->assertFalse($result);
+  }
+
 }
