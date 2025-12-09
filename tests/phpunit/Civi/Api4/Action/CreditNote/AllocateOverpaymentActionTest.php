@@ -375,4 +375,60 @@ class Civi_Api4_CreditNote_AllocateOverpaymentActionTest extends BaseHeadlessTes
     $this->assertCount(0, $allocations);
   }
 
+  /**
+   * Test allocate overpayment calculates tax when financial type has tax rate.
+   */
+  public function testAllocateOverpaymentCalculatesTaxWhenConfigured() {
+    $contribution = $this->getNextOverpaidContribution();
+    $overpaymentAmount = $contribution['overpayment_amount'];
+    $taxRate = 20;
+
+    // Create a financial account with tax rate.
+    $taxAccount = \Civi\Api4\FinancialAccount::create(FALSE)
+      ->addValue('name', 'Test Sales Tax Account')
+      ->addValue('financial_account_type_id:name', 'Liability')
+      ->addValue('is_tax', TRUE)
+      ->addValue('tax_rate', $taxRate)
+      ->addValue('is_active', TRUE)
+      ->execute()
+      ->first();
+
+    // Link tax account to the overpayment financial type.
+    $accountRelationshipId = \CRM_Core_PseudoConstant::getKey(
+      'CRM_Financial_DAO_EntityFinancialAccount',
+      'account_relationship',
+      'Sales Tax Account is'
+    );
+
+    \Civi\Api4\EntityFinancialAccount::create(FALSE)
+      ->addValue('entity_table', 'civicrm_financial_type')
+      ->addValue('entity_id', $this->overpaymentFinancialTypeId)
+      ->addValue('account_relationship', $accountRelationshipId)
+      ->addValue('financial_account_id', $taxAccount['id'])
+      ->execute();
+
+    $result = CreditNote::allocateOverpayment(FALSE)
+      ->setContributionId($contribution['id'])
+      ->execute()
+      ->first();
+
+    $lineItems = CreditNoteLine::get(FALSE)
+      ->addWhere('credit_note_id', '=', $result['id'])
+      ->execute();
+
+    $this->assertCount(1, $lineItems);
+
+    $lineItem = $lineItems->first();
+    $expectedTax = ($overpaymentAmount * $taxRate) / 100;
+    $this->assertEquals($expectedTax, $lineItem['tax_amount']);
+    $this->assertEquals($overpaymentAmount, $lineItem['line_total']);
+
+    // Total credit should include tax.
+    $creditNote = CreditNote::get(FALSE)
+      ->addWhere('id', '=', $result['id'])
+      ->execute()
+      ->first();
+    $this->assertEquals($overpaymentAmount + $expectedTax, $creditNote['total_credit']);
+  }
+
 }

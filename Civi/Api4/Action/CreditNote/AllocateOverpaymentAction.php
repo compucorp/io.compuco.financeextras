@@ -9,6 +9,7 @@ use Civi\Api4\CreditNote;
 use Civi\Api4\Contribution;
 use Civi\Api4\Company;
 use Civi\Api4\OptionValue;
+use Civi\Api4\EntityFinancialAccount;
 use Civi\Financeextras\Utils\OverpaymentUtils;
 use Civi\Financeextras\Utils\OptionValueUtils;
 use Civi\Financeextras\Event\ContributionPaymentUpdatedEvent;
@@ -167,6 +168,9 @@ class AllocateOverpaymentAction extends AbstractAction {
       ->execute()
       ->first()['value'] ?? NULL;
 
+    // Get tax rate for the financial type if configured.
+    $taxRate = $this->getTaxRateForFinancialType($financialTypeId);
+
     return CreditNote::save(FALSE)
       ->addRecord([
         'contact_id' => $contactId,
@@ -182,13 +186,33 @@ class AllocateOverpaymentAction extends AbstractAction {
             'financial_type_id' => $financialTypeId,
             'quantity' => 1,
             'unit_price' => $amount,
-            'tax_amount' => 0,
-            'line_total' => $amount,
+            'tax_rate' => $taxRate,
           ],
         ],
       ])
       ->execute()
       ->first();
+  }
+
+  /**
+   * Get the tax rate for a financial type.
+   *
+   * @param int $financialTypeId
+   *   The financial type ID.
+   *
+   * @return float
+   *   The tax rate (0 if no sales tax account is configured).
+   */
+  private function getTaxRateForFinancialType(int $financialTypeId): float {
+    $entityFinancialAccount = EntityFinancialAccount::get(FALSE)
+      ->addSelect('financial_account_id.tax_rate')
+      ->addWhere('account_relationship:name', '=', 'Sales Tax Account is')
+      ->addWhere('entity_table', '=', 'civicrm_financial_type')
+      ->addWhere('entity_id', '=', $financialTypeId)
+      ->execute()
+      ->first();
+
+    return (float) ($entityFinancialAccount['financial_account_id.tax_rate'] ?? 0);
   }
 
   /**
