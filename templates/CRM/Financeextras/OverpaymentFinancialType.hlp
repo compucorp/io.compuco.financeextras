@@ -1,0 +1,10 @@
+{htxt id="overpayment_financial_type"}
+<p>
+  {ts}Select which financial type to be used for overpayments. Suggested configuration:{/ts}
+</p>
+<ol style="margin-left: 5px;">
+<li>{ts}Create a new financial type "Overpayment". This will automatically create a linked financial account called "Overpayment".{/ts}</li>
+<li>{ts}Set the "Accounts Receivable Account is" for the financial type to be your Accounts Receivable Account.{/ts}</li>
+<li>{ts}Modify the Overpayment Financial Account (used for "Income Account is") so that the fields "Accounting Code" and "Accounting Type code" are the same as your Accounts Receivable account.{/ts}</li>
+</ol>
+{/htxt}

@@ -43,6 +43,14 @@
       </td>
       <td>{$form.receivable_payment_method.html}</td>
     </tr>
+
+    <tr>
+      <td class="label">
+        {$form.overpayment_financial_type_id.label}
+        {help id="overpayment_financial_type" file="CRM/Financeextras/OverpaymentFinancialType.hlp"}
+      </td>
+      <td>{$form.overpayment_financial_type_id.html}</td>
+    </tr>
     </tbody>
   </table>
   <div class="crm-submit-buttons">

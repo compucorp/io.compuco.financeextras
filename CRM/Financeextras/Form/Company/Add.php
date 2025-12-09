@@ -82,6 +82,19 @@ class CRM_Financeextras_Form_Company_Add extends CRM_Core_Form {
       TRUE
     );
 
+    $this->addEntityRef(
+      'overpayment_financial_type_id',
+      ts('Financial Type for Overpayments'),
+      [
+        'entity' => 'FinancialType',
+        'api' => ['params' => ['is_active' => 1]],
+        'select' => ['minimumInputLength' => 0],
+        'placeholder' => ts('Select Financial Type'),
+        'multiple' => FALSE,
+      ],
+      FALSE
+    );
+
     $this->addButtons([
       [
         'type' => 'submit',
@@ -111,6 +124,7 @@ class CRM_Financeextras_Form_Company_Add extends CRM_Core_Form {
     $values['creditnote_prefix'] = $company->creditnote_prefix;
     $values['next_creditnote_number'] = $company->next_creditnote_number;
     $values['receivable_payment_method'] = $company->receivable_payment_method;
+    $values['overpayment_financial_type_id'] = $company->overpayment_financial_type_id;
 
     return $values;
   }
@@ -159,6 +173,7 @@ class CRM_Financeextras_Form_Company_Add extends CRM_Core_Form {
     $params['creditnote_prefix'] = $submittedValues['creditnote_prefix'];
     $params['next_creditnote_number'] = $submittedValues['next_creditnote_number'];
     $params['receivable_payment_method'] = $submittedValues['receivable_payment_method'];
+    $params['overpayment_financial_type_id'] = !empty($submittedValues['overpayment_financial_type_id']) ? $submittedValues['overpayment_financial_type_id'] : NULL;
 
     CRM_Financeextras_BAO_Company::create($params);
 

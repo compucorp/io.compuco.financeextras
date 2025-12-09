@@ -103,6 +103,15 @@ class CRM_Financeextras_DAO_Company extends CRM_Core_DAO {
   public $receivable_payment_method;
 
   /**
+   * Financial type to use for overpayment credit notes
+   *
+   * @var int|string|null
+   *   (SQL type: int unsigned)
+   *   Note that values will be retrieved from the database as a string.
+   */
+  public $overpayment_financial_type_id;
+
+  /**
    * Class constructor.
    */
   public function __construct() {
@@ -132,6 +141,7 @@ class CRM_Financeextras_DAO_Company extends CRM_Core_DAO {
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'contact_id', 'civicrm_contact', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'invoice_template_id', 'civicrm_msg_template', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'creditnote_template_id', 'civicrm_msg_template', 'id');
+      Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'overpayment_financial_type_id', 'civicrm_financial_type', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
     return Civi::$statics[__CLASS__]['links'];
@@ -290,6 +300,27 @@ class CRM_Financeextras_DAO_Company extends CRM_Core_DAO {
           'localizable' => 0,
           'html' => [
             'label' => E::ts("Accounts Receivable Payment Method"),
+          ],
+          'add' => NULL,
+        ],
+        'overpayment_financial_type_id' => [
+          'name' => 'overpayment_financial_type_id',
+          'type' => CRM_Utils_Type::T_INT,
+          'title' => E::ts('Financial Type for Overpayments'),
+          'description' => E::ts('Financial type to use for overpayment credit notes'),
+          'where' => 'financeextras_company.overpayment_financial_type_id',
+          'table_name' => 'financeextras_company',
+          'entity' => 'Company',
+          'bao' => 'CRM_Financeextras_DAO_Company',
+          'localizable' => 0,
+          'FKClassName' => 'CRM_Financial_DAO_FinancialType',
+          'html' => [
+            'label' => E::ts("Financial Type for Overpayments"),
+          ],
+          'pseudoconstant' => [
+            'table' => 'civicrm_financial_type',
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
           ],
           'add' => NULL,
         ],
