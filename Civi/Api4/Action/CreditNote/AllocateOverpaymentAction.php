@@ -11,10 +11,7 @@ use Civi\Api4\Company;
 use Civi\Api4\OptionValue;
 use Civi\Api4\EntityFinancialAccount;
 use Civi\Financeextras\Utils\OverpaymentUtils;
-use Civi\Financeextras\Utils\OptionValueUtils;
-use Civi\Financeextras\Utils\FinancialAccountUtils;
 use Civi\Financeextras\Event\ContributionPaymentUpdatedEvent;
-use Civi\Financeextras\Setup\Manage\AccountsReceivablePaymentMethod;
 
 /**
  * Allocate overpayment to a new credit note.
@@ -99,7 +96,7 @@ class AllocateOverpaymentAction extends AbstractAction {
       $this->contributionId,
       $overpaymentAmount,
       $creditNote['cn_number'],
-      (int) $contribution['financial_type_id']
+      (int) $ownerOrgId
     );
 
     return $creditNote;
@@ -227,7 +224,8 @@ class AllocateOverpaymentAction extends AbstractAction {
    * to credit note credit for use on future invoices.
    *
    * Since this is an internal allocation (not actual money movement),
-   * both sides of the transaction use the Accounts Receivable account.
+   * both sides of the transaction use the Accounts Receivable account
+   * configured for the company.
    *
    * @param int $contributionId
    *   The contribution ID.
@@ -235,20 +233,23 @@ class AllocateOverpaymentAction extends AbstractAction {
    *   The overpayment amount (will be recorded as negative).
    * @param string $creditNoteNumber
    *   The credit note number for reference.
-   * @param int $financialTypeId
-   *   The contribution's financial type ID.
+   * @param int $ownerOrgId
+   *   The owner organization (company) contact ID.
    */
   private function recordOverpaymentAdjustment(
     int $contributionId,
     float $amount,
     string $creditNoteNumber,
-    int $financialTypeId
+    int $ownerOrgId
   ): void {
-    // Use accounts_receivable payment instrument since this is an internal allocation.
-    $paymentInstrumentId = OptionValueUtils::getValueForOptionValue(
-      'payment_instrument',
-      AccountsReceivablePaymentMethod::NAME
-    );
+    // Get the company's configured receivable payment method.
+    $company = Company::get(FALSE)
+      ->addSelect('receivable_payment_method')
+      ->addWhere('contact_id', '=', $ownerOrgId)
+      ->execute()
+      ->first();
+
+    $paymentInstrumentId = $company['receivable_payment_method'];
 
     $trxn = \CRM_Financial_BAO_Payment::create([
       'contribution_id' => $contributionId,
@@ -259,10 +260,10 @@ class AllocateOverpaymentAction extends AbstractAction {
       'is_send_contribution_notification' => FALSE,
     ]);
 
-    // Get Accounts Receivable account from the contribution's financial type.
-    $accountsReceivableId = FinancialAccountUtils::getFinancialTypeAccount(
-      $financialTypeId,
-      'Accounts Receivable Account is'
+    // Get the Accounts Receivable financial account from the company's
+    // configured receivable payment method.
+    $accountsReceivableId = \CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount(
+      $paymentInstrumentId
     );
 
     // Update the financial transaction:
