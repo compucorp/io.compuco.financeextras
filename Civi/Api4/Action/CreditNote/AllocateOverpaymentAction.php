@@ -179,7 +179,7 @@ class AllocateOverpaymentAction extends AbstractAction {
         'currency' => $currency,
         'date' => $today,
         'description' => ts('Overpayment'),
-        'reference' => ts('Contribution #%1', [1 => $this->contributionId]),
+        'reference' => (string) $this->contributionId,
         'items' => [
           [
             'description' => ts('Overpayment %1', [1 => $todayFormatted]),
