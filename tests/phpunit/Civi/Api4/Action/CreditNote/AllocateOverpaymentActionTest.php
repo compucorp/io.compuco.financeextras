@@ -376,9 +376,13 @@ class Civi_Api4_CreditNote_AllocateOverpaymentActionTest extends BaseHeadlessTes
   }
 
   /**
-   * Test allocate overpayment calculates tax when financial type has tax rate.
+   * Test allocate overpayment does NOT add tax even when financial type has tax rate.
+   *
+   * The overpayment amount is already the gross cash difference (total_payments
+   * minus contribution_total), where contribution_total is tax-inclusive.
+   * Adding tax would inflate the credit note beyond the actual overpayment.
    */
-  public function testAllocateOverpaymentCalculatesTaxWhenConfigured() {
+  public function testAllocateOverpaymentDoesNotAddTaxEvenWhenConfigured() {
     $contribution = $this->getNextOverpaidContribution();
     $overpaymentAmount = $contribution['overpayment_amount'];
     $taxRate = 20;
@@ -419,16 +423,16 @@ class Civi_Api4_CreditNote_AllocateOverpaymentActionTest extends BaseHeadlessTes
     $this->assertCount(1, $lineItems);
 
     $lineItem = $lineItems->first();
-    $expectedTax = ($overpaymentAmount * $taxRate) / 100;
-    $this->assertEquals($expectedTax, $lineItem['tax_amount']);
+    // Tax should be zero - overpayment is already gross cash.
+    $this->assertEquals(0, $lineItem['tax_amount']);
     $this->assertEquals($overpaymentAmount, $lineItem['line_total']);
 
-    // Total credit should include tax.
+    // Total credit should equal overpayment amount (no tax added).
     $creditNote = CreditNote::get(FALSE)
       ->addWhere('id', '=', $result['id'])
       ->execute()
       ->first();
-    $this->assertEquals($overpaymentAmount + $expectedTax, $creditNote['total_credit']);
+    $this->assertEquals($overpaymentAmount, $creditNote['total_credit']);
   }
 
 }
