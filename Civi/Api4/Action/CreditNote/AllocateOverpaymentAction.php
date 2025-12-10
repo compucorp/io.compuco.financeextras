@@ -12,7 +12,9 @@ use Civi\Api4\OptionValue;
 use Civi\Api4\EntityFinancialAccount;
 use Civi\Financeextras\Utils\OverpaymentUtils;
 use Civi\Financeextras\Utils\OptionValueUtils;
+use Civi\Financeextras\Utils\FinancialAccountUtils;
 use Civi\Financeextras\Event\ContributionPaymentUpdatedEvent;
+use Civi\Financeextras\Setup\Manage\AccountsReceivablePaymentMethod;
 
 /**
  * Allocate overpayment to a new credit note.
@@ -96,7 +98,8 @@ class AllocateOverpaymentAction extends AbstractAction {
     $this->recordOverpaymentAdjustment(
       $this->contributionId,
       $overpaymentAmount,
-      $creditNote['cn_number']
+      $creditNote['cn_number'],
+      (int) $contribution['financial_type_id']
     );
 
     return $creditNote;
@@ -223,19 +226,29 @@ class AllocateOverpaymentAction extends AbstractAction {
    * The overpayment is not refunded to the customer - it is converted
    * to credit note credit for use on future invoices.
    *
+   * Since this is an internal allocation (not actual money movement),
+   * both sides of the transaction use the Accounts Receivable account.
+   *
    * @param int $contributionId
    *   The contribution ID.
    * @param float $amount
    *   The overpayment amount (will be recorded as negative).
    * @param string $creditNoteNumber
    *   The credit note number for reference.
+   * @param int $financialTypeId
+   *   The contribution's financial type ID.
    */
   private function recordOverpaymentAdjustment(
     int $contributionId,
     float $amount,
-    string $creditNoteNumber
+    string $creditNoteNumber,
+    int $financialTypeId
   ): void {
-    $paymentInstrumentId = OptionValueUtils::getValueForOptionValue('payment_instrument', 'credit_note');
+    // Use accounts_receivable payment instrument since this is an internal allocation.
+    $paymentInstrumentId = OptionValueUtils::getValueForOptionValue(
+      'payment_instrument',
+      AccountsReceivablePaymentMethod::NAME
+    );
 
     $trxn = \CRM_Financial_BAO_Payment::create([
       'contribution_id' => $contributionId,
@@ -246,12 +259,22 @@ class AllocateOverpaymentAction extends AbstractAction {
       'is_send_contribution_notification' => FALSE,
     ]);
 
-    // CiviCRM Payment BAO hardcodes "Refunded" status for negative amounts,
-    // but this is an overpayment adjustment, not a refund, so update to "Completed".
+    // Get Accounts Receivable account from the contribution's financial type.
+    $accountsReceivableId = FinancialAccountUtils::getFinancialTypeAccount(
+      $financialTypeId,
+      'Accounts Receivable Account is'
+    );
+
+    // Update the financial transaction:
+    // - Set status to "Completed" (Payment BAO hardcodes "Refunded" for negative amounts)
+    // - Set both from/to accounts to Accounts Receivable since this is an
+    //   internal allocation, not actual money movement
     $completedStatusId = \CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'status_id', 'Completed');
     \CRM_Core_BAO_FinancialTrxn::create([
       'id' => $trxn->id,
       'status_id' => $completedStatusId,
+      'from_financial_account_id' => $accountsReceivableId,
+      'to_financial_account_id' => $accountsReceivableId,
     ]);
 
     // Dispatch event to trigger contribution status recalculation.
