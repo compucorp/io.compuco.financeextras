@@ -7,4 +7,7 @@
 <li>{ts}Set the "Accounts Receivable Account is" for the financial type to be your Accounts Receivable Account.{/ts}</li>
 <li>{ts}Modify the Overpayment Financial Account (used for "Income Account is") so that the fields "Accounting Code" and "Accounting Type code" are the same as your Accounts Receivable account.{/ts}</li>
 </ol>
+<p>
+  {ts}This configuration will allocate your overpayments to the same accounts as your accounts receivable.{/ts}
+</p>
 {/htxt}
