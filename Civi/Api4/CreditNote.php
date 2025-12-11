@@ -8,6 +8,7 @@ use Civi\Api4\Action\CreditNote\RefundAction;
 use Civi\Api4\Action\CreditNote\ComputeTotalAction;
 use Civi\Api4\Action\CreditNote\CreditNoteSaveAction;
 use Civi\Api4\Action\CreditNote\DeleteWithItemsAction;
+use Civi\Api4\Action\CreditNote\AllocateOverpaymentAction;
 
 /**
  * CreditNote entity.
@@ -101,6 +102,24 @@ class CreditNote extends Generic\DAOEntity {
   }
 
   /**
+   * Allocate an overpayment to a new credit note.
+   *
+   * Creates a credit note for the overpayment amount and allocates it
+   * to the contribution to balance the contribution. The remaining credit
+   * can then be allocated to future invoices.
+   *
+   * @param bool $checkPermissions
+   *   Should permission be checked for the user.
+   *
+   * @return \Civi\Api4\Action\CreditNote\AllocateOverpaymentAction
+   *   Returns the allocate overpayment action.
+   */
+  public static function allocateOverpayment($checkPermissions = TRUE) {
+    return (new AllocateOverpaymentAction(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
    * {@inheritDoc}
    */
   public static function permissions() {
@@ -109,6 +128,7 @@ class CreditNote extends Generic\DAOEntity {
       'get' => ['access CiviCRM', 'access CiviContribute'],
       'void' => ['access CiviContribute', 'edit contributions'],
       'refund' => ['access CiviContribute', 'edit contributions'],
+      'allocateOverpayment' => ['access CiviContribute', 'edit contributions'],
       'computeTotal' => ['access CiviCRM', 'access CiviContribute'],
       'default' => ['access CiviCRM', 'access CiviContribute', 'edit contributions'],
       'delete' => ['access CiviCRM', 'access CiviContribute', 'delete in CiviContribute'],

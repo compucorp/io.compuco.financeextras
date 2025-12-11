@@ -4,6 +4,7 @@ namespace Civi\Financeextras\Hook\Links;
 
 use Civi\Financeextras\Hook\Links\Contribution\Refund;
 use Civi\Financeextras\Hook\Links\Contribution\CreditNote;
+use Civi\Financeextras\Hook\Links\Contribution\Overpayment;
 
 /**
  * Contribution
@@ -54,6 +55,7 @@ class Contribution {
     $links = [
       new Refund((int) $this->objectId, $this->links),
       new CreditNote((int) $this->objectId, $this->links),
+      new Overpayment((int) $this->objectId, $this->links),
     ];
     foreach ($links as $link) {
       $link->add();

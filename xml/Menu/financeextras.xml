@@ -99,4 +99,10 @@
     <title>Void Contribution</title>
     <access_arguments>administer CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/contribution/overpayment/allocate</path>
+    <page_callback>CRM_Financeextras_Form_Contribute_OverpaymentAllocate</page_callback>
+    <title>Allocate Overpayment to Credit Note</title>
+    <access_arguments>edit contributions</access_arguments>
+  </item>
 </menu>

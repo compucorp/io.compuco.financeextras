@@ -233,4 +233,17 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
     }
   }
 
+  /**
+   * Add overpayment_financial_type_id to Company table.
+   */
+  public function upgrade_1006(): bool {
+    $this->ctx->log->info('Applying update 1006 - Adding overpayment_financial_type_id to Company');
+
+    if (!\CRM_Core_BAO_SchemaHandler::checkIfFieldExists('financeextras_company', 'overpayment_financial_type_id', FALSE)) {
+      $this->executeSqlFile('sql/upgrade_1006.sql');
+    }
+
+    return TRUE;
+  }
+
 }

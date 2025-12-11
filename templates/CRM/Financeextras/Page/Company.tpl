@@ -16,6 +16,7 @@
             <th>{ts}Credit Note Prefix{/ts}</th>
             <th>{ts}Next Credit Note Number{/ts}</th>
             <th>{ts}Accounts Receivable{/ts}</th>
+            <th>{ts}Overpayment Financial Type{/ts}</th>
             <th></th>
           </tr>
           </thead>
@@ -29,6 +30,7 @@
                 <td>{$row.creditnote_prefix}</td>
                 <td>{$row.next_creditnote_number}</td>
                 <td>{$row.receivable_payment_method}</td>
+                <td>{$row.overpayment_financial_type_name}</td>
                 <td>{$row.action|replace:'xx':$row.id}</td>
               </tr>
             {/foreach}

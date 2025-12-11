@@ -123,4 +123,25 @@
       <label>Accounts Receivable Payment Method</label>
     </html>
   </field>
+
+  <field>
+    <name>overpayment_financial_type_id</name>
+    <title>Financial Type for Overpayments</title>
+    <type>int unsigned</type>
+    <comment>Financial type to use for overpayment credit notes</comment>
+    <pseudoconstant>
+      <table>civicrm_financial_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <html>
+      <label>Financial Type for Overpayments</label>
+    </html>
+  </field>
+  <foreignKey>
+    <name>overpayment_financial_type_id</name>
+    <table>civicrm_financial_type</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
 </table>
