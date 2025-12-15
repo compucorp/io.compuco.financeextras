@@ -9,7 +9,7 @@
     <email>hello@compuco.io</email>
   </maintainer>
   <releaseDate>2025-12-11</releaseDate>
-  <version>2.7.0</version>
+  <version>8.22.0</version>
   <develStage>stable</develStage>
   <compatibility>
     <ver>5.51</ver>
