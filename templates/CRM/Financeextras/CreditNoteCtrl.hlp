@@ -4,7 +4,7 @@
 </p>
 {/htxt}
 
-{htxt id="creditnotes_description}
+{htxt id="creditnotes_description"}
 <p>
   {ts}An optional public description that will be shown on the printed credit note.{/ts}
 </p>
