@@ -54,18 +54,18 @@ class UpdateQuery {
       LEFT JOIN civicrm_financial_account fa_from ON fa_from.id = ft.from_financial_account_id
       LEFT JOIN civicrm_option_group cog ON cog.name = 'payment_instrument'
       LEFT JOIN civicrm_option_value cov ON (cov.value = ft.payment_instrument_id AND cov.option_group_id = cog.id)
-      -- @custom-code start: updated to include creditnote 
+      -- @custom-code start: updated to include creditnote
       LEFT JOIN civicrm_entity_financial_trxn eftc ON (eftc.financial_trxn_id  = ft.id AND eftc.entity_table IN ('civicrm_contribution', 'financeextras_credit_note'))
       LEFT JOIN civicrm_contribution c ON (c.id = eftc.entity_id AND eftc.entity_table='civicrm_contribution')
       LEFT JOIN financeextras_credit_note fcn ON (fcn.id = eftc.entity_id AND eftc.entity_table='financeextras_credit_note')
-      -- @custom-code end 
+      -- @custom-code end
       LEFT JOIN civicrm_option_group cog_status ON cog_status.name = 'contribution_status'
       LEFT JOIN civicrm_option_value cov_status ON (cov_status.value = ft.status_id AND cov_status.option_group_id = cog_status.id)
       LEFT JOIN civicrm_entity_financial_trxn efti ON (efti.financial_trxn_id  = ft.id AND efti.entity_table = 'civicrm_financial_item')
       LEFT JOIN civicrm_financial_item fi ON fi.id = efti.entity_id
       LEFT JOIN civicrm_financial_account fac ON fac.id = fi.financial_account_id
       LEFT JOIN civicrm_financial_account fa ON fa.id = fi.financial_account_id
-      WHERE eb.batch_id = ( %1 )";
+      WHERE eftc.id IS NOT NULL AND eb.batch_id = ( %1 )";
   }
 
 }
