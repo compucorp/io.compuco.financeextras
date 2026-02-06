@@ -22,7 +22,7 @@
       <td>{{item.quantity}}</td>
       <td>{{ formatMoney(item['unit_price'], currency, true) }}</td>
       <td>{{item.tax_rate}}%</td>
-      <td>{{ formatMoney(item['line_total'], currency, true) }}</td>
+      <td>{{ item['line_total'] }}</td>
      </tr>
     </table>
   </div>

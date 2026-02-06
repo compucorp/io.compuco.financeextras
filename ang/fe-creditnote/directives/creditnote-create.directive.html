@@ -195,7 +195,7 @@
                   <input type="text" value="{{ creditnotes.items[$index].tax_rate > 0 ? roundTo(creditnotes.items[$index].tax_rate, 4)+'%' : '' }}" class="form-control" disabled>
                 </td>
                 <td style="width: 10em">
-                  <input type="text" value="{{ formatMoney(creditnotes.items[$index].line_total, creditnotes.currency) }}" class="form-control" disabled>
+                  <input type="text" value="{{ creditnotes.items[$index].line_total }}" class="form-control" disabled>
                 </td>
                 <td><a ng-if="creditnotes.items.length > 1" href ng-click="removeCreditnotesItem($index)" ><i class="fa fa-trash"></i></a></td>
               </tr>
