@@ -111,6 +111,29 @@ class CRM_Financeextras_Form_Company_AddTest extends BaseHeadlessTest {
     $this->assertEquals($params['next_invoice_number'], $records[0]['next_invoice_number']);
   }
 
+  public function testUpdatingCompanyRemovesOverpaymentFinancialTypeWhenCleared() {
+    $params = [
+      'contact_id' => 1,
+      'invoice_template_id' => 1,
+      'invoice_prefix' => 'INV_',
+      'next_invoice_number' => '000001',
+      'creditnote_template_id' => 1,
+      'creditnote_prefix' => 'CN_',
+      'next_creditnote_number' => '000002',
+      'receivable_payment_method' => 1,
+      'overpayment_financial_type_id' => 1,
+    ];
+    $company = CRM_Financeextras_BAO_Company::create($params);
+
+    $_REQUEST['id'] = $company->id;
+    $params['overpayment_financial_type_id'] = '';
+    $this->submitForm($params);
+    unset($_REQUEST['id']);
+
+    $updatedCompany = CRM_Financeextras_BAO_Company::getById($company->id);
+    $this->assertNull($updatedCompany->overpayment_financial_type_id);
+  }
+
   private function submitForm($formValues) {
     $form = new CRM_Financeextras_Form_Company_Add();
     $form->controller = new CRM_Core_Controller_Simple('CRM_Financeextras_Form_Company_Add', '');

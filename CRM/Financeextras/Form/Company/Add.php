@@ -173,7 +173,7 @@ class CRM_Financeextras_Form_Company_Add extends CRM_Core_Form {
     $params['creditnote_prefix'] = $submittedValues['creditnote_prefix'];
     $params['next_creditnote_number'] = $submittedValues['next_creditnote_number'];
     $params['receivable_payment_method'] = $submittedValues['receivable_payment_method'];
-    $params['overpayment_financial_type_id'] = !empty($submittedValues['overpayment_financial_type_id']) ? $submittedValues['overpayment_financial_type_id'] : NULL;
+    $params['overpayment_financial_type_id'] = !empty($submittedValues['overpayment_financial_type_id']) ? $submittedValues['overpayment_financial_type_id'] : 'NULL';
 
     CRM_Financeextras_BAO_Company::create($params);
 
