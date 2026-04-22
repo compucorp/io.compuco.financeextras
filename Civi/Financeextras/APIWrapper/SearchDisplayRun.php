@@ -139,6 +139,12 @@ class SearchDisplayRun {
    *    The API result object.
    */
   private static function alterFinanceReportDisplay(&$result) {
+    // Pairs are keyed by "entity_id:financial_trxn_id" so two display
+    // rows pointing at the same pair never add a duplicate OR-clause.
+    $pairs = [];
+
+    // First pass: reformat money columns and collect the (entity_id,
+    // financial_trxn_id) pairs we need to resolve.
     foreach ($result as &$display) {
       if (!is_array($display)) {
         continue;
@@ -150,19 +156,62 @@ class SearchDisplayRun {
           $column['val'] = \CRM_Utils_Money::format($val);
         }
       }
+      unset($column);
 
-      $entityFinancialTrxn = \Civi\Api4\EntityFinancialTrxn::get(FALSE)
-        ->addWhere('entity_table', '=', 'civicrm_financial_item')
-        ->addWhere('entity_id', '=', $display['key'])
-        ->addWhere('financial_trxn_id', '=', $display['data']['FinancialItem_EntityFinancialTrxn_FinancialTrxn_01.id'])
-        ->execute()
-        ->first();
-
-      $key = $entityFinancialTrxn['id'] ?? NULL;
-      if (!empty($key)) {
-        $display['key'] = $key;
+      $entityId = $display['key'] ?? NULL;
+      $financialTrxnId = $display['data']['FinancialItem_EntityFinancialTrxn_FinancialTrxn_01.id'] ?? NULL;
+      if (!empty($entityId) && !empty($financialTrxnId)) {
+        $pairs[$entityId . ':' . $financialTrxnId] = [$entityId, $financialTrxnId];
       }
     }
+    unset($display);
+
+    if (empty($pairs)) {
+      return;
+    }
+
+    // Single batch query that matches the exact (entity_id,
+    // financial_trxn_id) pairs the display asked for. A cross-product
+    // `entity_id IN (...) AND financial_trxn_id IN (...)` would match
+    // unrelated rows and force MySQL to evaluate many more rows than
+    // necessary.
+    $query = \Civi\Api4\EntityFinancialTrxn::get(FALSE)
+      ->addSelect('id', 'entity_id', 'financial_trxn_id')
+      ->addWhere('entity_table', '=', 'civicrm_financial_item');
+
+    $orConditions = [];
+    foreach ($pairs as [$entityId, $financialTrxnId]) {
+      $orConditions[] = [
+        'AND',
+        [
+          ['entity_id', '=', $entityId],
+          ['financial_trxn_id', '=', $financialTrxnId],
+        ],
+      ];
+    }
+    $query->addClause('OR', $orConditions);
+
+    $keyMap = [];
+    foreach ($query->execute() as $row) {
+      $keyMap[$row['entity_id'] . ':' . $row['financial_trxn_id']] = $row['id'];
+    }
+
+    // Second pass: swap in the EntityFinancialTrxn.id as the row key.
+    foreach ($result as &$display) {
+      if (!is_array($display)) {
+        continue;
+      }
+      $entityId = $display['key'] ?? NULL;
+      $financialTrxnId = $display['data']['FinancialItem_EntityFinancialTrxn_FinancialTrxn_01.id'] ?? NULL;
+      if (empty($entityId) || empty($financialTrxnId)) {
+        continue;
+      }
+      $mapKey = $entityId . ':' . $financialTrxnId;
+      if (!empty($keyMap[$mapKey])) {
+        $display['key'] = $keyMap[$mapKey];
+      }
+    }
+    unset($display);
   }
 
 }
