@@ -219,6 +219,21 @@ function financeextras_civicrm_buildForm($formName, &$form) {
 }
 
 /**
+ * Implements hook_civicrm_merge().
+ */
+function financeextras_civicrm_merge($type, &$data, $mainId = NULL, $otherId = NULL, $tables = NULL) {
+  $hooks = [
+    \Civi\Financeextras\Hook\Merge\ContactMerge::class,
+  ];
+
+  foreach ($hooks as $hook) {
+    if ($hook::shouldHandle($type, $mainId, $otherId)) {
+      (new $hook($type, $data, $mainId, $otherId))->handle();
+    }
+  }
+}
+
+/**
  * Implements hook_civicrm_alterMailParams().
  */
 function financeextras_civicrm_alterMailParams(&$params, $context) {
