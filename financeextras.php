@@ -18,6 +18,7 @@ use Civi\Financeextras\Hook\Post\UpdateLineItemPriceFieldValues;
 function financeextras_civicrm_config(&$config) {
   _financeextras_civix_civicrm_config($config);
   Civi::dispatcher()->addListener('civi.api.respond', ['Civi\Financeextras\APIWrapper\SearchDisplayRun', 'respond'], -100);
+  Civi::dispatcher()->addListener('civi.api.prepare', ['Civi\Financeextras\APIWrapper\SearchDisplayDownload', 'prepare'], 100);
   Civi::dispatcher()->addSubscriber(new Civi\Financeextras\Event\Subscriber\CreditNoteInvoiceSubscriber());
   Civi::dispatcher()->addListener('civi.api.respond', ['Civi\Financeextras\APIWrapper\Contribution', 'respond'], -101);
   Civi::dispatcher()->addListener('civi.api.prepare', ['Civi\Financeextras\APIWrapper\Payment', 'prepare'], -102);
