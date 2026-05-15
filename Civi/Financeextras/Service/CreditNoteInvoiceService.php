@@ -4,7 +4,6 @@ namespace Civi\Financeextras\Service;
 
 use CRM_Utils_Array;
 use CRM_Core_Config;
-use Civi\Api4\Setting;
 use Civi\Api4\Contact;
 use Civi\Api4\CreditNote;
 use Civi\Api4\Contribution;
@@ -184,12 +183,7 @@ class CreditNoteInvoiceService {
    * Returns the tax term.
    */
   private function getTaxTerm() {
-    $settings = Setting::get(FALSE)
-      ->addSelect('contribution_invoice_settings')
-      ->execute()
-      ->first()['value'];
-
-    return $settings['tax_term'] ?? 'Tax';
+    return \Civi::settings()->get('tax_term') ?? ts('Tax');
   }
 
 }

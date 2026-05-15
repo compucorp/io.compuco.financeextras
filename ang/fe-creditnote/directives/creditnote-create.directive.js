@@ -385,10 +385,10 @@
      */
     async function getTaxTerm() {
       const setting = await crmApi4('Setting', 'get', {
-        select: ["contribution_invoice_settings"]
+        select: ["tax_term"]
       });
 
-      return setting[0]['value']['tax_term'] ?? '';
+      return setting[0]?.value ?? CRM.ts('Tax');
     }
 
     /**
