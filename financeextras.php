@@ -210,6 +210,7 @@ function financeextras_civicrm_buildForm($formName, &$form) {
     \Civi\Financeextras\Hook\BuildForm\AdditionalPaymentButton::class,
     \Civi\Financeextras\Hook\BuildForm\PaymentCreate::class,
     \Civi\Financeextras\Hook\BuildForm\RefundCreditNotePaymentInformation::class,
+    \Civi\Financeextras\Hook\BuildForm\CreditNoteImporterPreImportCleanup::class,
   ];
 
   foreach ($hooks as $hook) {
