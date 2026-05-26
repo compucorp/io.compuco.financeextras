@@ -23,7 +23,7 @@ class ContributionTemplate {
     }
 
     $this->content = json_decode(base64_decode($templateContent), TRUE);
-    \Civi::cache('session')->clear('fe_org_message_template');
+    \Civi::cache('session')->delete('fe_org_message_template');
   }
 
   public static function shouldHandle($content) {
