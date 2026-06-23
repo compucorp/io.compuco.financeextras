@@ -7,6 +7,7 @@ use Civi\Financeextras\Setup\Manage\CreditNoteActivityTypeManager;
 use Civi\Financeextras\Setup\Manage\CreditNoteAllocationTypeManager;
 use Civi\Financeextras\Setup\Manage\CreditNoteInvoiceTemplateManager;
 use Civi\Financeextras\Setup\Manage\CreditNotePaymentInstrumentManager;
+use Civi\Financeextras\Setup\Manage\CreditNoteCustomGroupExtensionManager;
 use Civi\Financeextras\Setup\Manage\ContributionOwnerOrganizationManager;
 use Civi\Financeextras\Setup\Manage\AccountsReceivablePaymentMethod;
 
@@ -27,10 +28,14 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
       new ContributionOwnerOrganizationManager(),
       new CreditNotePaymentInstrumentManager(),
       new AccountsReceivablePaymentMethod(),
+      new CreditNoteCustomGroupExtensionManager(),
     ];
     foreach ($manageSteps as $manageStep) {
       $manageStep->create();
     }
+
+    $this->executeCustomDataFile('xml/credit_note_external_id_customGroup.xml');
+    $this->executeSqlFile('sql/upgrade_1007.sql');
 
     $configurationSteps = [
       new SetDefaultCompany(),
@@ -53,6 +58,7 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
       new ContributionOwnerOrganizationManager(),
       new CreditNotePaymentInstrumentManager(),
       new AccountsReceivablePaymentMethod(),
+      new CreditNoteCustomGroupExtensionManager(),
     ];
 
     foreach ($steps as $step) {
@@ -73,6 +79,7 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
       new ContributionOwnerOrganizationManager(),
       new CreditNotePaymentInstrumentManager(),
       new AccountsReceivablePaymentMethod(),
+      new CreditNoteCustomGroupExtensionManager(),
     ];
 
     foreach ($steps as $step) {
@@ -93,6 +100,7 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
       new ContributionOwnerOrganizationManager(),
       new CreditNotePaymentInstrumentManager(),
       new AccountsReceivablePaymentMethod(),
+      new CreditNoteCustomGroupExtensionManager(),
     ];
 
     foreach ($steps as $step) {
@@ -242,6 +250,19 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
     if (!\CRM_Core_BAO_SchemaHandler::checkIfFieldExists('financeextras_company', 'overpayment_financial_type_id', FALSE)) {
       $this->executeSqlFile('sql/upgrade_1006.sql');
     }
+
+    return TRUE;
+  }
+
+  /**
+   * Installs the CreditNoteImporter prerequisites.
+   */
+  public function upgrade_1007(): bool {
+    $this->ctx->log->info('Applying update 1007 - Installing CreditNoteImporter custom field');
+
+    (new CreditNoteCustomGroupExtensionManager())->create();
+    $this->executeCustomDataFile('xml/credit_note_external_id_customGroup.xml');
+    $this->executeSqlFile('sql/upgrade_1007.sql');
 
     return TRUE;
   }
