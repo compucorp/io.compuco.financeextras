@@ -122,14 +122,28 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
       new AccountsReceivablePaymentMethod(),
     ];
     foreach ($manageSteps as $manageStep) {
-      $manageStep->create();
+      // Guard each manager independently: these call APIv4/BAO and can throw if
+      // invoked before the entity registry is ready (e.g. a large multi-version
+      // upgrade). A single failing manager must not abort the whole upgrade queue,
+      // nor skip the remaining managers.
+      try {
+        $manageStep->create();
+      }
+      catch (\Throwable $e) {
+        $this->ctx->log->info($e->getMessage());
+      }
     }
 
     $configurationSteps = [
       new SetDefaultCompany(),
     ];
     foreach ($configurationSteps as $configurationStep) {
-      $configurationStep->apply();
+      try {
+        $configurationStep->apply();
+      }
+      catch (\Throwable $e) {
+        $this->ctx->log->info($e->getMessage());
+      }
     }
 
     return TRUE;
@@ -154,19 +168,28 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
       $this->executeSqlFile('sql/upgrade_1002.sql');
     }
 
-    $defaultAccountReceivableAccount = \Civi\Api4\OptionValue::get(FALSE)
-      ->setCheckPermissions(FALSE)
-      ->addSelect('value')
-      ->addWhere('option_group_id:name', '=', 'payment_instrument')
-      ->addWhere('name', '=', AccountsReceivablePaymentMethod::NAME)
-      ->execute()
-      ->first();
+    // Guard the APIv4 backfill: it can throw if invoked before the entity
+    // registry is ready during a large multi-version upgrade. The schema change
+    // above is what this step must guarantee; the default-value backfill is
+    // best-effort and must not abort the upgrade queue.
+    try {
+      $defaultAccountReceivableAccount = \Civi\Api4\OptionValue::get(FALSE)
+        ->setCheckPermissions(FALSE)
+        ->addSelect('value')
+        ->addWhere('option_group_id:name', '=', 'payment_instrument')
+        ->addWhere('name', '=', AccountsReceivablePaymentMethod::NAME)
+        ->execute()
+        ->first();
 
-    if (!empty($defaultAccountReceivableAccount['value'])) {
-      \Civi\Api4\Company::update(FALSE)
-        ->addValue('receivable_payment_method', $defaultAccountReceivableAccount['value'])
-        ->addWhere('id', '=', 1)
-        ->execute();
+      if (!empty($defaultAccountReceivableAccount['value'])) {
+        \Civi\Api4\Company::update(FALSE)
+          ->addValue('receivable_payment_method', $defaultAccountReceivableAccount['value'])
+          ->addWhere('id', '=', 1)
+          ->execute();
+      }
+    }
+    catch (\Throwable $e) {
+      $this->ctx->log->info($e->getMessage());
     }
 
     return TRUE;
@@ -209,7 +232,9 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
     catch (\Throwable $e) {
       $this->ctx->log->info($e->getMessage());
 
-      return FALSE;
+      // Return TRUE so a failure here logs but does not abort the upgrade queue
+      // (a FALSE return triggers ERROR_ABORT in CRM_Queue_Runner).
+      return TRUE;
     }
   }
 
@@ -237,7 +262,9 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
     catch (\Throwable $e) {
       $this->ctx->log->info($e->getMessage());
 
-      return FALSE;
+      // Return TRUE so a failure here logs but does not abort the upgrade queue
+      // (a FALSE return triggers ERROR_ABORT in CRM_Queue_Runner).
+      return TRUE;
     }
   }
 
