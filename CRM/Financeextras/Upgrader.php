@@ -130,7 +130,7 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
         $manageStep->create();
       }
       catch (\Throwable $e) {
-        $this->ctx->log->info($e->getMessage());
+        $this->ctx->log->error(sprintf('Upgrade 1000: manager step "%s" failed: %s', get_class($manageStep), $e->getMessage()));
       }
     }
 
@@ -142,7 +142,7 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
         $configurationStep->apply();
       }
       catch (\Throwable $e) {
-        $this->ctx->log->info($e->getMessage());
+        $this->ctx->log->error(sprintf('Upgrade 1000: configuration step "%s" failed: %s', get_class($configurationStep), $e->getMessage()));
       }
     }
 
@@ -189,7 +189,7 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
       }
     }
     catch (\Throwable $e) {
-      $this->ctx->log->info($e->getMessage());
+      $this->ctx->log->error('Upgrade 1002: failed to backfill the default receivable payment method: ' . $e->getMessage());
     }
 
     return TRUE;
@@ -230,7 +230,7 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
       return TRUE;
     }
     catch (\Throwable $e) {
-      $this->ctx->log->info($e->getMessage());
+      $this->ctx->log->error('Upgrade 1003: failed to backfill line items with empty price field values: ' . $e->getMessage());
 
       // Return TRUE so a failure here logs but does not abort the upgrade queue
       // (a FALSE return triggers ERROR_ABORT in CRM_Queue_Runner).
@@ -260,7 +260,7 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
       return TRUE;
     }
     catch (\Throwable $e) {
-      $this->ctx->log->info($e->getMessage());
+      $this->ctx->log->error('Upgrade 1005: failed to replace text in the CreditNoteInvoice template: ' . $e->getMessage());
 
       // Return TRUE so a failure here logs but does not abort the upgrade queue
       // (a FALSE return triggers ERROR_ABORT in CRM_Queue_Runner).
