@@ -181,7 +181,7 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
         ->execute()
         ->first();
 
-      if (!empty($defaultAccountReceivableAccount['value'])) {
+      if (is_array($defaultAccountReceivableAccount) && !empty($defaultAccountReceivableAccount['value'])) {
         \Civi\Api4\Company::update(FALSE)
           ->addValue('receivable_payment_method', $defaultAccountReceivableAccount['value'])
           ->addWhere('id', '=', 1)
