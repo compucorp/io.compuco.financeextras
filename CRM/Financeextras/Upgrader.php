@@ -287,9 +287,18 @@ class CRM_Financeextras_Upgrader extends CRM_Extension_Upgrader_Base {
   public function upgrade_1007(): bool {
     $this->ctx->log->info('Applying update 1007 - Installing CreditNoteImporter custom field');
 
-    (new CreditNoteCustomGroupExtensionManager())->create();
-    $this->executeCustomDataFile('xml/credit_note_external_id_customGroup.xml');
-    $this->executeSqlFile('sql/upgrade_1007.sql');
+    // Guard consistently with the other upgrade steps: these calls (an APIv3
+    // option-value lookup plus a custom-data XML import) can throw during a large
+    // multi-version upgrade before the schema/registry is fully ready. Log and
+    // continue rather than abort the whole upgrade queue.
+    try {
+      (new CreditNoteCustomGroupExtensionManager())->create();
+      $this->executeCustomDataFile('xml/credit_note_external_id_customGroup.xml');
+      $this->executeSqlFile('sql/upgrade_1007.sql');
+    }
+    catch (\Throwable $e) {
+      $this->ctx->log->error('Upgrade 1007: failed to install CreditNoteImporter prerequisites: ' . $e->getMessage());
+    }
 
     return TRUE;
   }
