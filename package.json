@@ -13,7 +13,12 @@
     "url": "https://github.com/compucorp/io.compuco.financeextras/issues"
   },
   "homepage": "https://github.com/compucorp/io.compuco.financeextras#readme",
+  "scripts": {
+    "test": "node --test tests/js/*.test.js"
+  },
   "devDependencies": {
-    "eslint": "^8.40.0"
+    "eslint": "^8.40.0",
+    "jquery": "^3.7.1",
+    "jsdom": "^24.1.0"
   }
 }
