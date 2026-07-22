@@ -65,8 +65,8 @@ class ContributionViewTest extends BaseHeadlessTest {
     (new ContributionView($this->makeContributionViewForm((int) $contribution['id'])))->handle();
 
     $html = $this->renderPageHeader();
-    $this->assertStringContainsString(self::CREDIT_NOTE_SCRIPT, $html);
-    $this->assertStringContainsString(self::VOID_SCRIPT, $html);
+    $this->assertContains(self::CREDIT_NOTE_SCRIPT, $html);
+    $this->assertContains(self::VOID_SCRIPT, $html);
   }
 
   public function testCreditNoteScriptNotEnqueuedForRefundedContribution(): void {
@@ -75,7 +75,7 @@ class ContributionViewTest extends BaseHeadlessTest {
     (new ContributionView($this->makeContributionViewForm((int) $contribution['id'])))->handle();
 
     $html = $this->renderPageHeader();
-    $this->assertStringNotContainsString(self::CREDIT_NOTE_SCRIPT, $html);
+    $this->assertNotContains(self::CREDIT_NOTE_SCRIPT, $html);
   }
 
 }
