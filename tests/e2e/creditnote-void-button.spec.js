@@ -35,8 +35,11 @@ test.describe('Contribution action buttons (Create New Credit Note / Void Contri
       window.CRM.$('<a class="crm-popup" href="' + url + '">View</a>').appendTo('body')[0].click();
     }, { id: CONTRIBUTION_ID, cid: CONTACT_ID });
 
-    // Allow the pop-up snippet + any injected page-header script to execute.
-    await page.waitForTimeout(4000);
+    // Wait for the View pop-up to load and its action button to be injected —
+    // this proves the button script has run, without a hardcoded delay.
+    const popupForm = page.locator('form.CRM_Contribute_Form_ContributionView');
+    await popupForm.waitFor({ state: 'visible' });
+    await popupForm.locator('a.btn-creditnote-create').first().waitFor({ state: 'visible' });
 
     await expect(
       page.locator('#Search a.btn-creditnote-create'),

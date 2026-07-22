@@ -20,7 +20,7 @@
           .addClass('button btn-creditnote-create btn btn-primary-outline small-popup')
           .css({ background: '#fff', border: '1px solid #2786c2', color: '#2786c2' })
           .attr('href', btnUrl)
-          .append($('<span>').text('Void Contribution'))
+          .append($('<span>').text(ts('Void Contribution')))
       );
 
     $('form.CRM_Contribute_Form_ContributionView, form.CRM_Contribute_Form_Contribution')
