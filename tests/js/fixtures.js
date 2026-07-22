@@ -2,6 +2,10 @@
 
 const { JSDOM } = require('jsdom');
 
+// Stub CiviCRM's global ts() (i18n) so the button scripts under test, which
+// wrap their labels in ts(), don't throw a ReferenceError under jsdom/node.
+global.ts = (str) => str;
+
 /**
  * Builds a DOM that contains BOTH:
  *   - a Find Contributions search form (#Search) whose row contains the text

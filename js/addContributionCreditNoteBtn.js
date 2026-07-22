@@ -18,7 +18,7 @@
       .css({ display: 'inline-flex', marginLeft: '10px' })
       .append(
         $('<a>').addClass('button no-popup btn-creditnote-create').attr('href', btnUrl)
-          .append($('<span>').text('Create New Credit Note'))
+          .append($('<span>').text(ts('Create New Credit Note')))
       );
 
     $('form.CRM_Contribute_Form_ContributionView, form.CRM_Contribute_Form_Contribution')
