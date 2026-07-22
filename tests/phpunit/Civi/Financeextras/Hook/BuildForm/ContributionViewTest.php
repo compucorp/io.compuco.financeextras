@@ -22,6 +22,17 @@ class ContributionViewTest extends BaseHeadlessTest {
   private const VOID_SCRIPT = 'addContributionVoidBtn.js';
 
   /**
+   * Reset the page-header region to a fresh instance before each test:
+   * CRM_Core_Region is a persistent singleton, so resources enqueued by one
+   * test would otherwise bleed into the next and break the "not enqueued"
+   * assertions. Unsetting the singleton (rather than clear()) keeps the
+   * built-in 'default' snippet that CRM_Core_Region::render() requires.
+   */
+  public function setUp(): void {
+    unset(\Civi::$statics['CRM_Core_Region']['page-header']);
+  }
+
+  /**
    * Builds a ContributionView form whose `id` resolves to the given
    * contribution (the hook reads `$form->get('id')` in its constructor).
    */
@@ -29,6 +40,9 @@ class ContributionViewTest extends BaseHeadlessTest {
     $form = new CRM_Contribute_Form_ContributionView();
     $form->controller = new CRM_Core_Controller();
     $form->set('id', $contributionId);
+    // The real ContributionView page assigns this; the hook's handleButtons()
+    // iterates it for Cancelled/Failed contributions, so provide it here.
+    $form->assign('linkButtons', []);
 
     return $form;
   }
@@ -69,8 +83,11 @@ class ContributionViewTest extends BaseHeadlessTest {
     $this->assertContains(self::VOID_SCRIPT, $html);
   }
 
-  public function testCreditNoteScriptNotEnqueuedForRefundedContribution(): void {
-    $contribution = $this->fabricateContribution('Refunded');
+  public function testCreditNoteScriptNotEnqueuedForCancelledContribution(): void {
+    // NB: a contribution cannot be created directly in "Refunded" status
+    // (CiviCRM coerces it to Completed); "Cancelled" is also in the hook's
+    // exclusion list and persists on create.
+    $contribution = $this->fabricateContribution('Cancelled');
 
     (new ContributionView($this->makeContributionViewForm((int) $contribution['id'])))->handle();
 
