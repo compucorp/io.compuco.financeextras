@@ -32,7 +32,6 @@ class ContributionView {
     ]);
 
     $url = \CRM_Utils_System::url('civicrm/contribution/creditnote', ['reset' => 1, 'action' => 'add', 'contribution_id' => $this->id]);
-    \Civi::resources()->addVars('financeextras', ['is_contribution_view' => TRUE]);
     \Civi::resources()->addVars('financeextras', ['creditnote_btn_url' => $url]);
   }
 
@@ -51,7 +50,6 @@ class ContributionView {
     ]);
 
     $url = \CRM_Utils_System::url('civicrm/financeextras/contribution/void', ['reset' => 1, 'action' => 'void', 'id' => $this->id]);
-    \Civi::resources()->addVars('financeextras', ['is_contribution_view' => TRUE]);
     \Civi::resources()->addVars('financeextras', ['contribution_void_btn_url' => $url]);
   }
 
