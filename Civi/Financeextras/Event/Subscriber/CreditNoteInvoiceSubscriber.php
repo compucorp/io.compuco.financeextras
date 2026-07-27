@@ -52,26 +52,33 @@ class CreditNoteInvoiceSubscriber implements EventSubscriberInterface {
    * @param array $targetContactIds
    * @param string $type
    * @param string $subject
-   * @param array $attachment
+   * @param string $attachment
    * @param string $details
    */
   private function createActivity($targetContactIds, $type, $subject, $attachment, $details) {
     $now = (new DateTime())->format('YmdHis');
     $currentUser = \CRM_Core_Session::singleton()->get('userID');
-    \Civi\Api4\Activity::create(FALSE)
+    $activity = \Civi\Api4\Activity::create(FALSE)
       ->addValue('subject', $subject)
       ->addValue('target_contact_id', $targetContactIds)
       ->addValue('source_contact_id', $currentUser)
       ->addValue('activity_type_id:name', $type)
       ->addValue('activity_date_time', $now)
       ->addValue('details', $details)
-      ->addValue('attachFile_1', [
-        'uri' => $attachment,
-        'type' => 'application/pdf',
-        'location' => $attachment,
-        'upload_date' => date('YmdHis'),
-      ])
-      ->execute();
+      ->execute()
+      ->first();
+
+    if (!empty($attachment)) {
+      $attachmentParams = [
+        'attachFile_1' => [
+          'uri' => $attachment,
+          'type' => 'application/pdf',
+          'location' => $attachment,
+          'upload_date' => date('YmdHis'),
+        ],
+      ];
+      \CRM_Core_BAO_File::processAttachment($attachmentParams, 'civicrm_activity', $activity['id']);
+    }
   }
 
   /**
