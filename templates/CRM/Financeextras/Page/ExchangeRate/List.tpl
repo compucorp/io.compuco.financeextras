@@ -9,9 +9,25 @@
 
   <div class="panel panel-default">
     <div class="panel-body">
-      <crm-angular-js modules="fe-exchange-rate">
+      <crm-angular-js modules="fe-exchange-rate" id="fe-exchange-rate-list">
         <afsearch-exchange-rate></afsearch-exchange-rate>
       </crm-angular-js>
     </div>
   </div>
 </div>
+
+<script type="text/javascript">
+  {literal}
+    CRM.$(function($) {
+      $('#fe-exchange-rate-list').on('crmPopupFormSuccess', function() {
+        $(this).find('crm-search-display-table').each(function() {
+          var ctrl = angular.element(this).controller('crmSearchDisplayTable');
+          if (ctrl && ctrl.getResultsPronto) {
+            ctrl.rowCount = null;
+            ctrl.getResultsPronto();
+          }
+        });
+      });
+    });
+  {/literal}
+</script>
