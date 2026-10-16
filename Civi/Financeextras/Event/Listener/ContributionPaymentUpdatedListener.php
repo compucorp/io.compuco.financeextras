@@ -28,8 +28,8 @@ class ContributionPaymentUpdatedListener {
     }
 
     $status = match (TRUE) {
-      empty($contribution['paid_amount']) => 'Pending',
       $contribution['total_amount'] == $contribution['paid_amount'] => 'Completed',
+      empty($contribution['paid_amount']) => 'Pending',
       $contribution['total_amount'] > $contribution['paid_amount'] => 'Partially paid',
       $contribution['total_amount'] < $contribution['paid_amount'] => 'Pending refund',
     };
