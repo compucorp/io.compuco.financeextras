@@ -16,6 +16,7 @@ class ContributionCreate {
 
   public function handle() {
     $this->addCustomLineItemTemplate();
+    $this->addLineItemChangeSync();
     $this->addCreditNoteCancelAction();
     $this->configureRecordPaymentField();
     $this->preventUserFromSettingContributionStatus();
@@ -40,8 +41,30 @@ class ContributionCreate {
         $statusElement->setValue(OptionValueUtils::getValueForOptionValue('contribution_status', 'Pending'));
       }
       $statusElement->freeze();
+
+      if ($this->isEdit()) {
+        $this->useCurrentStatusOnSubmit();
+      }
     }
     catch (\Throwable $th) {
+    }
+  }
+
+  /**
+   * Replaces the submitted status with the contribution's current status.
+   */
+  private function useCurrentStatusOnSubmit() {
+    if (!isset($this->form->_submitValues['contribution_status_id'])) {
+      return;
+    }
+
+    $currentStatusId = \CRM_Core_DAO::getFieldValue(
+      'CRM_Contribute_DAO_Contribution',
+      $this->form->_id,
+      'contribution_status_id'
+    );
+    if ($currentStatusId) {
+      $this->form->_submitValues['contribution_status_id'] = $currentStatusId;
     }
   }
 
@@ -99,10 +122,7 @@ class ContributionCreate {
    * Defaults to opening a contribution with the line item editor view.
    */
   private function addCustomLineItemTemplate() {
-    $lineItemEditorIsInstalled = 'installed' ===
-    \CRM_Extension_System::singleton()->getManager()->getStatus('biz.jmaconsulting.lineitemedit');
-
-    if (!$lineItemEditorIsInstalled) {
+    if (!$this->isLineItemEditorInstalled()) {
       return;
     }
 
@@ -126,6 +146,36 @@ class ContributionCreate {
       \Civi::resources()->addVars('financeextras', ['contrib_currency' => $contribution['currency']]);
       \Civi::resources()->addVars('financeextras', ['contrib_total' => $total]);
     }
+  }
+
+  /**
+   * Keeps the form in sync after line item edit and cancel popups.
+   */
+  private function addLineItemChangeSync() {
+    if (!$this->isEdit() || !($this->form->_action & CRM_Core_Action::UPDATE)) {
+      return;
+    }
+
+    if (!$this->isLineItemEditorInstalled()) {
+      return;
+    }
+
+    \Civi::resources()->add([
+      'scriptFile' => [E::LONG_NAME, 'js/syncContributionWithLineItems.js'],
+      'region' => 'page-header',
+    ]);
+    \Civi::resources()->addVars('financeextras', ['edit_contribution_id' => $this->form->_id]);
+  }
+
+  /**
+   * Checks if the line item editor extension is installed.
+   *
+   * @return bool
+   *   Whether biz.jmaconsulting.lineitemedit is installed.
+   */
+  protected function isLineItemEditorInstalled(): bool {
+    return \CRM_Extension_Manager::STATUS_INSTALLED ===
+      \CRM_Extension_System::singleton()->getManager()->getStatus('biz.jmaconsulting.lineitemedit');
   }
 
   /**
