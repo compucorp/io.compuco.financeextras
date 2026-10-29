@@ -1,0 +1,12 @@
+{
+  "name": "financeextras-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Playwright end-to-end tests for io.compuco.financeextras (contribution action buttons).",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.45.0"
+  }
+}
