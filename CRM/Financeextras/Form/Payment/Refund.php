@@ -124,6 +124,24 @@ class CRM_Financeextras_Form_Payment_Refund extends CRM_Core_Form {
   }
 
   /**
+   * Sets the form's default values.
+   *
+   * Defaults the "create credit note" checkbox to checked so that, by default,
+   * a refund also creates and applies a matching credit note. Without this the
+   * contribution is left with an amount owing after the refund and its status
+   * drops to "Pending (Incomplete Transaction)". The checked state must come
+   * from the form defaults - a raw `checked` HTML attribute on the element is
+   * not honoured by CiviCRM's QuickForm checkbox.
+   *
+   * @return array
+   */
+  public function setDefaultValues() {
+    return [
+      'create_credit_note' => 1,
+    ];
+  }
+
+  /**
    * Gets the payment processor name.
    */
   public function getPaymentProcessorNameById(int $Id) {
@@ -199,7 +217,6 @@ class CRM_Financeextras_Form_Payment_Refund extends CRM_Core_Form {
       'create_credit_note' => [
         'type' => 'checkbox',
         'label' => 'Also automatically create a credit note for this amount and apply to this invoice',
-        'extra' => ['checked' => TRUE],
         'required' => FALSE,
       ],
     ];
