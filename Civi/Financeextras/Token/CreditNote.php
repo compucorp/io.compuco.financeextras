@@ -25,7 +25,7 @@ class CreditNote extends AbstractTokenSubscriber {
     parent::__construct('creditNote', $this->geTokens());
   }
 
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.token.list' => 'registerTokens',
       'civi.token.eval' => 'evaluateTokens',
