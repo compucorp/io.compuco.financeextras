@@ -227,6 +227,9 @@ function financeextras_civicrm_buildForm($formName, &$form) {
 function financeextras_civicrm_alterMailParams(&$params, $context) {
   $hooks = [
     AlterContributionReceipt::class,
+    // Must run before InvoiceTemplate, which replaces the domain_* variables
+    // with the details of the organisation that owns the contribution.
+    \Civi\Financeextras\Hook\AlterMailParams\InvoiceLegacyVariables::class,
     \Civi\Financeextras\Hook\AlterMailParams\InvoiceTemplate::class,
   ];
 
