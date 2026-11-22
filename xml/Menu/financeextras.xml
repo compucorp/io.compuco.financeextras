@@ -105,4 +105,10 @@
     <title>Allocate Overpayment to Credit Note</title>
     <access_arguments>edit contributions</access_arguments>
   </item>
+  <item>
+    <path>civicrm/ajax/financeextras/batch/transactions</path>
+    <page_callback>CRM_Financeextras_Page_AJAX::getFinancialTransactionsList</page_callback>
+    <access_arguments>access CiviContribute</access_arguments>
+    <is_ajax>true</is_ajax>
+  </item>
 </menu>

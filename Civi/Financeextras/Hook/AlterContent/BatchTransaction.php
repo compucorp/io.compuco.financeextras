@@ -41,6 +41,10 @@ class BatchTransaction {
    */
   private function useCustomFinancialTransactionList() {
     $this->content = str_replace('CRM_Financial_Page_AJAX&fnName=getFinancialTransactionsList', 'CRM_Financeextras_Page_AJAX&fnName=getFinancialTransactionsList', $this->content);
+    // CiviCRM 6.20 lists the transactions through its own route (civicrm/ajax/batch/transactions)
+    // instead of civicrm/ajax/rest with a class and function name, so the replacement above no
+    // longer matches there and the page would fall back to core's contribution-only listing.
+    $this->content = str_replace('civicrm/ajax/batch/transactions', 'civicrm/ajax/financeextras/batch/transactions', $this->content);
     $this->content = str_replace("{sClass:'crm-type'}", "{sClass:'crm-type', 'bVisible': false}", $this->content);
   }
 

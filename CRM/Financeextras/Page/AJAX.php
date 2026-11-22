@@ -7,6 +7,18 @@ class CRM_Financeextras_Page_AJAX {
    * Returns list of transactions for accounting batch (Credit notes and contributions)
    */
   public static function getFinancialTransactionsList() {
+    // Same access rule as core's CRM_Financial_Page_AJAX::getFinancialTransactionsList() since 6.20:
+    // the batch must exist and the user must be allowed to view it.
+    $batchID = CRM_Utils_Request::retrieve('entityID', 'Positive', NULL, FALSE, NULL, 'REQUEST');
+    $batch = $batchID ? \Civi\Api4\Batch::get(FALSE)
+      ->addWhere('id', '=', $batchID)
+      ->addSelect('created_id')
+      ->execute()
+      ->first() : NULL;
+    if (!$batch || !CRM_Batch_BAO_Batch::checkBatchPermission('view', $batch['created_id'])) {
+      CRM_Utils_System::permissionDenied();
+    }
+
     $sortMapper = [
       0 => '',
       1 => '',
