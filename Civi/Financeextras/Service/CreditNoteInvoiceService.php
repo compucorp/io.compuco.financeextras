@@ -124,8 +124,7 @@ class CreditNoteInvoiceService {
    *   An array of address lines.
    */
   private function getContactLocation($contactId): array {
-    $locParams = ['contact_id' => $contactId];
-    $locationDefaults = \CRM_Core_BAO_Location::getValues($locParams);
+    $locationDefaults = \Civi\Financeextras\Utils\LocationUtils::getValues((int) $contactId);
 
     $stateProvinceId = $locationDefaults['address'][1]['state_province_id'] ?? NULL;
     $stateProvinceAbbreviationDomain = !empty($stateProvinceId) ? \CRM_Core_PseudoConstant::stateProvinceAbbreviation($stateProvinceId) : '';

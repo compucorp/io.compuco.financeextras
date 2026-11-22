@@ -197,7 +197,7 @@ class InvoiceLegacyVariables {
    */
   private function getDomainVariables() {
     $domain = \CRM_Core_BAO_Domain::getDomain();
-    $location = \CRM_Core_BAO_Location::getValues(['contact_id' => $domain->contact_id]);
+    $location = \Civi\Financeextras\Utils\LocationUtils::getValues((int) $domain->contact_id);
     $address = $location['address'][1] ?? [];
 
     return [

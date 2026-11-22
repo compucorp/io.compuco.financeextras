@@ -137,7 +137,7 @@ class InvoiceTemplate {
    */
   private function getOwnerOrganisationLocation() {
     $ownerOrganisationId = $this->contributionOwnerCompany['contact_id'];
-    $locationDefaults = \CRM_Core_BAO_Location::getValues(['contact_id' => $ownerOrganisationId]);
+    $locationDefaults = \Civi\Financeextras\Utils\LocationUtils::getValues((int) $ownerOrganisationId);
 
     if (!empty($locationDefaults['address'][1]['state_province_id'])) {
       $locationDefaults['address'][1]['state_province_abbreviation'] = \CRM_Core_PseudoConstant::stateProvinceAbbreviation($locationDefaults['address'][1]['state_province_id']);
