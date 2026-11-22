@@ -1,17 +1,14 @@
 <?php
 
-namespace Civi\Api4\Action\Currency;
+namespace Civi\Api4\Action\FinanceExtrasCurrency;
 
 use Civi\Api4\Generic\Result;
 use Civi\Api4\Generic\AbstractAction;
-use Civi\Api4\Generic\Traits\DAOActionTrait;
 
 /**
  * Format a monetary string..
  */
 class FormatAction extends AbstractAction {
-  use DAOActionTrait;
-
   /**
    * Currency to format to.
    *

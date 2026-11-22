@@ -128,7 +128,7 @@
       function setCustomTotalAmount(amount) {
         const currencySelect = $('#currency').val() ?? CRM.vars.financeextras.contrib_currency ?? '';
         
-        CRM.api4('Currency', 'format', {
+        CRM.api4('FinanceExtrasCurrency', 'format', {
           currency: currencySelect,
           value: amount
         }).then(function(results) {
